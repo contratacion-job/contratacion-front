@@ -1,0 +1,29 @@
+<div class="p-6 space-y-6">
+  <h1 class="text-3xl font-bold mb-6">Dashboard Mock</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="bg-white rounded-lg shadow p-4">
+      <h2 class="text-xl font-semibold mb-2">Dashboard Contrato</h2>
+      <p>Resumen y métricas de contratos.</p>
+      <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"></apx-chart>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-4">
+      <h2 class="text-xl font-semibold mb-2">Dashboard Proveedor</h2>
+      <p>Resumen y métricas de proveedores.</p>
+      <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"></apx-chart>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-4">
+      <h2 class="text-xl font-semibold mb-2">Dashboard Suplimento</h2>
+      <p>Resumen y métricas de suplementos.</p>
+      <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"></apx-chart>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-4">
+      <h2 class="text-xl font-semibold mb-2">Dashboard Ejecución</h2>
+      <p>Resumen y métricas de ejecución de contratos.</p>
+      <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"></apx-chart>
+    </div>
+  </div>
+</div>

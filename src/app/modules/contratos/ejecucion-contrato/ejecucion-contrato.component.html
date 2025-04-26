@@ -1,0 +1,270 @@
+<div class="flex flex-col min-h-screen p-6 w-full">
+  <!-- Card -->
+  <div class="relative flex flex-col flex-auto p-6 pr-3 pb-3 bg-card rounded-2xl shadow overflow-hidden mb-6 w-full">
+    <div class="absolute bottom-0 right-0 w-24 h-24 -m-6">
+      <mat-icon
+        class="icon-size-24 opacity-25 text-green-500 dark:text-green-400"
+        [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
+    </div>
+    <div class="flex items-center">
+      <div class="flex flex-col">
+        <div class="text-lg font-medium tracking-tight leading-6 truncate">Estado Anterior</div>
+        <div class="text-green-600 font-medium text-sm">
+          Datos recientes de ejecución de contratos
+        </div>
+      </div>
+      <div class="ml-auto -mt-2">
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="previousStatementMenu">
+          <mat-icon
+            class="icon-size-5"
+            [svgIcon]="'heroicons_mini:ellipsis-vertical'"></mat-icon>
+        </button>
+        <mat-menu #previousStatementMenu="matMenu">
+          <button mat-menu-item>
+            <span class="flex items-center">
+              <mat-icon
+                class="icon-size-5 mr-3"
+                [svgIcon]="'heroicons_solid:credit-card'"></mat-icon>
+              <span>Ver detalles</span>
+            </span>
+          </button>
+          <button mat-menu-item>
+            <span class="flex items-center">
+              <mat-icon
+                class="icon-size-5 mr-3"
+                [svgIcon]="'heroicons_solid:banknotes'"></mat-icon>
+              <span>Reportes</span>
+            </span>
+          </button>
+          <mat-divider class="my-2"></mat-divider>
+          <button mat-menu-item>
+            <span class="flex items-center">
+              <mat-icon
+                class="icon-size-5 mr-3"
+                [svgIcon]="'heroicons_solid:printer'"></mat-icon>
+              <span>Imprimir</span>
+            </span>
+          </button>
+          <button mat-menu-item>
+            <span class="flex items-center">
+              <mat-icon
+                class="icon-size-5 mr-3"
+                [svgIcon]="'heroicons_solid:envelope'"></mat-icon>
+              <span>Enviar por correo</span>
+            </span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+    <div class="flex flex-row flex-wrap mt-4 -mx-6">
+      <div class="flex flex-col mx-6 my-3">
+        <div class="text-sm font-medium leading-none text-secondary">Total Ejecuciones</div>
+        <div class="mt-2 font-medium text-3xl leading-none">{{data.length}}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ejecucion Contratos Table -->
+  <div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
+    <!-- Header -->
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+      <!-- Loader -->
+      <div
+        class="absolute inset-x-0 bottom-0"
+        *ngIf="isLoading">
+        <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
+      </div>
+      <!-- Title -->
+      <div class="text-4xl font-extrabold tracking-tight">Ejecución de Contratos</div>
+      <!-- Actions -->
+      <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+        <!-- Search -->
+        <mat-form-field
+          class="fuse-mat-dense fuse-mat-rounded min-w-64"
+          [subscriptSizing]="'dynamic'">
+          <mat-icon
+            class="icon-size-5"
+            matPrefix
+            [svgIcon]="'heroicons_solid:magnifying-glass'"></mat-icon>
+          <input
+            matInput
+            [formControl]="searchInputControl"
+            [autocomplete]="'off'"
+            [placeholder]="'Buscar ejecuciones'">
+        </mat-form-field>
+        <!-- Add ejecucion button -->
+        <button
+          class="ml-4"
+          mat-flat-button
+          [color]="'primary'"
+          (click)="createRecord()">
+          <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+          <span class="ml-2 mr-1">Agregar</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-auto overflow-hidden">
+      <!-- Ejecuciones list -->
+      <div class="flex flex-col flex-auto sm:mb-18 overflow-x-auto">
+        <ng-container *ngIf="dataSource.data.length > 0; else noEjecucionesTemplate">
+          <div class="grid">
+            <!-- Header -->
+            <div
+              class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+              matSort
+              matSortDisableClear
+              style="grid-template-columns: repeat(7, minmax(0, 1fr));">
+              <div [mat-sort-header]="'proveedor'">Proveedor</div>
+              <div [mat-sort-header]="'contrato'">Contrato</div>
+              <div [mat-sort-header]="'costo_cup'">Costo (CUP)</div>
+              <div [mat-sort-header]="'costo_cl'">Costo (CL)</div>
+              <div [mat-sort-header]="'trabajo_ejecutado'">Trabajo Ejecutado</div>
+              <div [mat-sort-header]="'fecha_ejecucion'">Fecha Ejecución</div>
+              <div>Detalles</div>
+            </div>
+            <!-- Rows -->
+            <ng-container *ngFor="let ejecucion of dataSource.data; trackBy: trackByFn">
+              <div
+                class="inventory-grid grid items-center gap-4 py-3 px-6 md:px-8 border-b"
+                style="grid-template-columns: repeat(7, minmax(0, 1fr));">
+                <div class="truncate">
+                  {{ejecucion.proveedor.nombre}}
+                </div>
+                <div class="truncate">
+                  {{ejecucion.contrato.no_contrato}}
+                </div>
+                <div>
+                  {{ejecucion.costo_cup | currency:'CUP':'symbol':'1.2-2'}}
+                </div>
+                <div>
+                  {{ejecucion.costo_cl | currency:'CLP':'symbol':'1.2-2'}}
+                </div>
+                <div class="truncate">
+                  {{ejecucion.trabajo_ejecutado}}
+                </div>
+                <div>
+                  {{ejecucion.fecha_ejecucion | date:'shortDate'}}
+                </div>
+                <div>
+                  <button
+                    class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                    mat-stroked-button
+                    (click)="toggleDetails(ejecucion.id)">
+                    <mat-icon
+                      class="icon-size-5"
+                      [svgIcon]="selectedRow?.id === ejecucion.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div class="grid">
+                <ng-container *ngIf="selectedRow?.id === ejecucion.id">
+                  <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: ejecucion}"></ng-container>
+                </ng-container>
+              </div>
+            </ng-container>
+          </div>
+
+          <mat-paginator
+            class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+            [ngClass]="{'pointer-events-none': isLoading}"
+            [length]="pagination.length"
+            [pageIndex]="pagination.page"
+            [pageSize]="pagination.size"
+            [pageSizeOptions]="[5, 10, 25, 100]"
+            [showFirstLastButtons]="true"></mat-paginator>
+        </ng-container>
+
+        <ng-template #rowDetailsTemplate let-ejecucion>
+          <div class="shadow-lg overflow-hidden">
+            <div class="flex border-b">
+              <!-- Selected ejecucion form -->
+              <form
+                class="flex flex-col w-full"
+                [formGroup]="selectedRowForm">
+                <div class="flex flex-col sm:flex-row p-8">
+                  <!-- Ejecucion details -->
+                  <div class="flex flex-auto flex-wrap">
+                    <div class="flex flex-col w-full lg:w-2/4 sm:pl-8">
+                      <mat-form-field class="w-full">
+                        <mat-label>Proveedor</mat-label>
+                        <mat-select formControlName="proveedor">
+                          <mat-option *ngFor="let proveedor of mockProveedor" [value]="proveedor">
+                            {{proveedor.nombre}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      <mat-form-field class="w-full">
+                        <mat-label>Contrato</mat-label>
+                        <mat-select formControlName="contrato">
+                          <mat-option *ngFor="let contrato of mockContrato" [value]="contrato">
+                            {{contrato.no_contrato}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      <mat-form-field class="w-full">
+                        <mat-label>Costo (CUP)</mat-label>
+                        <span matPrefix>CUP</span>
+                        <input
+                          matInput
+                          type="number"
+                          formControlName="costo_cup">
+                      </mat-form-field>
+                    </div>
+                    <div class="flex flex-col w-full lg:w-1/4 sm:pl-8">
+                      <mat-form-field class="w-full">
+                        <mat-label>Costo (CL)</mat-label>
+                        <span matPrefix>CLP</span>
+                        <input
+                          matInput
+                          type="number"
+                          formControlName="costo_cl">
+                      </mat-form-field>
+                      <mat-form-field class="w-full">
+                        <mat-label>Trabajo Ejecutado</mat-label>
+                        <input
+                          matInput
+                          formControlName="trabajo_ejecutado">
+                      </mat-form-field>
+                      <mat-form-field class="w-full">
+                        <mat-label>Fecha Ejecución</mat-label>
+                        <input
+                          matInput
+                          type="date"
+                          formControlName="fecha_ejecucion">
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between w-full border-t px-8 py-4">
+                  <button
+                    class="-ml-4"
+                    mat-button
+                    color="warn"
+                    (click)="deleteSelectedRecord()">
+                    Eliminar
+                  </button>
+                  <div class="flex items-center">
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      (click)="updateSelectedRecord()">
+                      Actualizar
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template #noEjecucionesTemplate>
+          <div class="p-8 sm:p-16 border-b text-4xl font-semibold tracking-tight text-center">¡No hay ejecuciones!</div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
