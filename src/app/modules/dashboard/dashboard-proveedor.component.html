@@ -1,3 +1,32 @@
-<h1>Dashboard Proveedor</h1>
-<p>Contenido del dashboard de proveedores.</p>
+<div class="p-6 space-y-6">
+  <h1 class="text-3xl font-bold mb-6">Dashboard Proveedor</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Total Proveedores</h2>
+      <p>Resumen del total de proveedores activos.</p>
+      <apx-chart [series]="totalProveedoresChartOptions.series" [chart]="totalProveedoresChartOptions.chart" [labels]="totalProveedoresChartOptions.labels" [plotOptions]="totalProveedoresChartOptions.plotOptions"></apx-chart>
+    </mat-card>
+
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Proveedores por Tipo</h2>
+      <p>Distribución de proveedores por tipo.</p>
+      <apx-chart [series]="proveedoresByTypeChartOptions.series" [chart]="proveedoresByTypeChartOptions.chart" [xaxis]="proveedoresByTypeChartOptions.xaxis"></apx-chart>
+    </mat-card>
+
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Proveedores por Estado</h2>
+      <p>Estado actual de los proveedores.</p>
+      <apx-chart [series]="proveedoresByStatusChartOptions.series" [chart]="proveedoresByStatusChartOptions.chart" [labels]="proveedoresByStatusChartOptions.labels"></apx-chart>
+    </mat-card>
+
+</div>
+    <div class="mt-6">
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Proveedores por Mes</h2>
+      <p>Proveedores registrados por mes.</p>
+      <apx-chart [series]="proveedoresByMonthChartOptions.series" [chart]="proveedoresByMonthChartOptions.chart" [xaxis]="proveedoresByMonthChartOptions.xaxis"></apx-chart>
+    </mat-card>
+</div>
+</div>
 

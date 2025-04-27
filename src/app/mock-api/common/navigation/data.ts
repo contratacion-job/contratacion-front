@@ -24,7 +24,6 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 icon: 'heroicons_outline:document-check',
                 link: '/contratos/tipos',
             },
-
             {
                 id: 'monto-vencimiento',
                 title: 'Vencidos',

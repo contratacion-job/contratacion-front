@@ -1,3 +1,30 @@
-<<h1>Dashboard Contrato</h1>
-<p>Contenido del dashboard de contratos.</p>
-<app-dashboard-mock></app-dashboard-mock>
+<div class="p-6 space-y-6">
+  <h1 class="text-3xl font-bold mb-6">Dashboard Contrato</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Total Contratos</h2>
+      <p>Resumen del total de contratos activos.</p>
+      <apx-chart [series]="totalContractsChartOptions.series" [chart]="totalContractsChartOptions.chart" [labels]="totalContractsChartOptions.labels" [plotOptions]="totalContractsChartOptions.plotOptions"></apx-chart>
+    </mat-card>
+    <div class="mt-8">
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Contratos por Tipo</h2>
+      <p>Distribución de contratos por tipo.</p>
+      <apx-chart [series]="contractsByTypeChartOptions.series" [chart]="contractsByTypeChartOptions.chart" [xaxis]="contractsByTypeChartOptions.xaxis"></apx-chart>
+    </mat-card>
+  </div>
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Contratos por Estado</h2>
+      <p>Estado actual de los contratos.</p>
+      <apx-chart [series]="contractsByStatusChartOptions.series" [chart]="contractsByStatusChartOptions.chart" [labels]="contractsByStatusChartOptions.labels"></apx-chart>
+    </mat-card>
+  </div>
+    <div class="mt-6">
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Contratos por Mes</h2>
+      <p>Contratos registrados por mes.</p>
+      <apx-chart [series]="contractsByMonthChartOptions.series" [chart]="contractsByMonthChartOptions.chart" [xaxis]="contractsByMonthChartOptions.xaxis"></apx-chart>
+    </mat-card>
+  </div>
+</div>

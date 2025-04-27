@@ -1,2 +1,29 @@
-<h1>Dashboard Suplimento</h1>
-<p>Contenido del dashboard de suplimentos.</p>
+<div class="p-6 space-y-6">
+  <h1 class="text-3xl font-bold mb-6">Dashboard Suplimento</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Total Suplimentos</h2>
+      <p>Resumen del total de suplimentos activos.</p>
+      <apx-chart [series]="totalSuplimentosChartOptions.series" [chart]="totalSuplimentosChartOptions.chart" [labels]="totalSuplimentosChartOptions.labels" [plotOptions]="totalSuplimentosChartOptions.plotOptions"></apx-chart>
+    </mat-card>
+
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Suplimentos por Tipo</h2>
+      <p>Distribución de suplimentos por tipo.</p>
+      <apx-chart [series]="suplimentosByTypeChartOptions.series" [chart]="suplimentosByTypeChartOptions.chart" [xaxis]="suplimentosByTypeChartOptions.xaxis"></apx-chart>
+    </mat-card>
+
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Suplimentos por Estado</h2>
+      <p>Estado actual de los suplimentos.</p>
+      <apx-chart [series]="suplimentosByStatusChartOptions.series" [chart]="suplimentosByStatusChartOptions.chart" [labels]="suplimentosByStatusChartOptions.labels"></apx-chart>
+    </mat-card>
+
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Suplimentos por Mes</h2>
+      <p>Suplimentos registrados por mes.</p>
+      <apx-chart [series]="suplimentosByMonthChartOptions.series" [chart]="suplimentosByMonthChartOptions.chart" [xaxis]="suplimentosByMonthChartOptions.xaxis"></apx-chart>
+    </mat-card>
+  </div>
+</div>

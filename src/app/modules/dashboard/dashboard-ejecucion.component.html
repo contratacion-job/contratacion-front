@@ -1,2 +1,30 @@
-<h1>Dashboard Ejecución</h1>
-<p>Contenido del dashboard de ejecución de contratos.</p>
+<div class="p-6 space-y-6">
+  <h1 class="text-3xl font-bold mb-6">Dashboard Ejecución</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Total Ejecución</h2>
+      <p>Resumen del total de ejecución de contratos.</p>
+      <apx-chart [series]="totalEjecucionChartOptions.series" [chart]="totalEjecucionChartOptions.chart" [labels]="totalEjecucionChartOptions.labels" [plotOptions]="totalEjecucionChartOptions.plotOptions"></apx-chart>
+    </mat-card>
+
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Ejecución por Tipo</h2>
+      <p>Distribución de ejecución por tipo.</p>
+      <apx-chart [series]="ejecucionByTypeChartOptions.series" [chart]="ejecucionByTypeChartOptions.chart" [xaxis]="ejecucionByTypeChartOptions.xaxis"></apx-chart>
+    </mat-card>
+
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Ejecución por Estado</h2>
+      <p>Estado actual de la ejecución.</p>
+      <apx-chart [series]="ejecucionByStatusChartOptions.series" [chart]="ejecucionByStatusChartOptions.chart" [labels]="ejecucionByStatusChartOptions.labels"></apx-chart>
+    </mat-card>
+</div>
+    <div class="mt-8">
+    <mat-card class="p-4">
+      <h2 class="text-xl font-semibold mb-2">Ejecución por Mes</h2>
+      <p>Ejecución registrada por mes.</p>
+      <apx-chart [series]="ejecucionByMonthChartOptions.series" [chart]="ejecucionByMonthChartOptions.chart" [xaxis]="ejecucionByMonthChartOptions.xaxis"></apx-chart>
+    </mat-card>
+  </div>
+</div>
