@@ -211,8 +211,9 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
 
   openNewContratoDialog(): void {
     const dialogRef = this.dialog.open(ContratoFormComponent, {
-      width: '800px',
-      disableClose: true
+      width: '40%',
+      height: '90%',
+      disableClose: false
     });
 
     dialogRef.afterClosed().subscribe(result => {

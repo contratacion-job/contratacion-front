@@ -17,6 +17,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatDividerModule} from '@angular/material/divider';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ProveedorFormComponent } from '../proveedor-form/proveedor-form.component';
 import { 
   mockContrato, 
   mockMinisterio, 
@@ -43,7 +45,8 @@ import {
     MatInputModule,
     MatSelectModule,
     MatMenuModule,
-    MatDividerModule
+    MatDividerModule,
+    MatDialogModule
   ],
   templateUrl: './proveedor-list.component.html',
   styleUrls: ['./proveedor-list.component.scss']
@@ -75,7 +78,9 @@ export class ProveedorListComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor() {
+  constructor(
+    private dialog: MatDialog
+  ) {
     this.dataSource = new MatTableDataSource([]);
     this.selectedRowForm = new FormGroup({});
   }
@@ -128,8 +133,23 @@ export class ProveedorListComponent implements OnInit {
   }
 
   createRecord(): void {
-    console.log('Crear nuevo proveedor');
-    // Implement logic to add a new proveedor
+    this.addNewProveedor();
+  }
+
+  addNewProveedor(): void {
+    const dialogRef = this.dialog.open(ProveedorFormComponent, {
+      width: '30%',
+      height: '60%',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Agregar el nuevo proveedor a la lista
+        this.data = [...this.data, result];
+        this.dataSource.data = this.data;
+      }
+    });
   }
 
   updateSelectedRecord(): void {
@@ -152,4 +172,3 @@ export class ProveedorListComponent implements OnInit {
     }
   }
 }
-

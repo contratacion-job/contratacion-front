@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,7 +12,9 @@ import { Router } from '@angular/router';
 import { ContratoService } from '../services/contrato.service';
 import { Contrato, TipoContrato, VigenciaContrato, Proveedor, Departamento } from 'app/models/Type';
 import { mockProveedor, mockTipoContrato, mockVigenciaContrato, mockDepartamento } from 'app/mock-api/contrato-fake/fake';
-
+import { MatIconModule } from '@angular/material/icon';
+import { ProveedorFormComponent } from 'app/modules/proveedores/proveedor-form/proveedor-form.component';
+import { DepartamentoFormComponent } from 'app/modules/organizacion/departamento-list/departamento-list.component';
 @Component({
   selector: 'app-contrato-form',
   standalone: true,
@@ -24,12 +26,15 @@ import { mockProveedor, mockTipoContrato, mockVigenciaContrato, mockDepartamento
     MatButtonModule,
     MatSelectModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatIconModule
   ],
   templateUrl: './contrato-form.component.html',
   styleUrl: './contrato-form.component.scss'
 })
 export class ContratoFormComponent implements OnInit {
+
+
   contratoForm: FormGroup;
   proveedores: Proveedor[] = mockProveedor;
   tiposContrato: TipoContrato[] = mockTipoContrato;
@@ -39,6 +44,7 @@ export class ContratoFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private contratoService: ContratoService,
+    private dialog: MatDialog,
     public dialogRef: MatDialogRef<ContratoFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
@@ -87,5 +93,36 @@ export class ContratoFormComponent implements OnInit {
         }
       });
     }
+  }
+  openNewProveedorDialog() {
+    const dialogRef = this.dialog.open(ProveedorFormComponent, {
+      width: '30%',
+      height: '60%',
+      disableClose: false
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+    
+      }
+    });
+  }
+  openNewDepartamentoDialog() {
+    const dialogRef = this.dialog.open(DepartamentoFormComponent, {
+      width: '30%',
+      height: '60%',
+      disableClose: false
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Agregar el nuevo departamento a la lista
+        this.departamentos = [...this.departamentos, result];
+        // Seleccionar el nuevo departamento
+        this.contratoForm.patchValue({
+          departamento: result
+        });
+      }
+    });
   }
 }

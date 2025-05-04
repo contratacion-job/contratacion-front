@@ -1,1 +1,72 @@
-<p>proveedor-form works!</p>
+<div class="flex flex-col p-6 md:p-8 gap-4">
+    <h2 class="text-3xl font-bold mb-4">Nuevo Proveedor</h2>
+
+    <form [formGroup]="proveedorForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <mat-form-field appearance="outline">
+                <mat-label>Nombre</mat-label>
+                <input matInput formControlName="nombre" required>
+                <mat-error *ngIf="proveedorForm.get('nombre')?.hasError('required')">
+                    El nombre es requerido
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Código</mat-label>
+                <input matInput formControlName="codigo" required>
+                <mat-error *ngIf="proveedorForm.get('codigo')?.hasError('required')">
+                    El código es requerido
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <mat-form-field appearance="outline">
+                <mat-label>Teléfonos</mat-label>
+                <input matInput formControlName="telefonos" required>
+                <mat-error *ngIf="proveedorForm.get('telefonos')?.hasError('required')">
+                    Los teléfonos son requeridos
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Domicilio</mat-label>
+                <input matInput formControlName="domicilio" required>
+                <mat-error *ngIf="proveedorForm.get('domicilio')?.hasError('required')">
+                    El domicilio es requerido
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <mat-form-field appearance="outline">
+                <mat-label>Municipio</mat-label>
+                <mat-select formControlName="municipio" required>
+                    <mat-option *ngFor="let mun of municipios" [value]="mun">
+                        {{mun.nombre_municipio}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="proveedorForm.get('municipio')?.hasError('required')">
+                    El municipio es requerido
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Ministerio</mat-label>
+                <mat-select formControlName="ministerio" required>
+                    <mat-option *ngFor="let min of ministerios" [value]="min">
+                        {{min.nombre_ministerio}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="proveedorForm.get('ministerio')?.hasError('required')">
+                    El ministerio es requerido
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-4">
+            <button type="button" mat-stroked-button (click)="onCancel()">Cancelar</button>
+            <button type="submit" mat-flat-button color="primary" [disabled]="!proveedorForm.valid">Guardar</button>
+        </div>
+    </form>
+</div>

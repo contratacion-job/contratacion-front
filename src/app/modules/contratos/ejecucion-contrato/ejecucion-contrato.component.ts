@@ -18,11 +18,14 @@ import { MatSelectModule } from '@angular/material/select';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatDialog } from '@angular/material/dialog';
 import { 
   mockProveedor, 
   mockContrato 
 } from 'app/mock-api/contrato-fake/fake';
 import { EjecucionService } from 'app/modules/dashboard/services/ejecucion.service';
+import { SuplementoFormComponent } from 'app/modules/suplementos/suplemento-form/suplemento-form.component';
+
 
 @Component({
   selector: 'app-ejecucion-contrato',
@@ -44,7 +47,8 @@ import { EjecucionService } from 'app/modules/dashboard/services/ejecucion.servi
     CurrencyPipe,
     DatePipe,
     MatMenuModule,
-    MatDividerModule
+    MatDividerModule,
+
   ],
   templateUrl: './ejecucion-contrato.component.html',
   styleUrls: ['./ejecucion-contrato.component.scss']
@@ -75,7 +79,7 @@ export class EjecucionContratoComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(private ejecucionService: EjecucionService) {
+  constructor(private ejecucionService: EjecucionService, public dialog: MatDialog) {
     this.dataSource = new MatTableDataSource([]);
     this.selectedRowForm = new FormGroup({});
   }
@@ -144,16 +148,17 @@ export class EjecucionContratoComponent implements OnInit {
   }
 
   createRecord(): void {
-    if (this.selectedRowForm.valid) {
-      const newEjecucion = { ...this.selectedRowForm.value, id: this.data.length + 1 };
-      this.ejecucionService.createEjecucion(newEjecucion).subscribe({
-        next: (ejecucion) => {
-          this.loadEjecuciones();
-          this.selectedRow = null;
-          this.selectedRowForm.reset();
-        }
-      });
-    }
+    const dialogRef = this.dialog.open(SuplementoFormComponent, {
+      width: '30%',
+      height: '90%',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadEjecuciones();
+      }
+    });
   }
 
   updateSelectedRecord(): void {

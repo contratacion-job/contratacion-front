@@ -26,17 +26,26 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <mat-form-field appearance="outline">
-                <mat-label>Proveedor</mat-label>
-                <mat-select formControlName="proveedor" required>
-                    <mat-option *ngFor="let prov of proveedores" [value]="prov">
-                        {{prov.nombre}}
-                    </mat-option>
-                </mat-select>
-                <mat-error *ngIf="contratoForm.get('proveedor')?.hasError('required')">
-                    El proveedor es requerido
-                </mat-error>
-            </mat-form-field>
+            <div class="flex items-center gap-2">
+                <mat-form-field appearance="outline" class="flex-grow">
+                    <mat-label>Proveedor</mat-label>
+                    <mat-select formControlName="proveedor" required>
+                        <mat-option *ngFor="let prov of proveedores" [value]="prov">
+                            {{prov.nombre}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="contratoForm.get('proveedor')?.hasError('required')">
+                        El proveedor es requerido
+                    </mat-error>
+                </mat-form-field>
+                <button type="button" 
+                        mat-icon-button 
+                        color="primary"
+                        class="!w-10 !h-10 !min-w-10 -mt-3"
+                        (click)="openNewProveedorDialog()">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:plus'"></mat-icon>
+                </button>
+            </div>
 
             <mat-form-field appearance="outline">
                 <mat-label>Tipo de Contrato</mat-label>
@@ -122,17 +131,26 @@
 
         <!-- Departamento y Observaciones -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <mat-form-field appearance="outline">
-                <mat-label>Departamento</mat-label>
-                <mat-select formControlName="departamento" required>
-                    <mat-option *ngFor="let depto of departamentos" [value]="depto">
-                        {{depto.nombre_dpto}}
-                    </mat-option>
-                </mat-select>
-                <mat-error *ngIf="contratoForm.get('departamento')?.hasError('required')">
-                    El departamento es requerido
-                </mat-error>
-            </mat-form-field>
+            <div class="flex items-center gap-2">
+                <mat-form-field appearance="outline" class="flex-grow">
+                    <mat-label>Departamento</mat-label>
+                    <mat-select formControlName="departamento" required>
+                        <mat-option *ngFor="let depto of departamentos" [value]="depto">
+                            {{depto.nombre_dpto}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="contratoForm.get('departamento')?.hasError('required')">
+                        El departamento es requerido
+                    </mat-error>
+                </mat-form-field>
+                <button type="button" 
+                        mat-icon-button 
+                        color="primary"
+                        class="!w-10 !h-10 !min-w-10 -mt-3"
+                        (click)="openNewDepartamentoDialog()">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:plus'"></mat-icon>
+                </button>
+            </div>
 
             <mat-form-field appearance="outline">
                 <mat-label>Observaciones</mat-label>

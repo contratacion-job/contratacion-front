@@ -1,1 +1,73 @@
-<p>suplemento-form works!</p>
+<div class="flex flex-col p-6 w-full">
+  <div class="text-2xl font-bold mb-6">Agregar Ejecución</div>
+
+  <form [formGroup]="form" class="flex flex-col gap-4">
+    <!-- Proveedor -->
+    <div class="flex items-center gap-2">
+      <mat-form-field class="flex-auto">
+        <mat-label>Proveedor</mat-label>
+        <mat-select formControlName="proveedor">
+          <mat-option *ngFor="let proveedor of proveedores" [value]="proveedor">
+            {{proveedor.nombre}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button
+        class="min-w-10 min-h-7 h-7 px-2 leading-6"
+        mat-stroked-button
+        (click)="openNewProveedorDialog()">
+        <mat-icon class="icon-size-5">add</mat-icon>
+      </button>
+    </div>
+
+    <!-- Contrato -->
+    <div class="flex items-center gap-2">
+      <mat-form-field class="flex-auto">
+        <mat-label>Contrato</mat-label>
+        <mat-select formControlName="contrato">
+          <mat-option *ngFor="let contrato of contratos" [value]="contrato">
+            {{contrato.no_contrato}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button
+        class="min-w-10 min-h-7 h-7 px-2 leading-6"
+        mat-stroked-button
+        (click)="openNewContratoDialog()">
+        <mat-icon class="icon-size-5">add</mat-icon>
+      </button>
+    </div>
+
+    <!-- Costo CUP -->
+    <mat-form-field>
+      <mat-label>Costo (CUP)</mat-label>
+      <input matInput type="number" formControlName="costo_cup">
+    </mat-form-field>
+
+    <!-- Costo CL -->
+    <mat-form-field>
+      <mat-label>Costo (CL)</mat-label>
+      <input matInput type="number" formControlName="costo_cl">
+    </mat-form-field>
+
+    <!-- Trabajo Ejecutado -->
+    <mat-form-field>
+      <mat-label>Trabajo Ejecutado</mat-label>
+      <textarea matInput formControlName="trabajo_ejecutado"></textarea>
+    </mat-form-field>
+
+    <!-- Fecha Ejecución -->
+    <mat-form-field>
+      <mat-label>Fecha Ejecución</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="fecha_ejecucion">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <!-- Botones -->
+    <div class="flex justify-end gap-2">
+      <button mat-button (click)="cancel()">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="save()">Guardar</button>
+    </div>
+  </form>
+</div>

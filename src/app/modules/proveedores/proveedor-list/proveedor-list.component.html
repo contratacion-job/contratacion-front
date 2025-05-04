@@ -69,7 +69,7 @@
   <!-- Proveedores Table -->
   <div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
     <!-- Header -->
-    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b">
       <!-- Loader -->
       <div
         class="absolute inset-x-0 bottom-0"
@@ -77,7 +77,16 @@
         <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
       </div>
       <!-- Title -->
-      <div class="text-4xl font-extrabold tracking-tight">Proveedores</div>
+      <div class="flex-1 min-w-0">
+        <div class="flex flex-wrap items-center font-medium">
+          <div>Proveedores</div>
+        </div>
+        <div class="mt-2">
+          <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+            Lista de Proveedores
+          </h2>
+        </div>
+      </div>
       <!-- Actions -->
       <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
         <!-- Search -->
@@ -99,9 +108,9 @@
           class="ml-4"
           mat-flat-button
           [color]="'primary'"
-          (click)="createRecord()">
+          (click)="addNewProveedor()">
           <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-          <span class="ml-2 mr-1">Agregar</span>
+          <span class="ml-2">Agregar Proveedor</span>
         </button>
       </div>
     </div>

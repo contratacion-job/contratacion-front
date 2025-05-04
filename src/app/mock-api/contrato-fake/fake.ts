@@ -418,15 +418,11 @@ export const mockProvincia = [
       estado: "Vencido"
     }
   ];
+  
   export const mockEjecucionContrato = [
     { id: 1, proveedor: mockProveedor[0], contrato: mockContrato[0], costo_cup: 5000, costo_cl: 4000, trabajo_ejecutado: "Entrega de suministros", fecha_ejecucion: "2023-03-01" },
     { id: 2, proveedor: mockProveedor[1], contrato: mockContrato[1], costo_cup: 6000, costo_cl: 4500, trabajo_ejecutado: "Servicios educativos", fecha_ejecucion: "2024-04-01" },
     { id: 3, proveedor: mockProveedor[2], contrato: mockContrato[2], costo_cup: 7000, costo_cl: 5000, trabajo_ejecutado: "Construcción carretera", fecha_ejecucion: "2025-05-01" },
-    { id: 4, proveedor: mockProveedor[3], contrato: mockContrato[3], costo_cup: 4000, costo_cl: 3000, trabajo_ejecutado: "Consultoría técnica", fecha_ejecucion: "2023-06-01" },
-    { id: 5, proveedor: mockProveedor[4], contrato: mockContrato[4], costo_cup: 4500, costo_cl: 3500, trabajo_ejecutado: "Arrendamiento equipos", fecha_ejecucion: "2024-07-01" },
-    { id: 6, proveedor: mockProveedor[5], contrato: mockContrato[5], costo_cup: 5500, costo_cl: 4200, trabajo_ejecutado: "Mantenimiento hotel", fecha_ejecucion: "2025-08-01" },
-    { id: 7, proveedor: mockProveedor[6], contrato: mockContrato[6], costo_cup: 6500, costo_cl: 4800, trabajo_ejecutado: "Instalación eléctrica", fecha_ejecucion: "2023-09-01" },
-    { id: 8, proveedor: mockProveedor[7], contrato: mockContrato[7], costo_cup: 7000, costo_cl: 5000, trabajo_ejecutado: "Capacitación personal", fecha_ejecucion: "2024-10-01" },
-    { id: 9, proveedor: mockProveedor[8], contrato: mockContrato[8], costo_cup: 8000, costo_cl: 6000, trabajo_ejecutado: "Organización evento", fecha_ejecucion: "2025-11-01" },
-    { id: 10, proveedor: mockProveedor[9], contrato: mockContrato[9], costo_cup: 8500, costo_cl: 6500, trabajo_ejecutado: "Transporte mercancías", fecha_ejecucion: "2023-12-01" }
-];
+    { id: 4, proveedor: mockProveedor[0], contrato: mockContrato[3], costo_cup: 4000, costo_cl: 3000, trabajo_ejecutado: "Consultoría técnica", fecha_ejecucion: "2023-06-01" },
+    { id: 5, proveedor: mockProveedor[1], contrato: mockContrato[4], costo_cup: 8000, costo_cl: 6000, trabajo_ejecutado: "Mantenimiento", fecha_ejecucion: "2024-07-01" }
+  ];
