@@ -271,6 +271,7 @@ const config = {
         }
     },
     corePlugins: {
+        preflight: false, 
         appearance        : false,
         container         : false,
         float             : false,

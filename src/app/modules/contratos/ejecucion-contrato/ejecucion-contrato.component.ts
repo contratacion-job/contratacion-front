@@ -19,10 +19,10 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { 
-  mockEjecucionContrato, 
   mockProveedor, 
   mockContrato 
 } from 'app/mock-api/contrato-fake/fake';
+import { EjecucionService } from 'app/modules/dashboard/services/ejecucion.service';
 
 @Component({
   selector: 'app-ejecucion-contrato',
@@ -50,7 +50,7 @@ import {
   styleUrls: ['./ejecucion-contrato.component.scss']
 })
 export class EjecucionContratoComponent implements OnInit {
-  data: any[] = mockEjecucionContrato;
+  data: any[] = [];
 
   columns = [
     { key: 'proveedor', label: 'Proveedor', nestedKey: 'nombre', editable: false, selectOptions: mockProveedor },
@@ -69,22 +69,20 @@ export class EjecucionContratoComponent implements OnInit {
   selectedRow: any = null;
   selectedRowForm: FormGroup;
   isLoading = false;
+  errorMessage = '';
   pagination = { length: 0, page: 0, size: 10 };
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor() {
+  constructor(private ejecucionService: EjecucionService) {
     this.dataSource = new MatTableDataSource([]);
     this.selectedRowForm = new FormGroup({});
   }
 
   ngOnInit(): void {
     this.displayedColumns = this.columns.map(col => col.key).concat('details');
-    this.dataSource.data = this.data;
-    this.pagination.length = this.data.length;
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    this.loadEjecuciones();
 
     this.searchInputControl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
@@ -101,6 +99,25 @@ export class EjecucionContratoComponent implements OnInit {
         .toLowerCase();
       return searchStr.includes(filter);
     };
+  }
+
+  loadEjecuciones(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.ejecucionService.getEjecuciones().subscribe({
+      next: (ejecuciones) => {
+        this.data = ejecuciones;
+        this.dataSource.data = this.data;
+        this.pagination.length = this.data.length;
+        this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.errorMessage = 'Error loading ejecuciones';
+        this.isLoading = false;
+      }
+    });
   }
 
   trackByFn(index: number, item: any): number {
@@ -127,27 +144,37 @@ export class EjecucionContratoComponent implements OnInit {
   }
 
   createRecord(): void {
-    console.log('Crear nueva ejecución');
-    // Implement logic to add a new ejecucion
+    if (this.selectedRowForm.valid) {
+      const newEjecucion = { ...this.selectedRowForm.value, id: this.data.length + 1 };
+      this.ejecucionService.createEjecucion(newEjecucion).subscribe({
+        next: (ejecucion) => {
+          this.loadEjecuciones();
+          this.selectedRow = null;
+          this.selectedRowForm.reset();
+        }
+      });
+    }
   }
 
   updateSelectedRecord(): void {
-    if (this.selectedRow) {
-      const updatedData = { ...this.selectedRow, ...this.selectedRowForm.value };
-      const index = this.data.findIndex(row => row.id === this.selectedRow.id);
-      this.data[index] = updatedData;
-      this.dataSource.data = [...this.data];
-      console.log('Ejecución actualizada:', updatedData);
+    if (this.selectedRow && this.selectedRowForm.valid) {
+      const updatedEjecucion = { ...this.selectedRow, ...this.selectedRowForm.value };
+      this.ejecucionService.updateEjecucion(this.selectedRow.id, updatedEjecucion).subscribe({
+        next: (ejecucion) => {
+          this.loadEjecuciones();
+        }
+      });
     }
   }
 
   deleteSelectedRecord(): void {
     if (this.selectedRow) {
-      this.data = this.data.filter(row => row.id !== this.selectedRow.id);
-      this.dataSource.data = this.data;
-      this.selectedRow = null;
-      this.pagination.length = this.data.length;
-      console.log('Ejecución eliminada');
+      this.ejecucionService.deleteEjecucion(this.selectedRow.id).subscribe({
+        next: () => {
+          this.loadEjecuciones();
+          this.selectedRow = null;
+        }
+      });
     }
   }
 }

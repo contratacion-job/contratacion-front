@@ -1,0 +1,29 @@
+/* Estilos básicos para el componente de contratos vencidos */
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.inventory-grid > div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bg-card {
+  background-color: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
+}
+
+.text-secondary {
+  color: #6b7280;
+}
+
+.shadow {
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+}
