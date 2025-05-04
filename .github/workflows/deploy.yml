@@ -27,26 +27,32 @@ jobs:
       - name: List dist directory (for debugging)
         run: ls -la dist/
         
-      - name: Create 404.html for Angular routing
+      - name: Prepare deployment files
         run: |
+          # Crear carpeta temporal para los archivos de despliegue
+          mkdir -p deploy-files
+          
+          # Copiar los archivos de la build a la carpeta de despliegue
           if [ -d "dist/fuse" ]; then
-            cp dist/fuse/index.html dist/fuse/404.html
+            cp -r dist/fuse/* deploy-files/
           elif [ -d "dist" ]; then
-            cp dist/index.html dist/404.html
+            cp -r dist/* deploy-files/
           fi
           
-      - name: Create .nojekyll file
-        run: |
-          if [ -d "dist" ]; then
-            touch dist.nojekyll
-          elif [ -d "dist" ]; then
-            touch dist/.nojekyll
-          fi
+          # Crear archivo .nojekyll
+          touch deploy-files/.nojekyll
+          
+          # Crear archivo 404.html para Angular routing
+          cp deploy-files/index.html deploy-files/404.html
+          
+          # Listar archivos para verificar
+          echo "Files ready for deployment:"
+          ls -la deploy-files/
         
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist # Asegúrate de que esta es la carpeta correcta
+          folder: deploy-files  # Usar la carpeta temporal que creamos
           branch: gh-pages
           token: ${{ secrets.GITHUB_TOKEN }}
           clean: true  # Elimina archivos que ya no existen en la carpeta de origen
