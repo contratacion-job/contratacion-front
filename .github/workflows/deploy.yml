@@ -2,11 +2,13 @@ name: Deploy Angular App to GitHub Pages
 
 on:
   push:
-    branches: [ develop ]  # Ajusta según la rama que quieras desplegar
+    branches: [ main, develop ]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -22,9 +24,29 @@ jobs:
       - name: Build
         run: npm run build -- --base-href=/contratacion-front/
         
+      - name: List dist directory (for debugging)
+        run: ls -la dist/
+        
+      - name: Create 404.html for Angular routing
+        run: |
+          if [ -d "dist/fuse" ]; then
+            cp dist/fuse/index.html dist/fuse/404.html
+          elif [ -d "dist" ]; then
+            cp dist/index.html dist/404.html
+          fi
+          
+      - name: Create .nojekyll file
+        run: |
+          if [ -d "dist" ]; then
+            touch dist.nojekyll
+          elif [ -d "dist" ]; then
+            touch dist/.nojekyll
+          fi
+        
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist  # Ajusta al nombre de tu carpeta de salida
-          branch: gh-pages  # La rama donde se publicará el código compilado
-          token: ${{ secrets.DEPLOY_TOKEN }}
+          folder: dist # Asegúrate de que esta es la carpeta correcta
+          branch: gh-pages
+          token: ${{ secrets.GITHUB_TOKEN }}
+          clean: true  # Elimina archivos que ya no existen en la carpeta de origen
