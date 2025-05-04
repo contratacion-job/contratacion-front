@@ -9,7 +9,6 @@
         "ng": "ng",
         "start": "ng serve",
         "build": "ng build",
-        "deploy:github": "ng build --base-href=/contratacion-front/ && cp dist/contratacion-front/index.html dist/contratacion-front/404.html"
         "watch": "ng build --watch --configuration development",
         "test": "ng test"
     },
