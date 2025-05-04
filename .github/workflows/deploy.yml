@@ -2,7 +2,7 @@ name: Deploy Angular App to GitHub Pages
 
 on:
   push:
-    branches: [ main, develop ]  # Ajusta según la rama que quieras desplegar
+    branches: [ develop ]  # Ajusta según la rama que quieras desplegar
 
 jobs:
   build-and-deploy:
@@ -14,7 +14,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '19'
+          node-version: '20'
           
       - name: Install dependencies
         run: npm ci
@@ -27,3 +27,4 @@ jobs:
         with:
           folder: dist  # Ajusta al nombre de tu carpeta de salida
           branch: gh-pages  # La rama donde se publicará el código compilado
+          token: ${{ secrets.DEPLOY_TOKEN }}
