@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfuse=self.webpackChunkfuse||[]).push([[333],{7333:(c,u,t)=>{t.r(u),t.d(u,{SuplementosRoutingModule:()=>l});var n=t(8109),o=t(9212);const e=[];let l=(()=>{class s{static#t=this.\u0275fac=function(a){return new(a||s)};static#s=this.\u0275mod=o.oAB({type:s});static#u=this.\u0275inj=o.cJS({imports:[n.Bz.forChild(e),n.Bz]})}return s})()}}]);
