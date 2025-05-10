@@ -1,32 +1,45 @@
-<div class="p-6 space-y-6">
-  <h1 class="text-3xl font-bold mb-6">Dashboard Proveedor</h1>
-
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Total Proveedores</h2>
-      <p>Resumen del total de proveedores activos.</p>
+<div class="dashboard-container" style="width: 100%;">
+  <!-- Primera fila: 3 gráficas a todo lo ancho -->
+  <div class="chart-grid" style="display: flex; gap: 20px; width: 100%;">
+    <div class="chart-container" style="flex: 1 1 33%;">
+      <h2>Total Proveedores</h2>
       <apx-chart [series]="totalProveedoresChartOptions.series" [chart]="totalProveedoresChartOptions.chart" [labels]="totalProveedoresChartOptions.labels" [plotOptions]="totalProveedoresChartOptions.plotOptions"></apx-chart>
-    </mat-card>
-
-    <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Proveedores por Tipo</h2>
-      <p>Distribución de proveedores por tipo.</p>
+    </div>
+    <div class="chart-container" style="flex: 1 1 33%;">
+      <h2>Proveedores por Tipo</h2>
       <apx-chart [series]="proveedoresByTypeChartOptions.series" [chart]="proveedoresByTypeChartOptions.chart" [xaxis]="proveedoresByTypeChartOptions.xaxis"></apx-chart>
-    </mat-card>
-
-    <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Proveedores por Estado</h2>
-      <p>Estado actual de los proveedores.</p>
+    </div>
+    <div class="chart-container" style="flex: 1 1 33%;">
+      <h2>Proveedores por Estado</h2>
       <apx-chart [series]="proveedoresByStatusChartOptions.series" [chart]="proveedoresByStatusChartOptions.chart" [labels]="proveedoresByStatusChartOptions.labels"></apx-chart>
-    </mat-card>
+    </div>
+  </div>
 
-</div>
-    <div class="mt-6">
-    <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Proveedores por Mes</h2>
-      <p>Proveedores registrados por mes.</p>
+  <!-- Segunda fila: 3 gráficas a todo lo ancho -->
+  <div class="chart-grid" style="display: flex; gap: 20px; width: 100%; margin-top: 20px;">
+    <div class="chart-container" style="flex: 1 1 33%;">
+      <h2>Proveedores por Tipo de Empresa</h2>
+      <apx-chart [series]="proveedoresByTipoEmpresaChartOptions.series" [chart]="proveedoresByTipoEmpresaChartOptions.chart" [xaxis]="proveedoresByTipoEmpresaChartOptions.xaxis"></apx-chart>
+    </div>
+    <div class="chart-container" style="flex: 1 1 33%;">
+      <h2>Proveedores por Ministerio</h2>
+      <apx-chart [series]="proveedoresByMinisterioChartOptions.series" [chart]="proveedoresByMinisterioChartOptions.chart" [xaxis]="proveedoresByMinisterioChartOptions.xaxis"></apx-chart>
+    </div>
+    <div class="chart-container" style="flex: 1 1 33%;">
+      <h2>Proveedores por Provincia</h2>
+      <apx-chart [series]="proveedoresByProvinciaChartOptions.series" [chart]="proveedoresByProvinciaChartOptions.chart" [xaxis]="proveedoresByProvinciaChartOptions.xaxis"></apx-chart>
+    </div>
+  </div>
+
+  <!-- Tercera fila: 2 gráficas a todo lo ancho -->
+  <div class="chart-grid" style="display: flex; gap: 20px; width: 100%; margin-top: 20px;">
+    <div class="chart-container" style="flex: 1 1 50%;">
+      <h2>Proveedores por Municipio</h2>
+      <apx-chart [series]="proveedoresByMunicipioChartOptions.series" [chart]="proveedoresByMunicipioChartOptions.chart" [xaxis]="proveedoresByMunicipioChartOptions.xaxis"></apx-chart>
+    </div>
+    <div class="chart-container" style="flex: 1 1 50%;">
+      <h2>Proveedores por Mes</h2>
       <apx-chart [series]="proveedoresByMonthChartOptions.series" [chart]="proveedoresByMonthChartOptions.chart" [xaxis]="proveedoresByMonthChartOptions.xaxis"></apx-chart>
-    </mat-card>
+    </div>
+  </div>
 </div>
-</div>
-

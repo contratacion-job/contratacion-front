@@ -8,10 +8,14 @@ import { mockContrato, expiredContracts,mockDepartamento } from 'app/mock-api/co
   providedIn: 'root'
 })
 export class ContratoService {
-  private contratos: Contrato[] = mockContrato;
-  private expired: Contrato[] = expiredContracts;
+  private contratos: Contrato[] = [];
+  private expired: Contrato[] = [];
 
-  constructor() {}
+  constructor() {
+    this.contratos = mockContrato || [];
+    this.expired = expiredContracts || [];
+    console.log('Contratos inicializados:', this.contratos);
+  }
 
   getContratos(): Observable<Contrato[]> {
     return of([...this.contratos]);

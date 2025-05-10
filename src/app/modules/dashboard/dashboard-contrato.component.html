@@ -1,30 +1,134 @@
-<div class="p-6 space-y-6">
-  <h1 class="text-3xl font-bold mb-6">Dashboard Contrato</h1>
+<div class="dashboard-container">
+  <div class="chart-grid">
+    <!-- Top 10 Montos -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3>Top 10 Contratos - Mayor Monto</h3>
+        <button (click)="downloadChart('topMontoMayor')">
+          <i class="pi pi-download"></i>
+        </button>
+      </div>
+      <apx-chart
+        #topMontoMayorChart
+        [series]="topMontoMayorChartOptions.series"
+        [chart]="topMontoMayorChartOptions.chart"
+        [xaxis]="topMontoMayorChartOptions.xaxis"
+        [dataLabels]="topMontoMayorChartOptions.dataLabels"
+        [plotOptions]="topMontoMayorChartOptions.plotOptions"
+        [title]="topMontoMayorChartOptions.title"
+      ></apx-chart>
+    </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Total Contratos</h2>
-      <p>Resumen del total de contratos activos.</p>
-      <apx-chart [series]="totalContractsChartOptions.series" [chart]="totalContractsChartOptions.chart" [labels]="totalContractsChartOptions.labels" [plotOptions]="totalContractsChartOptions.plotOptions"></apx-chart>
-    </mat-card>
-    <div class="mt-8">
-    <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Contratos por Tipo</h2>
-      <p>Distribución de contratos por tipo.</p>
-      <apx-chart [series]="contractsByTypeChartOptions.series" [chart]="contractsByTypeChartOptions.chart" [xaxis]="contractsByTypeChartOptions.xaxis"></apx-chart>
-    </mat-card>
-  </div>
-    <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Contratos por Estado</h2>
-      <p>Estado actual de los contratos.</p>
-      <apx-chart [series]="contractsByStatusChartOptions.series" [chart]="contractsByStatusChartOptions.chart" [labels]="contractsByStatusChartOptions.labels"></apx-chart>
-    </mat-card>
-  </div>
-    <div class="mt-6">
-    <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Contratos por Mes</h2>
-      <p>Contratos registrados por mes.</p>
-      <apx-chart [series]="contractsByMonthChartOptions.series" [chart]="contractsByMonthChartOptions.chart" [xaxis]="contractsByMonthChartOptions.xaxis"></apx-chart>
-    </mat-card>
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3>Top 10 Contratos - Menor Monto</h3>
+        <button (click)="downloadChart('topMontoMenor')">
+          <i class="pi pi-download"></i>
+        </button>
+      </div>
+      <apx-chart
+        #topMontoMenorChart
+        [series]="topMontoMenorChartOptions.series"
+        [chart]="topMontoMenorChartOptions.chart"
+        [xaxis]="topMontoMenorChartOptions.xaxis"
+        [dataLabels]="topMontoMenorChartOptions.dataLabels"
+        [plotOptions]="topMontoMenorChartOptions.plotOptions"
+        [title]="topMontoMenorChartOptions.title"
+      ></apx-chart>
+    </div>
+
+    <!-- Top 10 Vigencias -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3>Top 10 Contratos - Mayor Vigencia</h3>
+        <button (click)="downloadChart('topVigenciaMayor')">
+          <i class="pi pi-download"></i>
+        </button>
+      </div>
+      <apx-chart
+        #topVigenciaMayorChart
+        [series]="topVigenciaMayorChartOptions.series"
+        [chart]="topVigenciaMayorChartOptions.chart"
+        [xaxis]="topVigenciaMayorChartOptions.xaxis"
+        [dataLabels]="topVigenciaMayorChartOptions.dataLabels"
+        [plotOptions]="topVigenciaMayorChartOptions.plotOptions"
+        [title]="topVigenciaMayorChartOptions.title"
+      ></apx-chart>
+    </div>
+
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3>Top 10 Contratos - Menor Vigencia</h3>
+        <button (click)="downloadChart('topVigenciaMenor')">
+          <i class="pi pi-download"></i>
+        </button>
+      </div>
+      <apx-chart
+        #topVigenciaMenorChart
+        [series]="topVigenciaMenorChartOptions.series"
+        [chart]="topVigenciaMenorChartOptions.chart"
+        [xaxis]="topVigenciaMenorChartOptions.xaxis"
+        [dataLabels]="topVigenciaMenorChartOptions.dataLabels"
+        [plotOptions]="topVigenciaMenorChartOptions.plotOptions"
+        [title]="topVigenciaMenorChartOptions.title"
+      ></apx-chart>
+    </div>
+
+    <!-- Distribución por Duración -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3>Contratos por Duración</h3>
+        <button (click)="downloadChart('duracionBuckets')">
+          <i class="pi pi-download"></i>
+        </button>
+      </div>
+      <apx-chart
+        #duracionBucketsChart
+        [series]="duracionBucketsChartOptions.series"
+        [chart]="duracionBucketsChartOptions.chart"
+        [xaxis]="duracionBucketsChartOptions.xaxis"
+        [dataLabels]="duracionBucketsChartOptions.dataLabels"
+        [plotOptions]="duracionBucketsChartOptions.plotOptions"
+        [title]="duracionBucketsChartOptions.title"
+      ></apx-chart>
+    </div>
+
+    <!-- Tipos de Contratos -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3>Tipos de Contratos</h3>
+        <button (click)="downloadChart('tiposContratos')">
+          <i class="pi pi-download"></i>
+        </button>
+      </div>
+      <apx-chart
+        #tiposContratosChart
+        [series]="tiposContratosChartOptions.series"
+        [chart]="tiposContratosChartOptions.chart"
+        [xaxis]="tiposContratosChartOptions.xaxis"
+        [dataLabels]="tiposContratosChartOptions.dataLabels"
+        [plotOptions]="tiposContratosChartOptions.plotOptions"
+        [title]="tiposContratosChartOptions.title"
+      ></apx-chart>
+    </div>
+
+    <!-- Departamentos -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3>Contratos por Departamento</h3>
+        <button (click)="downloadChart('departamentos')">
+          <i class="pi pi-download"></i>
+        </button>
+      </div>
+      <apx-chart
+        #departamentosChart
+        [series]="departamentosChartOptions.series"
+        [chart]="departamentosChartOptions.chart"
+        [xaxis]="departamentosChartOptions.xaxis"
+        [dataLabels]="departamentosChartOptions.dataLabels"
+        [plotOptions]="departamentosChartOptions.plotOptions"
+        [title]="departamentosChartOptions.title"
+      ></apx-chart>
+    </div>
   </div>
 </div>

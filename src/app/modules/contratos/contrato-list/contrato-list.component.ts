@@ -61,37 +61,72 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
     { label: 'Vencido', color: 'red' }
   ];
 
+  // Example financial summary properties
+  montoInicialCup: number = 8000;
+  totalEjecutadoCup: number = 6000;
+  montoRestanteCup: number = 2000;
+
+  montoInicialUsd: string = '-';
+  totalEjecutadoUsd: string = '-';
+  montoRestanteUsd: string = '-';
+
+  tiempoRestante: string = '1 año y 362 días';
+
   columns = [
-    { key: 'no_contrato', label: 'No. Contrato', editable: true },
-    { key: 'proveedor', label: 'Proveedor', nestedKey: 'nombre', editable: true, selectOptions: this.proveedores },
-    { key: 'tipo_contrato', label: 'Tipo de Contrato', nestedKey: 'tipo_contrato', editable: true, selectOptions: this.tiposContrato },
-    { key: 'departamento', label: 'Departamento', nestedKey: 'nombre_dpto', editable: false },
-    { key: 'valor_cup', label: 'Valor (CUP)', type: 'currency', editable: true },
-    { key: 'fecha_firmado', label: 'Fecha Firmado', type: 'date', editable: true },
-    { key: 'estado', label: 'Estado' },
-    { key: 'fecha_vencido', label: 'Fecha Vencido', type: 'date', editable: true }
+    { key: 'no_contrato', label: 'No. Contrato', sortable: true },
+    { key: 'proveedor', label: 'Proveedor', sortable: true },
+    { key: 'tipo_contrato', label: 'Tipo de Contrato', sortable: true },
+    { key: 'departamento', label: 'Departamento', sortable: true },
+    { key: 'valor_cup', label: 'Valor (CUP)', sortable: true },
+    { key: 'valor_usd', label: 'Valor (USD)', sortable: true },
+    { key: 'fecha_entrada', label: 'Fecha Entrada', sortable: true },
+    { key: 'fecha_firmado', label: 'Fecha Firmado', sortable: true },
+    { key: 'vigencia', label: 'Vigencia', sortable: true }
   ];
+
+  // Method to get color class for tiempoRestante based on selectedRow's estado
+  getTiempoRestanteColor(): string {
+    if (!this.selectedRow) return '';
+    switch (this.selectedRow.estado) {
+      case 'Activo':
+        return 'text-green-600';
+      case 'Casi a vencer':
+        return 'text-orange-600';
+      case 'Vencido':
+        return 'text-red-600';
+      default:
+        return '';
+    }
+  }
+
+  // Add missing properties to fix template errors
+  isLoading: boolean = false;
+  searchInputControl = new FormControl('');
+  dataSource = new MatTableDataSource<Contrato>([]);
+  noContracts: any = null;
+
+  displayedColumns = ['estado', 'no_contrato', 'proveedor', 'tipo_contrato', 'departamento', 'valor_cup', 'valor_usd', 'fecha_entrada', 'fecha_firmado', 'vigencia', 'details'];
 
   title = 'Contratos';
   addButtonText = 'Agregar Contrato';
-  dataSource: MatTableDataSource<Contrato>;
-  displayedColumns: string[] = [];
-  searchInputControl = new FormControl('');
+
+
   selectedRow: Contrato | null = null;
   selectedRowForm: FormGroup;
-  isLoading = false;
+
   errorMessage = '';
   pagination = { length: 0, page: 0, size: 10 };
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
+
   constructor(
     private contratoService: ContratoService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {
-    this.dataSource = new MatTableDataSource([]);
+    this.dataSource = new MatTableDataSource<Contrato>([]);
     this.selectedRowForm = new FormGroup({
       no_contrato: new FormControl(''),
       proveedor: new FormControl(null),
@@ -110,30 +145,75 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
     this.tiposContrato = mockTipoContrato;
     this.vigencias = mockVigenciaContrato;
     this.loadContratos();
-    this.displayedColumns = this.columns.map(col => col.key).concat('details');
 
+    // Configurar el ordenamiento
+    this.dataSource.sortingDataAccessor = (item: Contrato, property: string) => {
+      switch(property) {
+        case 'proveedor': return item.proveedor?.nombre;
+        case 'tipo_contrato': return item.tipo_contrato?.tipo_contrato;
+        case 'departamento': return item.departamento?.nombre_dpto;
+        case 'vigencia': return item.vigencia?.vigencia;
+        case 'valor_cup': return item.valor_cup || 0;
+        case 'valor_usd': return item.valor_usd || 0;
+        case 'fecha_entrada': return item.fecha_entrada || '';
+        case 'fecha_firmado': return item.fecha_firmado || '';
+        default: return item[property];
+      }
+    };
+
+    // Configurar el filtro
+    this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
+      if (!filter) return true;
+
+      const searchTerms = filter.toLowerCase().split(' ').filter(term => term.length > 0);
+      const dataStr = [
+        data.no_contrato,
+        data.proveedor?.nombre,
+        data.tipo_contrato?.tipo_contrato,
+        data.departamento?.nombre_dpto,
+        data.estado,
+        data.valor_cup?.toString(),
+        data.valor_usd?.toString(),
+        data.fecha_entrada,
+        data.fecha_firmado,
+        data.vigencia?.vigencia?.toString()
+      ].join(' ').toLowerCase();
+
+      return searchTerms.every(term => dataStr.includes(term));
+    };
+
+    // Suscribirse a los cambios en el control de búsqueda
     this.searchInputControl.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged())
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged()
+      )
       .subscribe(value => {
-        this.dataSource.filter = value?.trim().toLowerCase() || '';
+        this.dataSource.filter = value?.trim() || '';
+        if (this.dataSource.paginator) {
+          this.dataSource.paginator.firstPage();
+        }
         this.cdr.markForCheck();
       });
-
-    this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
-      const searchStr = Object.keys(data)
-        .reduce((currentTerm: string, key: string) => {
-          const value = this.getNestedValue(data, key, this.columns.find(col => col.key === key)?.nestedKey);
-          return currentTerm + (value || '') + ' ';
-        }, '')
-        .toLowerCase();
-      return searchStr.includes(filter);
-    };
   }
 
   ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
+    // Configurar paginator
     this.dataSource.paginator = this.paginator;
-    this.cdr.markForCheck();
+    if (this.paginator) {
+      this.paginator.pageSize = 10;
+      this.paginator.pageSizeOptions = [5, 10, 25, 50];
+    }
+
+    // Configurar sort
+    this.dataSource.sort = this.sort;
+    if (this.sort) {
+      this.sort.active = 'no_contrato';
+      this.sort.direction = 'asc';
+    }
+
+    // Forzar detección de cambios
+    this.cdr.detectChanges();
   }
 
   loadContratos(): void {
@@ -141,43 +221,18 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
     this.errorMessage = '';
     this.contratoService.getContratos().subscribe({
       next: (contratos) => {
-        console.log('Contratos received:', contratos);
-        // Filter out invalid contracts
-        this.data = contratos.filter(contract => {
-          if (!contract.proveedor || !contract.proveedor.nombre) {
-            console.warn(`Invalid proveedor for contract ID ${contract.id}:`, contract);
-            return false;
-          }
-          return true;
-        });
-        this.dataSource.data = this.data;
-        console.log('DataSource data:', this.dataSource.data);
-        this.pagination.length = this.dataSource.data.length;
-        // Transfer expired contracts
-        this.contratoService.transferExpiredContratos().subscribe({
-          next: (transferred) => {
-            if (transferred.length > 0) {
-              console.log('Transferred expired contracts:', transferred);
-              // Reload contracts after transfer
-              this.contratoService.getContratos().subscribe({
-                next: (updatedContratos) => {
-                  this.data = updatedContratos.filter(c => c.proveedor && c.proveedor.nombre);
-                  this.dataSource.data = this.data;
-                  this.pagination.length = this.dataSource.data.length;
-                  this.cdr.markForCheck();
-                }
-              });
-            }
-          }
-        });
+        console.log('Contratos cargados:', contratos);
+        this.data = contratos;
+        this.dataSource.data = contratos;
+        this.pagination.length = contratos.length;
         this.isLoading = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
-      error: (error) => {
-        console.error('Error fetching contratos:', error);
-        this.errorMessage = 'Failed to load contracts. Please try again.';
+      error: (err) => {
+        console.error('Error al cargar los contratos:', err);
+        this.errorMessage = 'Error al cargar los contratos. Por favor, intente nuevamente.';
         this.isLoading = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       }
     });
   }

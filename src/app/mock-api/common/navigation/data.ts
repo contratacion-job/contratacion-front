@@ -31,33 +31,34 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 icon: 'heroicons_outline:currency-dollar',
                 link: '/contratos/vencidos',
             },
+            {
+                id: 'suplementos-group',
+                title: 'Suplementos',
+                subtitle: 'Gestión de suplementos',
+                type: 'collapsable',
+                icon: 'heroicons_outline:document-duplicate',
+                children: [
+                    {
+                        id: 'suplementos-tablero',
+                        title: 'Tablero',
+                        type: 'basic',
+                        icon: 'heroicons_outline:archive-box',
+                        link: '/dashboard/dashboard-suplimento',
+                    },
+                    {
+                        id: 'suplementos-vencidos',
+                        title: 'Vencidos',
+                        type: 'basic',
+                        icon: 'heroicons_outline:currency-dollar',
+                        link: '/suplementos/vencidos',
+                    },
+                ],
+            },
         ],
     },
 
     // Suplementos section
-    {
-        id: 'suplementos-group',
-        title: 'Suplementos',
-        subtitle: 'Gestión de suplementos',
-        type: 'collapsable',
-        icon: 'heroicons_outline:document-duplicate',
-        children: [
-            {
-                id: 'suplementos-tablero',
-                title: 'Tablero',
-                type: 'basic',
-                icon: 'heroicons_outline:archive-box',
-                link: '/dashboard/dashboard-suplimento',
-            },
-            {
-                id: 'suplementos-vencidos',
-                title: 'Vencidos',
-                type: 'basic',
-                icon: 'heroicons_outline:currency-dollar',
-                link: '/suplementos/vencidos',
-            },
-        ],
-    },
+  
 
     // Proveedores section
     {

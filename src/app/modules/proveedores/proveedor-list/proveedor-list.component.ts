@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -19,14 +19,12 @@ import {MatMenuModule} from '@angular/material/menu';
 import {MatDividerModule} from '@angular/material/divider';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ProveedorFormComponent } from '../proveedor-form/proveedor-form.component';
+import { ProveedorService } from '../services/proveedor.service';
 import { 
-  mockContrato, 
   mockMinisterio, 
-  mockMunicipio, 
-  mockProveedor, 
-  mockTipoContrato, 
-  mockVigenciaContrato 
+  mockMunicipio 
 } from 'app/mock-api/contrato-fake/fake'; 
+
 @Component({
   selector: 'app-proveedor-list',
   standalone: true,
@@ -51,10 +49,8 @@ import {
   templateUrl: './proveedor-list.component.html',
   styleUrls: ['./proveedor-list.component.scss']
 })
-
-
 export class ProveedorListComponent implements OnInit {
-  data: any[] = mockProveedor;
+  data: any[] = [];
 
   columns = [
     { key: 'nombre', label: 'Nombre', editable: true },
@@ -79,7 +75,9 @@ export class ProveedorListComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private proveedorService: ProveedorService,
+    private cdr: ChangeDetectorRef
   ) {
     this.dataSource = new MatTableDataSource([]);
     this.selectedRowForm = new FormGroup({});
@@ -87,10 +85,7 @@ export class ProveedorListComponent implements OnInit {
 
   ngOnInit(): void {
     this.displayedColumns = this.columns.map(col => col.key).concat('details');
-    this.dataSource.data = this.data;
-    this.pagination.length = this.data.length;
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    this.loadProveedores();
 
     this.searchInputControl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
@@ -107,6 +102,26 @@ export class ProveedorListComponent implements OnInit {
         .toLowerCase();
       return searchStr.includes(filter);
     };
+  }
+
+  loadProveedores(): void {
+    this.isLoading = true;
+    this.proveedorService.getProveedores().subscribe({
+      next: (proveedores) => {
+        this.data = proveedores;
+        this.dataSource.data = this.data;
+        this.pagination.length = this.data.length;
+        this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator;
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error loading proveedores:', error);
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   trackByFn(index: number, item: any): number {
@@ -130,6 +145,7 @@ export class ProveedorListComponent implements OnInit {
       municipio: new FormControl(this.selectedRow?.municipio),
       ministerio: new FormControl(this.selectedRow?.ministerio)
     });
+    this.cdr.markForCheck();
   }
 
   createRecord(): void {
@@ -145,9 +161,14 @@ export class ProveedorListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Agregar el nuevo proveedor a la lista
-        this.data = [...this.data, result];
-        this.dataSource.data = this.data;
+        this.proveedorService.createProveedor(result).subscribe({
+          next: (newProveedor) => {
+            this.loadProveedores();
+          },
+          error: (error) => {
+            console.error('Error creating proveedor:', error);
+          }
+        });
       }
     });
   }
@@ -155,20 +176,29 @@ export class ProveedorListComponent implements OnInit {
   updateSelectedRecord(): void {
     if (this.selectedRow) {
       const updatedData = { ...this.selectedRow, ...this.selectedRowForm.value };
-      const index = this.data.findIndex(row => row.id === this.selectedRow.id);
-      this.data[index] = updatedData;
-      this.dataSource.data = [...this.data];
-      console.log('Proveedor actualizado:', updatedData);
+      this.proveedorService.updateProveedor(this.selectedRow.id, updatedData).subscribe({
+        next: () => {
+          this.loadProveedores();
+          this.selectedRow = null;
+        },
+        error: (error) => {
+          console.error('Error updating proveedor:', error);
+        }
+      });
     }
   }
 
   deleteSelectedRecord(): void {
     if (this.selectedRow) {
-      this.data = this.data.filter(row => row.id !== this.selectedRow.id);
-      this.dataSource.data = this.data;
-      this.selectedRow = null;
-      this.pagination.length = this.data.length;
-      console.log('Proveedor eliminado');
+      this.proveedorService.deleteProveedor(this.selectedRow.id).subscribe({
+        next: () => {
+          this.loadProveedores();
+          this.selectedRow = null;
+        },
+        error: (error) => {
+          console.error('Error deleting proveedor:', error);
+        }
+      });
     }
   }
 }

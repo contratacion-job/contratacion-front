@@ -1,19 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { mockEjecucionContrato } from 'app/mock-api/contrato-fake/fake';
-
-import { Proveedor, Contrato } from 'app/models/Type';
-
-export interface Ejecucion {
-  id: number;
-  proveedor: Proveedor;
-  contrato: Contrato;
-  costo_cup: number;
-  costo_cl: number;
-  trabajo_ejecutado: string;
-  fecha_ejecucion: string;
-  [key: string]: any;
-}
+import { EjecucionContrato } from 'app/models/Type';
 
 @Injectable({
   providedIn: 'root'
@@ -21,22 +9,22 @@ export interface Ejecucion {
 export class EjecucionService {
   constructor() {}
 
-  getEjecuciones(): Observable<Ejecucion[]> {
+  getEjecuciones(): Observable<EjecucionContrato[]> {
     return of(mockEjecucionContrato);
   }
 
-  getEjecucion(id: number): Observable<Ejecucion | undefined> {
+  getEjecucion(id: number): Observable<EjecucionContrato | undefined> {
     const ejecucion = mockEjecucionContrato.find(e => e.id === id);
     return of(ejecucion);
   }
 
-  createEjecucion(ejecucion: Ejecucion): Observable<Ejecucion> {
+  createEjecucion(ejecucion: EjecucionContrato): Observable<EjecucionContrato> {
     // Mock create: add to array (not persistent)
     mockEjecucionContrato.push(ejecucion);
     return of(ejecucion);
   }
 
-  updateEjecucion(id: number, ejecucion: Ejecucion): Observable<Ejecucion | undefined> {
+  updateEjecucion(id: number, ejecucion: EjecucionContrato): Observable<EjecucionContrato | undefined> {
     const index = mockEjecucionContrato.findIndex(e => e.id === id);
     if (index !== -1) {
       mockEjecucionContrato[index] = ejecucion;

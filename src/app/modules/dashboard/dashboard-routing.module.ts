@@ -1,5 +1,5 @@
 import { RouterModule, Routes } from '@angular/router';
-import { DashboardContratoComponent } from './dashboard-contrato.component';
+import { ContratoDashboardComponent } from './dashboard-contrato.component';
 import { DashboardProveedorComponent } from './dashboard-proveedor.component';
 import { DashboardSuplimentoComponent } from './dashboard-suplimento.component';
 import { DashboardEjecucionComponent } from './dashboard-ejecucion.component';
@@ -8,7 +8,7 @@ import { NgModule } from '@angular/core';
 export const dashboardRoutes: Routes = [
   {
     path: 'dashboard-contrato',
-    component: DashboardContratoComponent,
+    component: ContratoDashboardComponent,
   },
   {
     path: 'dashboard-proveedor',

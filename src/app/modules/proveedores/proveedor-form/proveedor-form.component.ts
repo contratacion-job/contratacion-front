@@ -39,7 +39,9 @@ export class ProveedorFormComponent implements OnInit {
       telefonos: ['', [Validators.required]],
       domicilio: ['', [Validators.required]],
       municipio: [null, [Validators.required]],
-      ministerio: [null, [Validators.required]]
+      ministerio: [null, [Validators.required]],
+      tipo: ['', [Validators.required]],
+      categoria: ['']
     });
   }
 

@@ -126,7 +126,7 @@
               class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
               matSort
               matSortDisableClear
-              style="grid-template-columns: repeat(6, minmax(0, 1fr));">
+              style="grid-template-columns: repeat(7, minmax(0, 1fr));">
               <div [mat-sort-header]="'nombre'">Nombre</div>
               <div [mat-sort-header]="'codigo'">Código</div>
               <div [mat-sort-header]="'telefonos'">Teléfonos</div>
@@ -139,7 +139,7 @@
             <ng-container *ngFor="let proveedor of dataSource.data; trackBy: trackByFn">
               <div
                 class="inventory-grid grid items-center gap-4 py-3 px-6 md:px-8 border-b"
-                style="grid-template-columns: repeat(6, minmax(0, 1fr));">
+                style="grid-template-columns: repeat(7, minmax(0, 1fr));">
                 <div class="truncate">
                   {{proveedor.nombre}}
                 </div>
@@ -247,19 +247,26 @@
                 </div>
                 <div class="flex items-center justify-between w-full border-t px-8 py-4">
                   <button
+                  class="-ml-4"
+                  mat-button
+                  [color]="'warn'"
+                  (click)="deleteSelectedRecord()"
+              ></button>
+                  <div class="flex items-center">
+                    <button
+                    class="-ml-4"
+                    mat-button
+                      [color]="'primary'"
+                      (click)="updateSelectedRecord()">
+                      Actualizar
+                    </button>
+                    <button
                     class="-ml-4"
                     mat-button
                     [color]="'warn'"
                     (click)="deleteSelectedRecord()">
                     Eliminar
                   </button>
-                  <div class="flex items-center">
-                    <button
-                      mat-flat-button
-                      [color]="'primary'"
-                      (click)="updateSelectedRecord()">
-                      Actualizar
-                    </button>
                   </div>
                 </div>
               </form>

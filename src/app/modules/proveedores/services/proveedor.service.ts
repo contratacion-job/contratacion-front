@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { mockProveedor } from 'app/mock-api/contrato-fake/fake';
 
 export interface Proveedor {
   id: number;
@@ -18,26 +19,57 @@ export interface Proveedor {
 })
 export class ProveedorService {
   private apiUrl = '/api/proveedores';
+  private useMockData = true; // Cambiar a false cuando el backend esté listo
+  private proveedores: Proveedor[] = [...mockProveedor];
 
   constructor(private http: HttpClient) {}
 
   getProveedores(): Observable<Proveedor[]> {
+    if (this.useMockData) {
+      return of(this.proveedores);
+    }
     return this.http.get<Proveedor[]>(this.apiUrl);
   }
 
   getProveedor(id: number): Observable<Proveedor> {
+    if (this.useMockData) {
+      const proveedor = this.proveedores.find(p => p.id === id);
+      return of(proveedor);
+    }
     return this.http.get<Proveedor>(`${this.apiUrl}/${id}`);
   }
 
   createProveedor(proveedor: Proveedor): Observable<Proveedor> {
+    if (this.useMockData) {
+      const newProveedor = {
+        ...proveedor,
+        id: Math.max(...this.proveedores.map(p => p.id)) + 1
+      };
+      this.proveedores.push(newProveedor);
+      return of(newProveedor);
+    }
     return this.http.post<Proveedor>(this.apiUrl, proveedor);
   }
 
   updateProveedor(id: number, proveedor: Proveedor): Observable<Proveedor> {
+    if (this.useMockData) {
+      const index = this.proveedores.findIndex(p => p.id === id);
+      if (index !== -1) {
+        this.proveedores[index] = { ...proveedor, id };
+        return of(this.proveedores[index]);
+      }
+    }
     return this.http.put<Proveedor>(`${this.apiUrl}/${id}`, proveedor);
   }
 
   deleteProveedor(id: number): Observable<void> {
+    if (this.useMockData) {
+      const index = this.proveedores.findIndex(p => p.id === id);
+      if (index !== -1) {
+        this.proveedores.splice(index, 1);
+      }
+      return of(void 0);
+    }
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

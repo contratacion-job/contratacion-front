@@ -1,20 +1,4 @@
-<div class="flex flex-col min-h-screen p-6 w-full">
-    <!-- Header with Add Button -->
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Contratos</h1>
-       
-    </div>
- 
-    <!-- Previous Statement Card -->
-    <div
-        class="relative flex flex-col flex-auto p-6 pr-3 pb-3 bg-card rounded-2xl shadow overflow-hidden mb-6 w-full"
-    >
-        <div class="absolute bottom-0 right-0 w-24 h-24 -m-6">
-            <mat-icon
-                class="icon-size-24 opacity-25 text-green-500 dark:text-green-400"
-                [svgIcon]="'heroicons_outline:check-circle'"
-            ></mat-icon>
-        </div>
+<div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent">
         <div class="flex items-center">
             <div class="flex flex-col">
                 <div
@@ -89,61 +73,63 @@
         <div class="flex flex-row flex-wrap mt-4 -mx-6">
             <div class="flex flex-col mx-6 my-3">
                 <div class="text-sm font-medium leading-none text-secondary">
-                    Límite de Tarjeta
+                    Monto Inicial CUP
                 </div>
                 <div class="mt-2 font-medium text-3xl leading-none">
-                    {{ 656 | currency : "USD" }}
+                    {{ montoInicialCup | currency : "CUP" }}
                 </div>
             </div>
             <div class="flex flex-col mx-6 my-3">
                 <div class="text-sm font-medium leading-none text-secondary">
-                    Gastado
+                    Total Ejecutado CUP
                 </div>
                 <div class="mt-2 font-medium text-3xl leading-none">
-                    {{ 567 | currency : "USD" }}
+                    {{ totalEjecutadoCup | currency : "CUP" }}
                 </div>
             </div>
             <div class="flex flex-col mx-6 my-3">
                 <div class="text-sm font-medium leading-none text-secondary">
-                    Mínimo
+                    Monto Restante CUP
                 </div>
                 <div class="mt-2 font-medium text-3xl leading-none">
-                    {{ 454 | currency : "USD" }}
+                    {{ montoRestanteCup | currency : "CUP" }}
                 </div>
             </div>
             <div class="flex flex-col mx-6 my-3">
                 <div class="text-sm font-medium leading-none text-secondary">
-                    Mínimo
+                    Monto Inicial USD
                 </div>
                 <div class="mt-2 font-medium text-3xl leading-none">
-                    {{ 454 | currency : "USD" }}
+                    {{ montoInicialUsd }}
                 </div>
             </div>
             <div class="flex flex-col mx-6 my-3">
                 <div class="text-sm font-medium leading-none text-secondary">
-                    Mínimo
+                    Total Ejecutado USD
                 </div>
                 <div class="mt-2 font-medium text-3xl leading-none">
-                    {{ 454 | currency : "USD" }}
+                    {{ totalEjecutadoUsd }}
                 </div>
             </div>
             <div class="flex flex-col mx-6 my-3">
                 <div class="text-sm font-medium leading-none text-secondary">
-                    Mínimo
+                    Monto Restante USD
                 </div>
                 <div class="mt-2 font-medium text-3xl leading-none">
-                    {{ 454 | currency : "USD" }}
+                    {{ montoRestanteUsd }}
+                </div>
+            </div>
+            <div class="flex flex-col mx-6 my-3" [ngClass]="getTiempoRestanteColor()">
+                <div class="text-sm font-medium leading-none text-secondary">
+                    Tiempo Restante
+                </div>
+                <div class="mt-2 font-medium text-3xl leading-none">
+                    {{ tiempoRestante }}
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Contracts Table -->
-    <div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
-        <!-- Header -->
-        <div
-            class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b"
-        >
+    <!-- Header -->
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
             <!-- Loader -->
             <div class="absolute inset-x-0 bottom-0" *ngIf="isLoading">
                 <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
@@ -182,22 +168,16 @@
             </div>
         </div>
 
-        <!-- Main -->
-        <div class="flex flex-auto overflow-hidden">
-            <!-- Contracts list -->
-            <div class="flex flex-col flex-auto sm:mb-18 overflow-x-auto">
-                <ng-container
-                    *ngIf="dataSource.data.length > 0; else noContracts"
-                >
-                    <div class="grid">
-                        <!-- Header -->
-
-                        <!-- Header -->
-<div
-    class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
-    matSort
-    matSortDisableClear
->
+    <!-- Main -->
+    <div class="flex flex-auto overflow-hidden">
+        <!-- Contracts list -->
+        <div class="flex flex-col flex-auto overflow-visible sm:overflow-y-auto">
+                <ng-container *ngIf="dataSource.data.length > 0; else noContracts">
+                    <!-- Header -->
+                    <div class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+                        matSort
+                        matSortDisableClear
+                        style="grid-template-columns: 40px repeat(9, minmax(100px, 1fr)) 80px;">
                             <div></div>
                             <div [mat-sort-header]="'no_contrato'">
                                 No. Contrato
@@ -225,16 +205,10 @@
                             <div class="sticky-end">Detalles</div>
                         </div>
 
-                        <!-- Rows -->
-                        <ng-container
-                            *ngFor="
-                                let contract of dataSource.data;
-                                trackBy: trackByFn
-                            "
-                        >
-<div
-    class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b items-center text-m"
->
+                    <!-- Rows -->
+                    <ng-container *ngFor="let contract of dataSource.data; trackBy: trackByFn">
+                        <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b items-center text-m"
+                            style="grid-template-columns: 40px repeat(9, minmax(100px, 1fr)) 80px;">
                                 <!-- Estado with colored dot -->
                                 <div>
                                     <span
@@ -303,58 +277,41 @@
                                     {{ contract.vigencia.vigencia }}
                                 </div>
                                 <!-- Details button -->
-                                <div class="text-center">
+                                <div class="flex items-center justify-center sticky-end">
                                     <button
-                                
-                                        class="min-w-10 min-h-7 h-7 px-2 leading-6 "
+                                        class="min-w-10 min-h-7 h-7 px-2 leading-6 whitespace-nowrap"
                                         mat-stroked-button
-                                        (click)="toggleDetails(contract.id)"
-                                    >
+                                        (click)="toggleDetails(contract.id)">
                                         <mat-icon
                                             class="icon-size-5"
-                                            [svgIcon]="
-                                                selectedRow?.id === contract.id
-                                                    ? 'heroicons_solid:chevron-up'
-                                                    : 'heroicons_solid:chevron-down'
-                                            "
-                                        ></mat-icon>
+                                            [svgIcon]="selectedRow?.id === contract.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
                                     </button>
                                 </div>
                             </div>
-                            <div class="grid">
-                                <ng-container
-                                    *ngIf="selectedRow?.id === contract.id"
-                                >
-                                    <ng-container
-                                        *ngTemplateOutlet="
-                                            rowDetailsTemplate;
-                                            context: { $implicit: contract }
-                                        "
-                                    ></ng-container>
-                                </ng-container>
-                            </div>
-                        </ng-container>
-                    </div>
+                       
+                        <div class="grid" *ngIf="selectedRow?.id === contract.id">
+                            <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: { $implicit: contract }">
+                            </ng-container>
+                        </div>
+                
+            
 
                     <mat-paginator
                         class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
-                        [ngClass]="{ 'pointer-events-none': isLoading }"
+                        [ngClass]="{'pointer-events-none': isLoading}"
                         [length]="pagination.length"
                         [pageIndex]="pagination.page"
                         [pageSize]="pagination.size"
                         [pageSizeOptions]="[5, 10, 25, 100]"
-                        [showFirstLastButtons]="true"
-                    ></mat-paginator>
+                        [showFirstLastButtons]="true">
+                    </mat-paginator>
                 </ng-container>
 
                 <ng-template #rowDetailsTemplate let-contract>
                     <div class="shadow-lg overflow-hidden">
                         <div class="flex border-b">
                             <!-- Selected contract form -->
-                            <form
-                                class="flex flex-col w-full"
-                                [formGroup]="selectedRowForm"
-                            >
+                            <form class="flex flex-col w-full" [formGroup]="selectedRowForm">
                                 <div class="flex flex-col sm:flex-row p-8">
                                     <!-- Contract details -->
                                     <div class="flex flex-auto flex-wrap">
@@ -513,7 +470,7 @@
                         </div>
                     </div>
                 </ng-template>
-
+          
                 <ng-template #noContracts>
                     <div
                         class="p-8 sm:p-16 border-b text-4xl font-semibold tracking-tight text-center"
@@ -521,7 +478,5 @@
                         ¡No hay contratos!
                     </div>
                 </ng-template>
-            </div>
-        </div>
-    </div>
-</div>
+          
+  

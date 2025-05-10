@@ -56,7 +56,7 @@ export class SuplementoFormComponent implements OnInit {
   openNewProveedorDialog(): void {
     const dialogRef = this.dialog.open(ProveedorFormComponent, {
       width: '40%',
-      height: '80%',
+      height: '60%',
       disableClose: false
     });
 
@@ -69,7 +69,7 @@ export class SuplementoFormComponent implements OnInit {
 
   openNewContratoDialog(): void {
     const dialogRef = this.dialog.open(ContratoFormComponent, {
-      width: '60%',
+      width: '40%',
       height: '90%',
       disableClose: false
     });
