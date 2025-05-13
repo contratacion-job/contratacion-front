@@ -11,8 +11,6 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 
 @NgModule({
   declarations: [
-    ContratoDashboardComponent,
-
   ],
   imports: [
     CommonModule,

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -35,6 +35,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-contrato-dashboard',
   standalone: true,
+  providers: [ContratoService],
   imports: [CommonModule, NgApexchartsModule],
   templateUrl: './dashboard-contrato.component.html',
   styleUrls: ['./contrato-dashboard.component.scss']
@@ -63,7 +64,7 @@ export class ContratoDashboardComponent implements OnInit {
   @ViewChild('duracionBucketsChart') duracionBucketsChart!: ChartComponent;
   public duracionBucketsChartOptions!: Partial<ChartOptions>;
 
-  constructor(private contratoService: ContratoService) {}
+  constructor(@Inject(ContratoService) private contratoService: ContratoService) {}
 
   ngOnInit(): void {
     this.fetchContratos();
