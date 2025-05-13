@@ -232,6 +232,60 @@ export class DashboardProveedorComponent implements OnInit, OnDestroy {
         categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
       }
     };
+
+    // Agrupar por tipo
+    const tipoGroups = this.groupByKey('tipo');
+    this.proveedoresByTypeChartOptions = {
+      chart: {
+        type: 'bar',
+        height: 200,
+      },
+      series: [{
+        name: 'Proveedores',
+        data: Object.values(tipoGroups.counts)
+      }],
+      xaxis: {
+        categories: Object.keys(tipoGroups.counts)
+      }
+    };
+
+    // Agrupar por estado
+    const estadoGroups = this.groupByKey('estado');
+    this.proveedoresByStatusChartOptions = {
+      chart: {
+        type: 'donut',
+        height: 200,
+      },
+      series: Object.values(estadoGroups.counts),
+      labels: Object.keys(estadoGroups.counts)
+    };
+
+    // Agrupar por tipo de empresa
+    const tipoEmpresaGroups = this.groupByKey('tipo_empresa');
+    this.proveedoresByTipoEmpresaChartOptions = {
+      chart: {
+        type: 'pie',
+        height: 200,
+      },
+      series: Object.values(tipoEmpresaGroups.counts),
+      labels: Object.keys(tipoEmpresaGroups.counts)
+    };
+
+    // Agrupar por provincia
+    const provinciaGroups = this.groupByKey('provincia', 'nombre_provincia');
+    this.proveedoresByProvinciaChartOptions = {
+      chart: {
+        type: 'bar',
+        height: 200,
+      },
+      series: [{
+        name: 'Proveedores',
+        data: Object.values(provinciaGroups.counts)
+      }],
+      xaxis: {
+        categories: Object.keys(provinciaGroups.counts)
+      }
+    };
   }
 
   private groupByKey(key: string, nestedKey?: string): { counts: { [key: string]: number }, total: number } {
