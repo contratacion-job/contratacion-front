@@ -1,10 +1,14 @@
 export interface Contrato {
   id: number;
   vigencia: VigenciaContrato;
+  vigencia_id: number;
   proveedor: Proveedor;
+  proveedor_id: number;
   tipo_contrato: TipoContrato;
+  tipo_contrato_id: number;
   departamento: Departamento;
   no_contrato: string;
+  no_contrato_contratacion: string;
   fecha_entrada: string;
   fecha_firmado: string;
   fecha_vencido: string;
@@ -27,7 +31,9 @@ export interface Contrato {
 export interface Proveedor {
   id: number;
   municipio: Municipio;
+  municipio_id: number;
   ministerio: Ministerio;
+  ministerio_id: number;
   nombre: string;
   codigo: string;
   telefonos: string;
@@ -44,6 +50,8 @@ export interface VigenciaContrato {
   vigencia: number;
   alerta_vigencia: number;
   tipo_alerta_vigencia: string;
+  tipo_vigencia: string;
+  proveedor: Proveedor;
 }
 
 export interface Departamento {

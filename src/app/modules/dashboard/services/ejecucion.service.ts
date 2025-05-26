@@ -7,7 +7,9 @@ import { Proveedor, Contrato } from 'app/models/Type';
 export interface Ejecucion {
   id: number;
   proveedor: Proveedor;
+  proveedor_id: number;
   contrato: Contrato;
+  no_contrato_id: number;
   costo_cup: number;
   costo_cl: number;
   trabajo_ejecutado: string;
