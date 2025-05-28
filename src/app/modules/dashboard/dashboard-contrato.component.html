@@ -1,13 +1,22 @@
-<div class="dashboard-container">
-  <div class="chart-grid">
-    <!-- Top 10 Montos -->
-    <div class="chart-container">
-      <div class="chart-header">
-        <h3>Top 10 Contratos - Mayor Monto</h3>
-        <button (click)="downloadChart('topMontoMayor')">
-          <i class="pi pi-download"></i>
-        </button>
-      </div>
+
+<div class="flex flex-col flex-auto min-w-0">
+
+  <!-- Main -->
+  <div class="flex-auto p-6 sm:p-10">
+ 
+      <!-- CONTENT GOES HERE -->
+      <div class="h-400 min-h-400 max-h-400 border-2   rounded-2xl">
+
+
+
+        <div class="p-6 space-y-6 w-full">
+         
+        
+          <!-- Nuevas gráficas -->
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-6">
+          <mat-card class="p-4">
+
       <apx-chart
         #topMontoMayorChart
         [series]="topMontoMayorChartOptions.series"
@@ -17,11 +26,11 @@
         [plotOptions]="topMontoMayorChartOptions.plotOptions"
         [title]="topMontoMayorChartOptions.title"
       ></apx-chart>
-    </div>
+     </mat-card>
 
     <div class="chart-container">
       <div class="chart-header">
-        <h3>Top 10 Contratos - Menor Monto</h3>
+
         <button (click)="downloadChart('topMontoMenor')">
           <i class="pi pi-download"></i>
         </button>
@@ -40,7 +49,7 @@
     <!-- Top 10 Vigencias -->
     <div class="chart-container">
       <div class="chart-header">
-        <h3>Top 10 Contratos - Mayor Vigencia</h3>
+
         <button (click)="downloadChart('topVigenciaMayor')">
           <i class="pi pi-download"></i>
         </button>
@@ -58,7 +67,7 @@
 
     <div class="chart-container">
       <div class="chart-header">
-        <h3>Top 10 Contratos - Menor Vigencia</h3>
+
         <button (click)="downloadChart('topVigenciaMenor')">
           <i class="pi pi-download"></i>
         </button>
@@ -77,7 +86,7 @@
     <!-- Distribución por Duración -->
     <div class="chart-container">
       <div class="chart-header">
-        <h3>Contratos por Duración</h3>
+
         <button (click)="downloadChart('duracionBuckets')">
           <i class="pi pi-download"></i>
         </button>
@@ -96,7 +105,7 @@
     <!-- Tipos de Contratos -->
     <div class="chart-container">
       <div class="chart-header">
-        <h3>Tipos de Contratos</h3>
+
         <button (click)="downloadChart('tiposContratos')">
           <i class="pi pi-download"></i>
         </button>
@@ -115,7 +124,7 @@
     <!-- Departamentos -->
     <div class="chart-container">
       <div class="chart-header">
-        <h3>Contratos por Departamento</h3>
+       
         <button (click)="downloadChart('departamentos')">
           <i class="pi pi-download"></i>
         </button>
@@ -131,4 +140,7 @@
       ></apx-chart>
     </div>
   </div>
-</div>
+  </div>
+  </div>
+  </div>
+  

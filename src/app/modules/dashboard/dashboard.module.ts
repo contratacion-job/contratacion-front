@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ContratoDashboardComponent } from './dashboard-contrato.component';
+
 import { DashboardProveedorComponent } from './dashboard-proveedor.component';
 import { DashboardSuplimentoComponent } from './dashboard-suplimento.component';
 import { DashboardEjecucionComponent } from './dashboard-ejecucion.component';
@@ -11,7 +11,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 
 @NgModule({
   declarations: [
-    ContratoDashboardComponent,
+
 
   ],
   imports: [

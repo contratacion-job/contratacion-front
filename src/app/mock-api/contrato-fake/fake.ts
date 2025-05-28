@@ -5,35 +5,132 @@ export const mockProvincia = [
   { id: 4, nombre_provincia: "Matanzas" },
   { id: 5, nombre_provincia: "Pinar del Río" }
 ];
-
-export const mockMinisterio = [
-  { id: 1, nombre_ministerio: "Ministerio de Salud" },
-  { id: 2, nombre_ministerio: "Ministerio de Educación" },
-  { id: 3, nombre_ministerio: "Ministerio de Agricultura" },
-  { id: 4, nombre_ministerio: "Ministerio de Cultura" },
-  { id: 5, nombre_ministerio: "Ministerio de Transporte" }
-];
-
+// Mock data for Municipio
 export const mockMunicipio = [
-  { id: 1, provincia_id: 1, provincia: mockProvincia[0], nombre_municipio: "Plaza de la Revolución" },
-  { id: 2, provincia_id: 1, provincia: mockProvincia[0], nombre_municipio: "Vedado" },
-  { id: 3, provincia_id: 2, provincia: mockProvincia[1], nombre_municipio: "Santiago Centro" },
-  { id: 4, provincia_id: 1, provincia: mockProvincia[0], nombre_municipio: "Centro Habana" },
-  { id: 5, provincia_id: 2, provincia: mockProvincia[1], nombre_municipio: "Segundo Frente" },
-  { id: 6, provincia_id: 3, provincia: mockProvincia[2], nombre_municipio: "Santa Clara" },
-  { id: 7, provincia_id: 4, provincia: mockProvincia[3], nombre_municipio: "Varadero" },
-  { id: 8, provincia_id: 5, provincia: mockProvincia[4], nombre_municipio: "Viñales" }
+  {
+    id: 1,
+    provincia_id: 1,
+    provincia: mockProvincia[0],
+    nombre_municipio: "Plaza de la Revolución"
+  },
+  {
+    id: 2,
+    provincia_id: 1,
+    provincia: mockProvincia[0],
+    nombre_municipio: "Centro Habana"
+  },
+  {
+    id: 3,
+    provincia_id: 2,
+    provincia: mockProvincia[1],
+    nombre_municipio: "Santiago de Cuba"
+  },
+  {
+    id: 4,
+    provincia_id: 3,
+    provincia: mockProvincia[2],
+    nombre_municipio: "Santa Clara"
+  }
 ];
 
+// Mock data for Ministerio
+export const mockMinisterio = [
+  {
+    id: 1,
+    nombre_ministerio: "Ministerio de Educación"
+  },
+  {
+    id: 2,
+    nombre_ministerio: "Ministerio de Salud Pública"
+  },
+  {
+    id: 3,
+    nombre_ministerio: "Ministerio de la Construcción"
+  },
+  {
+    id: 4,
+    nombre_ministerio: "Ministerio de Transporte"
+  }
+];
+// Mock data for TipoContrato
+
+// Mock data for Departamento
+export const mockDepartamento = [
+  {
+    id: 1,
+    nombre_departamento: "Departamento de Compras",
+    codigo: "COMP",
+    descripcion: "Encargado de las compras institucionales"
+  },
+  {
+    id: 2,
+    nombre_departamento: "Departamento de Educación",
+    codigo: "EDU",
+    descripcion: "Gestión de servicios educativos"
+  },
+  {
+    id: 3,
+    nombre_departamento: "Departamento de Construcción",
+    codigo: "CONST",
+    descripcion: "Supervisión de proyectos de construcción"
+  },
+  {
+    id: 4,
+    nombre_departamento: "Departamento de Tecnología",
+    codigo: "TEC",
+    descripcion: "Gestión de servicios tecnológicos"
+  }
+];
+export const mockVigencia = [
+  {
+    id: 1,
+    vigencia: 2023,
+    alerta_vigencia: 30,
+    tipo_vigencia: "Anual",
+    tipo_alerta_vigencia: "Días"
+  },
+  {
+    id: 2,
+    vigencia: 2024,
+    alerta_vigencia: 15,
+    tipo_vigencia: "Anual",
+    tipo_alerta_vigencia: "Días"
+  },
+  {
+    id: 3,
+    vigencia: 2025,
+    alerta_vigencia: 10,
+    tipo_vigencia: "Anual",
+    tipo_alerta_vigencia: "Días"
+  },
+  {
+    id: 4,
+    vigencia: 2024,
+    alerta_vigencia: 20,
+    tipo_vigencia: "Bianual",
+    tipo_alerta_vigencia: "Días"
+  },
+  {
+    id: 5,
+    vigencia: 2025,
+    alerta_vigencia: 45,
+    tipo_vigencia: "Trianual",
+    tipo_alerta_vigencia: "Días"
+  }
+];
+
+// Mock data for Proveedor
 export const mockProveedor = [
   {
     id: 1,
+    municipio_id: 1,
+    ministerio_id: 1,
     nombre: "Empresa de Suministros S.A.",
     codigo: "PRV001",
     telefonos: "555-0101",
     domicilio: "Calle Principal #123",
     municipio: mockMunicipio[0],
-    ministerio: mockMinisterio[0],
+    ministerio: mockMinisterio[0], // Solo id y nombre_ministerio
     fechaCreacion: "2023-01-15",
     estado: "Activo",
     tipo: "Empresa Estatal",
@@ -41,6 +138,8 @@ export const mockProveedor = [
   },
   {
     id: 2,
+    municipio_id: 2,
+    ministerio_id: 2,
     nombre: "Servicios Educativos C.A.",
     codigo: "PRV002",
     telefonos: "555-0202",
@@ -54,6 +153,8 @@ export const mockProveedor = [
   },
   {
     id: 3,
+    municipio_id: 3,
+    ministerio_id: 3,
     nombre: "Constructora del Este",
     codigo: "PRV003",
     telefonos: "555-0303",
@@ -67,6 +168,8 @@ export const mockProveedor = [
   },
   {
     id: 4,
+    municipio_id: 1,
+    ministerio_id: 1,
     nombre: "Consultoría Técnica Ltda.",
     codigo: "PRV004",
     telefonos: "555-0404",
@@ -80,6 +183,8 @@ export const mockProveedor = [
   },
   {
     id: 5,
+    municipio_id: 2,
+    ministerio_id: 2,
     nombre: "Eventos Culturales S.A.",
     codigo: "PRV005",
     telefonos: "555-0505",
@@ -93,6 +198,8 @@ export const mockProveedor = [
   },
   {
     id: 6,
+    municipio_id: 3,
+    ministerio_id: 3,
     nombre: "Transportes Unidos",
     codigo: "PRV006",
     telefonos: "555-0606",
@@ -106,454 +213,789 @@ export const mockProveedor = [
   },
   {
     id: 7,
-    nombre: "Cultura Varadero",
+    municipio_id: 4,
+    ministerio_id: 4,
+    nombre: "Tecnología Avanzada Corp.",
     codigo: "PRV007",
-    telefonos: "789-012-3456",
-    domicilio: "Avenida Playa, Varadero",
-    municipio: mockMunicipio[6],
+    telefonos: "555-0707",
+    domicilio: "Boulevard Tecnológico #111",
+    municipio: mockMunicipio[3],
     ministerio: mockMinisterio[3],
-    fechaCreacion: "2023-07-01",
+    fechaCreacion: "2023-07-25",
     estado: "Activo",
     tipo: "Empresa Privada",
     categoria: "Privada"
-  },
-  { 
-    id: 8, 
-    municipio: mockMunicipio[7], 
-    ministerio: mockMinisterio[2], 
-    nombre: "Agricultura Viñales", 
-    codigo: "PRV008", 
-    telefonos: "890-123-4567", 
-    domicilio: "Valle de Viñales",
-    fechaCreacion: "2023-08-10",
-    estado: "Pendiente",
-    tipo: "Cooperativa",
-    categoria: "Cooperativa"
   }
 ];
 
-export const mockDepartamento = [
-  { id: 1, nombre_dpto: "Recursos Humanos" },
-  { id: 2, nombre_dpto: "Finanzas" },
-  { id: 3, nombre_dpto: "IT" },
-  { id: 4, nombre_dpto: "Operaciones" },
-  { id: 5, nombre_dpto: "Logística" }
-];
 
+
+// Mock data for VigenciaContrato (interface completa con proveedor)
 export const mockVigenciaContrato = [
-  { id: 1, vigencia: 2023, alerta_vigencia: 30, tipo_alerta_vigencia: "Días" },
-  { id: 2, vigencia: 2024, alerta_vigencia: 15, tipo_alerta_vigencia: "Días" },
-  { id: 3, vigencia: 2025, alerta_vigencia: 10, tipo_alerta_vigencia: "Días" }
+  {
+    id: 1,
+    vigencia: 2023,
+    alerta_vigencia: 30,
+    tipo_alerta_vigencia: "Días",
+    tipo_vigencia: "Anual",
+    proveedor: mockProveedor[0]
+  },
+  {
+    id: 2,
+    vigencia: 2024,
+    alerta_vigencia: 15,
+    tipo_alerta_vigencia: "Días",
+    tipo_vigencia: "Anual",
+    proveedor: mockProveedor[1]
+  },
+  {
+    id: 3,
+    vigencia: 2025,
+    alerta_vigencia: 10,
+    tipo_alerta_vigencia: "Días",
+    tipo_vigencia: "Anual",
+    proveedor: mockProveedor[2]
+  },
+  {
+    id: 4,
+    vigencia: 2024,
+    alerta_vigencia: 20,
+    tipo_alerta_vigencia: "Días",
+    tipo_vigencia: "Bianual",
+    proveedor: mockProveedor[3]
+  },
+  {
+    id: 5,
+    vigencia: 2025,
+    alerta_vigencia: 45,
+    tipo_alerta_vigencia: "Días",
+    tipo_vigencia: "Trianual",
+    proveedor: mockProveedor[4]
+  }
+];
+export const mockTipoContrato = [
+  {
+    id: 1,
+    nombre_tipo_contrato: "Suministros",
+    descripcion: "Contratos para suministro de materiales"
+  },
+  {
+    id: 2,
+    nombre_tipo_contrato: "Servicios",
+    descripcion: "Contratos para prestación de servicios"
+  },
+  {
+    id: 3,
+    nombre_tipo_contrato: "Construcción",
+    descripcion: "Contratos para obras de construcción"
+  },
+  {
+    id: 4,
+    nombre_tipo_contrato: "Consultoría",
+    descripcion: "Contratos para servicios de consultoría"
+  },
+  {
+    id: 5,
+    nombre_tipo_contrato: "Mantenimiento",
+    descripcion: "Contratos para servicios de mantenimiento"
+  }
+];
+// Mock data for Contrato
+export const mockContrato = [
+  {
+    id: 1,
+    vigencia_id: 1,
+    proveedor_id: 1,
+    tipo_contrato_id: 1,
+    no_contrato: 1001,
+    fecha_entrada: new Date("2023-01-15"),
+    fecha_firmado: new Date("2023-01-10"),
+    valor_cup: 100000,
+    monto_vencimiento_cup: 90000,
+    monto_vencimiento_cl: 70000,
+    valor_usd: 4000,
+    monto_vencimiento_usd: 3500,
+    observaciones: "Contrato para suministros de oficina",
+    no_contrato_contratacion: 2001,
+    fecha_comite_contratacion: new Date("2023-01-05"),
+    no_comite_contratacion: 3001,
+    no_acuerdo_comite_contratacion: 4001,
+    fecha_comite_administracion: new Date("2023-01-08"),
+    no_comite_administracion: 5001,
+    no_acuerdo_comite_administracion: 6001,
+    departamento_id: 1,
+    fecha_vencido: new Date("2023-12-31"),
+    valor_monto_restante: 10000,
+    entidad: ["Entidad A", "Entidad B"],
+    vigencia: mockVigencia[0],
+    proveedor: mockProveedor[0],
+    tipo_contrato: mockTipoContrato[0],
+    departamento: mockDepartamento[0],
+    estado: "Vencido"
+  },
+  {
+    id: 2,
+    vigencia_id: 2,
+    proveedor_id: 2,
+    tipo_contrato_id: 2,
+    no_contrato: 1002,
+    fecha_entrada: new Date("2023-02-20"),
+    fecha_firmado: new Date("2023-02-15"),
+    valor_cup: 150000,
+    monto_vencimiento_cup: 130000,
+    monto_vencimiento_cl: 100000,
+    valor_usd: 5000,
+    monto_vencimiento_usd: 4500,
+    observaciones: "Contrato para servicios educativos",
+    no_contrato_contratacion: 2002,
+    fecha_comite_contratacion: new Date("2023-02-10"),
+    no_comite_contratacion: 3002,
+    no_acuerdo_comite_contratacion: 4002,
+    fecha_comite_administracion: new Date("2023-02-12"),
+    no_comite_administracion: 5002,
+    no_acuerdo_comite_administracion: 6002,
+    departamento_id: 2,
+    fecha_vencido: new Date("2024-12-31"),
+    valor_monto_restante: 20000,
+    entidad: ["Entidad Educativa A"],
+    vigencia: mockVigencia[1],
+    proveedor: mockProveedor[1],
+    tipo_contrato: mockTipoContrato[1],
+    departamento: mockDepartamento[1],
+    estado: "Activo"
+  },
+  {
+    id: 3,
+    vigencia_id: 3,
+    proveedor_id: 3,
+    tipo_contrato_id: 3,
+    no_contrato: 1003,
+    fecha_entrada: new Date("2023-03-10"),
+    fecha_firmado: new Date("2023-03-05"),
+    valor_cup: 120000,
+    monto_vencimiento_cup: 100000,
+    monto_vencimiento_cl: 80000,
+    valor_usd: 4500,
+    monto_vencimiento_usd: 4000,
+    observaciones: "Contrato para construcción de carretera",
+    no_contrato_contratacion: 2003,
+    fecha_comite_contratacion: new Date("2023-03-01"),
+    no_comite_contratacion: 3003,
+    no_acuerdo_comite_contratacion: 4003,
+    fecha_comite_administracion: new Date("2023-03-03"),
+    no_comite_administracion: 5003,
+    no_acuerdo_comite_administracion: 6003,
+    departamento_id: 3,
+    fecha_vencido: new Date("2025-12-31"),
+    valor_monto_restante: 20000,
+    entidad: ["Entidad Construcción A"],
+    vigencia: mockVigencia[2],
+    proveedor: mockProveedor[2],
+    tipo_contrato: mockTipoContrato[2],
+    departamento: mockDepartamento[2],
+    estado: "Activo"
+  },
+  {
+    id: 4,
+    vigencia_id: 1,
+    proveedor_id: 4,
+    tipo_contrato_id: 4,
+    no_contrato: 1004,
+    fecha_entrada: new Date("2023-04-05"),
+    fecha_firmado: new Date("2023-04-01"),
+    valor_cup: 40000,
+    monto_vencimiento_cup: 35000,
+    monto_vencimiento_cl: 25000,
+    valor_usd: 1500,
+    monto_vencimiento_usd: 1200,
+    observaciones: "Contrato para consultoría técnica",
+    no_contrato_contratacion: 2004,
+    fecha_comite_contratacion: new Date("2023-03-25"),
+    no_comite_contratacion: 3004,
+    no_acuerdo_comite_contratacion: 4004,
+    fecha_comite_administracion: new Date("2023-03-28"),
+    no_comite_administracion: 5004,
+    no_acuerdo_comite_administracion: 6004,
+    departamento_id: 1,
+    fecha_vencido: new Date("2023-12-31"),
+    valor_monto_restante: 5000,
+    entidad: ["Entidad Consultoría A"],
+    vigencia: mockVigencia[0],
+    proveedor: mockProveedor[3],
+    tipo_contrato: mockTipoContrato[3],
+    departamento: mockDepartamento[0],
+    estado: "Vencido"
+  },
+  {
+    id: 5,
+    vigencia_id: 2,
+    proveedor_id: 5,
+    tipo_contrato_id: 5,
+    no_contrato: 1005,
+    fecha_entrada: new Date("2023-05-15"),
+    fecha_firmado: new Date("2023-05-10"),
+    valor_cup: 80000,
+    monto_vencimiento_cup: 70000,
+    monto_vencimiento_cl: 55000,
+    valor_usd: 3000,
+    monto_vencimiento_usd: 2500,
+    observaciones: "Contrato para mantenimiento de equipos",
+    no_contrato_contratacion: 2005,
+    fecha_comite_contratacion: new Date("2023-05-05"),
+    no_comite_contratacion: 3005,
+    no_acuerdo_comite_contratacion: 4005,
+    fecha_comite_administracion: new Date("2023-05-08"),
+    no_comite_administracion: 5005,
+    no_acuerdo_comite_administracion: 6005,
+    departamento_id: 4,
+    fecha_vencido: new Date("2024-12-31"),
+    valor_monto_restante: 10000,
+    entidad: ["Entidad Mantenimiento A"],
+    vigencia: mockVigencia[1],
+    proveedor: mockProveedor[4],
+    tipo_contrato: mockTipoContrato[4],
+    departamento: mockDepartamento[3],
+    estado: "Activo"
+  },
+  {
+    id: 6,
+    vigencia_id: 3,
+    proveedor_id: 6,
+    tipo_contrato_id: 1,
+    no_contrato: 1006,
+    fecha_entrada: new Date("2023-06-20"),
+    fecha_firmado: new Date("2023-06-15"),
+    valor_cup: 90000,
+    monto_vencimiento_cup: 80000,
+    monto_vencimiento_cl: 65000,
+    valor_usd: 3500,
+    monto_vencimiento_usd: 3000,
+    observaciones: "Contrato para transporte de materiales",
+    no_contrato_contratacion: 2006,
+    fecha_comite_contratacion: new Date("2023-06-10"),
+    no_comite_contratacion: 3006,
+    no_acuerdo_comite_contratacion: 4006,
+    fecha_comite_administracion: new Date("2023-06-12"),
+    no_comite_administracion: 5006,
+    no_acuerdo_comite_administracion: 6006,
+    departamento_id: 2,
+    fecha_vencido: new Date("2025-12-31"),
+    valor_monto_restante: 10000,
+    entidad: ["Entidad Transporte A"],
+    vigencia: mockVigencia[2],
+    proveedor: mockProveedor[5],
+    tipo_contrato: mockTipoContrato[0],
+    departamento: mockDepartamento[1],
+    estado: "Activo"
+  },
+  {
+    id: 7,
+    vigencia_id: 4,
+    proveedor_id: 7,
+    tipo_contrato_id: 2,
+    no_contrato: 1007,
+    fecha_entrada: new Date("2023-07-25"),
+    fecha_firmado: new Date("2023-07-20"),
+    valor_cup: 110000,
+    monto_vencimiento_cup: 95000,
+    monto_vencimiento_cl: 75000,
+    valor_usd: 4200,
+    monto_vencimiento_usd: 3800,
+    observaciones: "Contrato para servicios tecnológicos",
+    no_contrato_contratacion: 2007,
+    fecha_comite_contratacion: new Date("2023-07-15"),
+    no_comite_contratacion: 3007,
+    no_acuerdo_comite_contratacion: 4007,
+    fecha_comite_administracion: new Date("2023-07-18"),
+    no_comite_administracion: 5007,
+    no_acuerdo_comite_administracion: 6007,
+    departamento_id: 4,
+    fecha_vencido: new Date("2025-12-31"),
+    valor_monto_restante: 15000,
+    entidad: ["Entidad Tecnológica A"],
+    vigencia: mockVigencia[3],
+    proveedor: mockProveedor[6],
+    tipo_contrato: mockTipoContrato[1],
+    departamento: mockDepartamento[3],
+    estado: "Activo"
+  }
 ];
 
-export const mockTipoContrato = [
-  { id: 1, tipo_contrato: "Suministro" },
-  { id: 2, tipo_contrato: "Servicios" },
-  { id: 3, tipo_contrato: "Consultoría" }
+// Mock data for EjecucionContrato
+export const mockEjecucionContrato = [
+  {
+    id: 1,
+    proveedor_id: 1,
+    no_contrato_id: 1,
+    costo_cup: 5000,
+    costo_cl: 4000,
+    trabajo_ejecutado: "Entrega de suministros",
+    fecha_ejecucion: new Date("2025-03-01"),
+    proveedor: mockProveedor[0],
+    contrato: mockContrato[0]
+  },
+  {
+    id: 2,
+    proveedor_id: 2,
+    no_contrato_id: 2,
+    costo_cup: 6000,
+    costo_cl: 4500,
+    trabajo_ejecutado: "Servicios educativos",
+    fecha_ejecucion: new Date("2025-04-01"),
+    proveedor: mockProveedor[1],
+    contrato: mockContrato[1]
+  },
+  {
+    id: 3,
+    proveedor_id: 1,
+    no_contrato_id: 1,
+    costo_cup: 5000,
+    costo_cl: 4000,
+    trabajo_ejecutado: "Entrega de suministros",
+    fecha_ejecucion: new Date("2023-03-01"),
+    proveedor: mockProveedor[0],
+    contrato: mockContrato[0]
+  },
+  {
+    id: 4,
+    proveedor_id: 2,
+    no_contrato_id: 2,
+    costo_cup: 6000,
+    costo_cl: 4500,
+    trabajo_ejecutado: "Servicios educativos",
+    fecha_ejecucion: new Date("2024-04-01"),
+    proveedor: mockProveedor[1],
+    contrato: mockContrato[1]
+  },
+  {
+    id: 5,
+    proveedor_id: 3,
+    no_contrato_id: 3,
+    costo_cup: 7000,
+    costo_cl: 5000,
+    trabajo_ejecutado: "Construcción carretera",
+    fecha_ejecucion: new Date("2025-05-01"),
+    proveedor: mockProveedor[2],
+    contrato: mockContrato[2]
+  },
+  {
+    id: 6,
+    proveedor_id: 4,
+    no_contrato_id: 4,
+    costo_cup: 4000,
+    costo_cl: 3000,
+    trabajo_ejecutado: "Consultoría técnica",
+    fecha_ejecucion: new Date("2023-06-01"),
+    proveedor: mockProveedor[3],
+    contrato: mockContrato[3]
+  },
+  {
+    id: 7,
+    proveedor_id: 5,
+    no_contrato_id: 5,
+    costo_cup: 8000,
+    costo_cl: 6000,
+    trabajo_ejecutado: "Mantenimiento",
+    fecha_ejecucion: new Date("2024-07-01"),
+    proveedor: mockProveedor[4],
+    contrato: mockContrato[4]
+  },
+  {
+    id: 8,
+    proveedor_id: 6,
+    no_contrato_id: 6,
+    costo_cup: 9000,
+    costo_cl: 7000,
+    trabajo_ejecutado: "Transporte de materiales",
+    fecha_ejecucion: new Date("2024-08-01"),
+    proveedor: mockProveedor[5],
+    contrato: mockContrato[5]
+  },
+  {
+    id: 9,
+    proveedor_id: 7,
+    no_contrato_id: 7,
+    costo_cup: 12000,
+    costo_cl: 9000,
+    trabajo_ejecutado: "Implementación de sistema",
+    fecha_ejecucion: new Date("2024-09-01"),
+    proveedor: mockProveedor[6],
+    contrato: mockContrato[6]
+  }
 ];
-  
-  export const mockContrato = [
-    {
-      id: 1,
-      vigencia: mockVigenciaContrato[0],
-      proveedor: mockProveedor[0],
-      tipo_contrato: mockTipoContrato[0],
-      departamento: mockDepartamento[0],
-      no_contrato: "CTR001",
-      fecha_entrada: "2025-01-15",
-      fecha_firmado: "2025-01-20",
-      fecha_vencido: "2026-01-20",
-      valor_cup: 100000,
-      monto_vencimiento_cup: 20000,
-      valor_cl: 90000,
-      monto_vencimiento_cl: 18000,
-      valor_usd: 4000,
-      monto_vencimiento_usd: 800,
-      observaciones: "Contrato activo",
-      no_comite_contratacion: 1,
-      fecha_comite_contratacion: "2025-01-10",
-      no_acuerdo_comite_contratacion: 101,
-      fecha_acuerdo_comite_contratacion: "2025-01-12",
-      no_comite_administracion: 201,
-      fecha_comite_administracion: "2025-01-14",
-      monto_total: 150000,
-      estado: "Activo"
-    },
-    {
-      id: 2,
-      vigencia: mockVigenciaContrato[1],
-      proveedor: mockProveedor[1],
-      tipo_contrato: mockTipoContrato[1],
-      departamento: mockDepartamento[1],
-      no_contrato: "CTR002",
-      fecha_entrada: "2025-02-15",
-      fecha_firmado: "2025-02-20",
-      fecha_vencido: "2027-02-20",
-      valor_cup: 200000,
-      monto_vencimiento_cup: 40000,
-      valor_cl: 180000,
-      monto_vencimiento_cl: 36000,
-      valor_usd: 8000,
-      monto_vencimiento_usd: 1600,
-      observaciones: "Contrato activo",
-      no_comite_contratacion: 2,
-      fecha_comite_contratacion: "2025-02-10",
-      no_acuerdo_comite_contratacion: 102,
-      fecha_acuerdo_comite_contratacion: "2025-02-12",
-      no_comite_administracion: 202,
-      fecha_comite_administracion: "2025-02-14",
-      monto_total: 280000,
-      estado: "Activo"
-    },
-    {
-      id: 3,
-      vigencia: mockVigenciaContrato[2],
-      proveedor: mockProveedor[2],
-      tipo_contrato: mockTipoContrato[2],
-      departamento: mockDepartamento[2],
-      no_contrato: "CTR003",
-      fecha_entrada: "2023-03-15",
-      fecha_firmado: "2023-03-20",
-      fecha_vencido: "2026-03-20",
-      valor_cup: 300000,
-      monto_vencimiento_cup: 60000,
-      valor_cl: 270000,
-      monto_vencimiento_cl: 54000,
-      valor_usd: 12000,
-      monto_vencimiento_usd: 2400,
-      observaciones: "Contrato activo",
-      no_comite_contratacion: 3,
-      fecha_comite_contratacion: "2023-03-10",
-      no_acuerdo_comite_contratacion: 103,
-      fecha_acuerdo_comite_contratacion: "2023-03-12",
-      no_comite_administracion: 203,
-      fecha_comite_administracion: "2023-03-14",
-      monto_total: 450000,
-      estado: "Activo"
-    },
-    {
-      id: 4,
-      vigencia: mockVigenciaContrato[0],
-      proveedor: mockProveedor[0],
-      tipo_contrato: mockTipoContrato[0],
-      departamento: mockDepartamento[0],
-      no_contrato: "CTR004",
-      fecha_entrada: "2023-04-15",
-      fecha_firmado: "2023-04-20",
-      fecha_vencido: "2023-07-20",
-      valor_cup: 40000,
-      monto_vencimiento_cup: 8000,
-      valor_cl: 36000,
-      monto_vencimiento_cl: 7200,
-      valor_usd: 1600,
-      monto_vencimiento_usd: 320,
-      observaciones: "Contrato activo",
-      no_comite_contratacion: 4,
-      fecha_comite_contratacion: "2023-04-10",
-      no_acuerdo_comite_contratacion: 104,
-      fecha_acuerdo_comite_contratacion: "2023-04-12",
-      no_comite_administracion: 204,
-      fecha_comite_administracion: "2023-04-14",
-      monto_total: 50000,
-      estado: "Activo"
-    },
-    {
-      id: 5,
-      vigencia: mockVigenciaContrato[1],
-      proveedor: mockProveedor[1],
-      tipo_contrato: mockTipoContrato[1],
-      departamento: mockDepartamento[1],
-      no_contrato: "CTR005",
-      fecha_entrada: "2023-05-15",
-      fecha_firmado: "2023-05-20",
-      fecha_vencido: "2023-11-20",
-      valor_cup: 60000,
-      monto_vencimiento_cup: 12000,
-      valor_cl: 54000,
-      monto_vencimiento_cl: 10800,
-      valor_usd: 2400,
-      monto_vencimiento_usd: 480,
-      observaciones: "Contrato activo",
-      no_comite_contratacion: 5,
-      fecha_comite_contratacion: "2023-05-10",
-      no_acuerdo_comite_contratacion: 105,
-      fecha_acuerdo_comite_contratacion: "2023-05-12",
-      no_comite_administracion: 205,
-      fecha_comite_administracion: "2023-05-14",
-      monto_total: 75000,
-      estado: "Activo"
-    },
-    {
-      id: 6,
-      vigencia: mockVigenciaContrato[2],
-      proveedor: mockProveedor[2],
-      tipo_contrato: mockTipoContrato[2],
-      departamento: mockDepartamento[2],
-      no_contrato: "CTR006",
-      fecha_entrada: "2023-06-15",
-      fecha_firmado: "2023-06-20",
-      fecha_vencido: "2024-06-20",
-      valor_cup: 140000,
-      monto_vencimiento_cup: 28000,
-      valor_cl: 126000,
-      monto_vencimiento_cl: 25200,
-      valor_usd: 5600,
-      monto_vencimiento_usd: 1120,
-      observaciones: "Contrato activo",
-      no_comite_contratacion: 6,
-      fecha_comite_contratacion: "2023-06-10",
-      no_acuerdo_comite_contratacion: 106,
-      fecha_acuerdo_comite_contratacion: "2023-06-12",
-      no_comite_administracion: 206,
-      fecha_comite_administracion: "2023-06-14",
-      monto_total: 180000,
-      estado: "Activo"
-    },
-    {
-      id: 7,
-      vigencia: mockVigenciaContrato[0],
-      proveedor: mockProveedor[0],
-      tipo_contrato: mockTipoContrato[0],
-      departamento: mockDepartamento[0],
-      no_contrato: "CTR007",
-      fecha_entrada: "2023-07-15",
-      fecha_firmado: "2023-07-20",
-      fecha_vencido: "2025-07-20",
-      valor_cup: 250000,
-      monto_vencimiento_cup: 50000,
-      valor_cl: 225000,
-      monto_vencimiento_cl: 45000,
-      valor_usd: 10000,
-      monto_vencimiento_usd: 2000,
-      observaciones: "Contrato activo",
-      no_comite_contratacion: 7,
-      fecha_comite_contratacion: "2023-07-10",
-      no_acuerdo_comite_contratacion: 107,
-      fecha_acuerdo_comite_contratacion: "2023-07-12",
-      no_comite_administracion: 207,
-      fecha_comite_administracion: "2023-07-14",
-      monto_total: 320000,
-      estado: "Activo"
-    },
-    {
-      id: 8,
-      vigencia: mockVigenciaContrato[1],
-      proveedor: mockProveedor[1],
-      tipo_contrato: mockTipoContrato[1],
-      departamento: mockDepartamento[1],
-      no_contrato: "CTR008",
-      fecha_entrada: "2023-08-15",
-      fecha_firmado: "2023-08-20",
-      fecha_vencido: "2023-11-20",
-      valor_cup: 35000,
-      monto_vencimiento_cup: 7000,
-      valor_cl: 31500,
-      monto_vencimiento_cl: 6300,
-      valor_usd: 1400,
-      monto_vencimiento_usd: 280,
-      observaciones: "Contrato activo",
-      no_comite_contratacion: 8,
-      fecha_comite_contratacion: "2023-08-10",
-      no_acuerdo_comite_contratacion: 108,
-      fecha_acuerdo_comite_contratacion: "2023-08-12",
-      no_comite_administracion: 208,
-      fecha_comite_administracion: "2023-08-14",
-      monto_total: 45000,
-      estado: "Activo"
-    },
-    {
-      id: 9,
-      vigencia: mockVigenciaContrato[2],
-      proveedor: mockProveedor[2],
-      tipo_contrato: mockTipoContrato[2],
-      departamento: mockDepartamento[2],
-      no_contrato: "CTR009",
-      fecha_entrada: "2023-09-15",
-      fecha_firmado: "2023-09-20",
-      fecha_vencido: "2026-09-20",
-      valor_cup: 400000,
-      monto_vencimiento_cup: 80000,
-      valor_cl: 360000,
-      monto_vencimiento_cl: 72000,
-      valor_usd: 16000,
-      monto_vencimiento_usd: 3200,
-      observaciones: "Contrato activo",
-      no_comite_contratacion: 9,
-      fecha_comite_contratacion: "2023-09-10",
-      no_acuerdo_comite_contratacion: 109,
-      fecha_acuerdo_comite_contratacion: "2023-09-12",
-      no_comite_administracion: 209,
-      fecha_comite_administracion: "2023-09-14",
-      monto_total: 520000,
-      estado: "Activo"
-    },
-    {
-      id: 10,
-      vigencia: mockVigenciaContrato[0],
-      proveedor: mockProveedor[0],
-      tipo_contrato: mockTipoContrato[0],
-      departamento: mockDepartamento[0],
-      no_contrato: "CTR010",
-      fecha_entrada: "2023-10-15",
-      fecha_firmado: "2023-10-20",
-      fecha_vencido: "2024-01-20",
-      valor_cup: 120000,
-      monto_vencimiento_cup: 24000,
-      valor_cl: 108000,
-      monto_vencimiento_cl: 21600,
-      valor_usd: 4800,
-      monto_vencimiento_usd: 960,
-      observaciones: "Contrato activo",
-      no_comite_contratacion: 10,
-      fecha_comite_contratacion: "2023-10-10",
-      no_acuerdo_comite_contratacion: 110,
-      fecha_acuerdo_comite_contratacion: "2023-10-12",
-      no_comite_administracion: 210,
-      fecha_comite_administracion: "2023-10-14",
-      monto_total: 95000,
-      estado: "Activo"
-    }
-  ];
-  
-  export const expiredContracts = [
-    {
-      id: 11,
-      vigencia: mockVigenciaContrato[1],
-      proveedor: mockProveedor[1],
-      tipo_contrato: mockTipoContrato[1],
-      departamento: mockDepartamento[1],
-      no_contrato: "CTR011",
-      fecha_entrada: "2022-11-01",
-      fecha_firmado: "2022-11-05",
-      fecha_vencido: "2024-11-05",
-      valor_cup: 16000,
-      monto_vencimiento_cup: 3200,
-      valor_cl: 13000,
-      monto_vencimiento_cl: 2600,
-      valor_usd: 800,
-      monto_vencimiento_usd: 160,
-      observaciones: "Contrato vencido",
-      no_comite_contratacion: 11,
-      fecha_comite_contratacion: "2022-10-25",
-      no_acuerdo_comite_contratacion: 111,
-      fecha_acuerdo_comite_contratacion: "2022-10-27",
-      no_comite_administracion: 211,
-      fecha_comite_administracion: "2022-10-29",
-      monto_total: 25000,
-      estado: "Vencido"
-    },
-    {
-      id: 12,
-      vigencia: mockVigenciaContrato[2],
-      proveedor: mockProveedor[2],
-      tipo_contrato: mockTipoContrato[2],
-      departamento: mockDepartamento[2],
-      no_contrato: "CTR012",
-      fecha_entrada: "2022-12-01",
-      fecha_firmado: "2022-12-05",
-      fecha_vencido: "2024-12-05",
-      valor_cup: 17000,
-      monto_vencimiento_cup: 3400,
-      valor_cl: 14000,
-      monto_vencimiento_cl: 2800,
-      valor_usd: 850,
-      monto_vencimiento_usd: 170,
-      observaciones: "Consultoría vencida",
-      no_comite_contratacion: 12,
-      fecha_comite_contratacion: "2022-11-25",
-      no_acuerdo_comite_contratacion: 112,
-      fecha_acuerdo_comite_contratacion: "2022-11-27",
-      no_comite_administracion: 212,
-      fecha_comite_administracion: "2022-11-29",
-      monto_total: 28000,
-      estado: "Vencido"
-    },
-    {
-      id: 13,
-      vigencia: mockVigenciaContrato[0],
-      proveedor: mockProveedor[0],
-      tipo_contrato: mockTipoContrato[0],
-      departamento: mockDepartamento[0],
-      no_contrato: "CTR013",
-      fecha_entrada: "2023-01-01",
-      fecha_firmado: "2023-01-05",
-      fecha_vencido: "2024-01-05",
-      valor_cup: 18000,
-      monto_vencimiento_cup: 3600,
-      valor_cl: 15000,
-      monto_vencimiento_cl: 3000,
-      valor_usd: 900,
-      monto_vencimiento_usd: 180,
-      observaciones: "Suministro vencido",
-      no_comite_contratacion: 13,
-      fecha_comite_contratacion: "2022-12-25",
-      no_acuerdo_comite_contratacion: 113,
-      fecha_acuerdo_comite_contratacion: "2022-12-27",
-      no_comite_administracion: 213,
-      fecha_comite_administracion: "2022-12-29",
-      monto_total: 30000,
-      estado: "Vencido"
-    },
-    {
-      id: 14,
-      vigencia: mockVigenciaContrato[1],
-      proveedor: mockProveedor[1],
-      tipo_contrato: mockTipoContrato[1],
-      departamento: mockDepartamento[1],
-      no_contrato: "CTR014",
-      fecha_entrada: "2023-02-01",
-      fecha_firmado: "2023-02-05",
-      fecha_vencido: "2024-02-05",
-      valor_cup: 19000,
-      monto_vencimiento_cup: 3800,
-      valor_cl: 16000,
-      monto_vencimiento_cl: 3200,
-      valor_usd: 950,
-      monto_vencimiento_usd: 190,
-      observaciones: "Servicios vencidos",
-      no_comite_contratacion: 14,
-      fecha_comite_contratacion: "2023-01-25",
-      no_acuerdo_comite_contratacion: 114,
-      fecha_acuerdo_comite_contratacion: "2023-01-27",
-      no_comite_administracion: 214,
-      fecha_comite_administracion: "2023-01-29",
-      monto_total: 32000,
-      estado: "Vencido"
-    },
-    {
-      id: 15,
-      vigencia: mockVigenciaContrato[2],
-      proveedor: mockProveedor[2],
-      tipo_contrato: mockTipoContrato[2],
-      departamento: mockDepartamento[2],
-      no_contrato: "CTR015",
-      fecha_entrada: "2023-03-01",
-      fecha_firmado: "2023-03-05",
-      fecha_vencido: "2024-03-05",
-      valor_cup: 20000,
-      monto_vencimiento_cup: 4000,
-      valor_cl: 17000,
-      monto_vencimiento_cl: 3400,
-      valor_usd: 1000,
-      monto_vencimiento_usd: 200,
-      observaciones: "Consultoría vencida",
-      no_comite_contratacion: 15,
-      fecha_comite_contratacion: "2023-02-25",
-      no_acuerdo_comite_contratacion: 115,
-      fecha_acuerdo_comite_contratacion: "2023-02-27",
-      no_comite_administracion: 215,
-      fecha_comite_administracion: "2023-03-01",
-      monto_total: 35000,
-      estado: "Vencido"
-    }
-  ];
-  
-  export const mockEjecucionContrato = [
-    { id: 1, proveedor: mockProveedor[0], contrato: mockContrato[0], costo_cup: 5000, costo_cl: 4000, trabajo_ejecutado: "Entrega de suministros", fecha_ejecucion: "2025-03-01" },
-    { id: 2, proveedor: mockProveedor[1], contrato: mockContrato[1], costo_cup: 6000, costo_cl: 4500, trabajo_ejecutado: "Servicios educativos", fecha_ejecucion: "2025-04-01" },
-    { id: 1, proveedor: mockProveedor[0], contrato: mockContrato[0], costo_cup: 5000, costo_cl: 4000, trabajo_ejecutado: "Entrega de suministros", fecha_ejecucion: "2023-03-01" },
-    { id: 2, proveedor: mockProveedor[1], contrato: mockContrato[1], costo_cup: 6000, costo_cl: 4500, trabajo_ejecutado: "Servicios educativos", fecha_ejecucion: "2024-04-01" },
-    { id: 3, proveedor: mockProveedor[2], contrato: mockContrato[2], costo_cup: 7000, costo_cl: 5000, trabajo_ejecutado: "Construcción carretera", fecha_ejecucion: "2025-05-01" },
-    { id: 4, proveedor: mockProveedor[0], contrato: mockContrato[3], costo_cup: 4000, costo_cl: 3000, trabajo_ejecutado: "Consultoría técnica", fecha_ejecucion: "2023-06-01" },
-    { id: 5, proveedor: mockProveedor[1], contrato: mockContrato[4], costo_cup: 8000, costo_cl: 6000, trabajo_ejecutado: "Mantenimiento", fecha_ejecucion: "2024-07-01" }
-  ];
+
+// Contratos vencidos
+export const expiredContracts = [
+  {
+    id: 1,
+    vigencia_id: 1,
+    proveedor_id: 1,
+    tipo_contrato_id: 1,
+    no_contrato: 1001,
+    fecha_entrada: new Date("2023-01-15"),
+    fecha_firmado: new Date("2023-01-10"),
+    valor_cup: 100000,
+    monto_vencimiento_cup: 90000,
+    monto_vencimiento_cl: 70000,
+    valor_usd: 4000,
+    monto_vencimiento_usd: 3500,
+    observaciones: "Contrato para suministros de oficina",
+    no_contrato_contratacion: 2001,
+    fecha_comite_contratacion: new Date("2023-01-05"),
+    no_comite_contratacion: 3001,
+    no_acuerdo_comite_contratacion: 4001,
+    fecha_comite_administracion: new Date("2023-01-08"),
+    no_comite_administracion: 5001,
+    no_acuerdo_comite_administracion: 6001,
+    departamento_id: 1,
+    fecha_vencido: new Date("2023-12-31"),
+    valor_monto_restante: 10000,
+    entidad: ["Entidad A", "Entidad B"],
+    vigencia: mockVigencia[0],
+    proveedor: mockProveedor[0],
+    tipo_contrato: mockTipoContrato[0],
+    departamento: mockDepartamento[0],
+    estado: "Vencido"
+  },
+  {
+    id: 4,
+    vigencia_id: 1,
+    proveedor_id: 4,
+    tipo_contrato_id: 4,
+    no_contrato: 1004,
+    fecha_entrada: new Date("2023-04-05"),
+    fecha_firmado: new Date("2023-04-01"),
+    valor_cup: 40000,
+    monto_vencimiento_cup: 35000,
+    monto_vencimiento_cl: 25000,
+    valor_usd: 1500,
+    monto_vencimiento_usd: 1200,
+    observaciones: "Contrato para consultoría técnica",
+    no_contrato_contratacion: 2004,
+    fecha_comite_contratacion: new Date("2023-03-25"),
+    no_comite_contratacion: 3004,
+    no_acuerdo_comite_contratacion: 4004,
+    fecha_comite_administracion: new Date("2023-03-28"),
+    no_comite_administracion: 5004,
+    no_acuerdo_comite_administracion: 6004,
+    departamento_id: 1,
+    fecha_vencido: new Date("2023-12-31"),
+    valor_monto_restante: 5000,
+    entidad: ["Entidad Consultoría A"],
+    vigencia: mockVigencia[0],
+    proveedor: mockProveedor[3],
+    tipo_contrato: mockTipoContrato[3],
+    departamento: mockDepartamento[0],
+    estado: "Vencido"
+  }
+];
+
+// Contratos próximos a vencer
+export const contractsNearExpiry = [
+  {
+    id: 2,
+    vigencia_id: 2,
+    proveedor_id: 2,
+    tipo_contrato_id: 2,
+    no_contrato: 1002,
+    fecha_entrada: new Date("2023-02-20"),
+    fecha_firmado: new Date("2023-02-15"),
+    valor_cup: 150000,
+    monto_vencimiento_cup: 130000,
+    monto_vencimiento_cl: 100000,
+    valor_usd: 5000,
+    monto_vencimiento_usd: 4500,
+    observaciones: "Contrato para servicios educativos",
+    no_contrato_contratacion: 2002,
+    fecha_comite_contratacion: new Date("2023-02-10"),
+    no_comite_contratacion: 3002,
+    no_acuerdo_comite_contratacion: 4002,
+    fecha_comite_administracion: new Date("2023-02-12"),
+    no_comite_administracion: 5002,
+    no_acuerdo_comite_administracion: 6002,
+    departamento_id: 2,
+    fecha_vencido: new Date("2024-12-31"),
+    valor_monto_restante: 20000,
+    entidad: ["Entidad Educativa A"],
+    vigencia: mockVigencia[1],
+    proveedor: mockProveedor[1],
+    tipo_contrato: mockTipoContrato[1],
+    departamento: mockDepartamento[1],
+    estado: "Próximo a vencer"
+  },
+  {
+    id: 5,
+    vigencia_id: 2,
+    proveedor_id: 5,
+    tipo_contrato_id: 5,
+    no_contrato: 1005,
+    fecha_entrada: new Date("2023-05-15"),
+    fecha_firmado: new Date("2023-05-10"),
+    valor_cup: 80000,
+    monto_vencimiento_cup: 70000,
+    monto_vencimiento_cl: 55000,
+    valor_usd: 3000,
+    monto_vencimiento_usd: 2500,
+    observaciones: "Contrato para mantenimiento de equipos",
+    no_contrato_contratacion: 2005,
+    fecha_comite_contratacion: new Date("2023-05-05"),
+    no_comite_contratacion: 3005,
+    no_acuerdo_comite_contratacion: 4005,
+    fecha_comite_administracion: new Date("2023-05-08"),
+    no_comite_administracion: 5005,
+    no_acuerdo_comite_administracion: 6005,
+    departamento_id: 4,
+    fecha_vencido: new Date("2024-12-31"),
+    valor_monto_restante: 10000,
+    entidad: ["Entidad Mantenimiento A"],
+    vigencia: mockVigencia[1],
+    proveedor: mockProveedor[4],
+    tipo_contrato: mockTipoContrato[4],
+    departamento: mockDepartamento[3],
+    estado: "Próximo a vencer"
+  }
+];
+
+// Estadísticas de contratos
+export const contractStats = {
+  total: 7,
+  activos: 5,
+  vencidos: 2,
+  proximosAVencer: 2,
+  valorTotal: 690000,
+  valorEjecutado: 51000,
+  valorPendiente: 639000
+};
+
+// Estadísticas por año
+export const contractStatsByYear = [
+  {
+    year: 2023,
+    total: 3,
+    activos: 1,
+    vencidos: 2,
+    valorTotal: 260000,
+    valorEjecutado: 15000
+  },
+  {
+    year: 2024,
+    total: 2,
+    activos: 2,
+    vencidos: 0,
+    valorTotal: 230000,
+    valorEjecutado: 14000
+  },
+  {
+    year: 2025,
+    total: 2,
+    activos: 2,
+    vencidos: 0,
+    valorTotal: 200000,
+    valorEjecutado: 22000
+  }
+];
+
+// Estadísticas por proveedor
+export const contractStatsByProvider = [
+  {
+    proveedor: mockProveedor[0],
+    totalContratos: 1,
+    valorTotal: 100000,
+    valorEjecutado: 10000,
+    estado: "Vencido"
+  },
+  {
+    proveedor: mockProveedor[1],
+    totalContratos: 1,
+    valorTotal: 150000,
+    valorEjecutado: 10500,
+    estado: "Próximo a vencer"
+  },
+  {
+    proveedor: mockProveedor[2],
+    totalContratos: 1,
+    valorTotal: 120000,
+    valorEjecutado: 7000,
+    estado: "Activo"
+  },
+  {
+    proveedor: mockProveedor[3],
+    totalContratos: 1,
+    valorTotal: 40000,
+    valorEjecutado: 4000,
+    estado: "Vencido"
+  },
+  {
+    proveedor: mockProveedor[4],
+    totalContratos: 1,
+    valorTotal: 80000,
+    valorEjecutado: 8000,
+    estado: "Próximo a vencer"
+  },
+  {
+    proveedor: mockProveedor[5],
+    totalContratos: 1,
+    valorTotal: 90000,
+    valorEjecutado: 9000,
+    estado: "Activo"
+  },
+  {
+    proveedor: mockProveedor[6],
+    totalContratos: 1,
+    valorTotal: 110000,
+    valorEjecutado: 12000,
+    estado: "Activo"
+  }
+];
+
+// Estadísticas por tipo de contrato
+export const contractStatsByType = [
+  {
+    tipoContrato: mockTipoContrato[0],
+    totalContratos: 2,
+    valorTotal: 190000,
+    valorEjecutado: 14000
+  },
+  {
+    tipoContrato: mockTipoContrato[1],
+    totalContratos: 2,
+    valorTotal: 260000,
+    valorEjecutado: 18500
+  },
+  {
+    tipoContrato: mockTipoContrato[2],
+    totalContratos: 1,
+    valorTotal: 120000,
+    valorEjecutado: 7000
+  },
+  {
+    tipoContrato: mockTipoContrato[3],
+    totalContratos: 1,
+    valorTotal: 40000,
+    valorEjecutado: 4000
+  },
+  {
+    tipoContrato: mockTipoContrato[4],
+    totalContratos: 1,
+    valorTotal: 80000,
+    valorEjecutado: 8000
+  }
+];
+
+// Ejecuciones por mes
+export const executionsByMonth = [
+  { mes: "Enero", ejecuciones: 0, valor: 0 },
+  { mes: "Febrero", ejecuciones: 0, valor: 0 },
+  { mes: "Marzo", ejecuciones: 2, valor: 10000 },
+  { mes: "Abril", ejecuciones: 2, valor: 12000 },
+  { mes: "Mayo", ejecuciones: 1, valor: 7000 },
+  { mes: "Junio", ejecuciones: 1, valor: 4000 },
+  { mes: "Julio", ejecuciones: 1, valor: 8000 },
+  { mes: "Agosto", ejecuciones: 1, valor: 9000 },
+  { mes: "Septiembre", ejecuciones: 1, valor: 12000 },
+  { mes: "Octubre", ejecuciones: 0, valor: 0 },
+  { mes: "Noviembre", ejecuciones: 0, valor: 0 },
+  { mes: "Diciembre", ejecuciones: 0, valor: 0 }
+];
+
+// Alertas de contratos
+export const contractAlerts = [
+  {
+    id: 1,
+    contrato: mockContrato[1],
+    tipo: "Próximo a vencer",
+    diasRestantes: 15,
+    mensaje: "El contrato 1002 vence en 15 días",
+    prioridad: "Alta",
+    fecha: new Date("2024-12-16")
+  },
+  {
+    id: 2,
+    contrato: mockContrato[4],
+    tipo: "Próximo a vencer",
+    diasRestantes: 15,
+    mensaje: "El contrato 1005 vence en 15 días",
+    prioridad: "Alta",
+    fecha: new Date("2024-12-16")
+  },
+  {
+    id: 3,
+    contrato: mockContrato[0],
+    tipo: "Vencido",
+    diasRestantes: -360,
+    mensaje: "El contrato 1001 está vencido desde hace 360 días",
+    prioridad: "Crítica",
+    fecha: new Date("2023-12-31")
+  },
+  {
+    id: 4,
+    contrato: mockContrato[3],
+    tipo: "Vencido",
+    diasRestantes: -360,
+    mensaje: "El contrato 1004 está vencido desde hace 360 días",
+    prioridad: "Crítica",
+    fecha: new Date("2023-12-31")
+  }
+];
+
+// Proveedores más activos
+export const mostActiveProviders = [
+  {
+    proveedor: mockProveedor[1],
+    totalContratos: 1,
+    totalEjecuciones: 2,
+    valorTotal: 150000,
+    valorEjecutado: 10500,
+    ultimaEjecucion: new Date("2025-04-01")
+  },
+  {
+    proveedor: mockProveedor[6],
+    totalContratos: 1,
+    totalEjecuciones: 1,
+    valorTotal: 110000,
+    valorEjecutado: 12000,
+    ultimaEjecucion: new Date("2024-09-01")
+  },
+  {
+    proveedor: mockProveedor[5],
+    totalContratos: 1,
+    totalEjecuciones: 1,
+    valorTotal: 90000,
+    valorEjecutado: 9000,
+    ultimaEjecucion: new Date("2024-08-01")
+  },
+  {
+    proveedor: mockProveedor[4],
+    totalContratos: 1,
+    totalEjecuciones: 1,
+    valorTotal: 80000,
+    valorEjecutado: 8000,
+    ultimaEjecucion: new Date("2024-07-01")
+  },
+  {
+    proveedor: mockProveedor[2],
+    totalContratos: 1,
+    totalEjecuciones: 1,
+    valorTotal: 120000,
+    valorEjecutado: 7000,
+    ultimaEjecucion: new Date("2025-05-01")
+  }
+];
+
+// Resumen ejecutivo
+export const executiveSummary = {
+  contratosActivos: 5,
+  contratosVencidos: 2,
+  contratosProximosAVencer: 2,
+  valorTotalContratos: 690000,
+  valorTotalEjecutado: 51000,
+  porcentajeEjecucion: 7.39,
+  proveedoresActivos: 7,
+  tiposContratoActivos: 5,
+  alertasActivas: 4,
+  tendenciaEjecucion: "Positiva",
+  mesConMayorEjecucion: "Septiembre",
+  proveedorMasActivo: "Tecnología Avanzada Corp.",
+  departamentoConMasContratos: "Departamento de Compras"
+};
+

@@ -13,6 +13,7 @@ import {
 } from 'ng-apexcharts';
 import { Contrato } from 'app/models/Type';
 import { ContratoService } from '../contratos/services/contrato.service';
+import { MatCardModule } from '@angular/material/card';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -35,7 +36,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-contrato-dashboard',
   standalone: true,
-  imports: [CommonModule, NgApexchartsModule],
+  imports: [CommonModule, NgApexchartsModule,MatCardModule],
   templateUrl: './dashboard-contrato.component.html',
   styleUrls: ['./contrato-dashboard.component.scss']
 })
@@ -98,7 +99,7 @@ export class ContratoDashboardComponent implements OnInit {
       ],
       chart: {
         type: 'bar',
-        height: 350
+        height: 300
       },
       plotOptions: {
         bar: {
@@ -125,7 +126,7 @@ export class ContratoDashboardComponent implements OnInit {
       ],
       chart: {
         type: 'bar',
-        height: 350
+        height: 300
       },
       plotOptions: {
         bar: {
@@ -212,7 +213,7 @@ export class ContratoDashboardComponent implements OnInit {
 
   private createTiposChart(): void {
     const tiposCount = this.contratos.reduce((acc, contrato) => {
-      const tipo = contrato.tipo_contrato.tipo_contrato;
+      const tipo = contrato.tipo_contrato.nombre_tipo_contrato;
       acc[tipo] = (acc[tipo] || 0) + 1;
       return acc;
     }, {} as { [key: string]: number });
@@ -300,7 +301,7 @@ export class ContratoDashboardComponent implements OnInit {
 
   private createDepartamentosChart(): void {
     const deptosCount = this.contratos.reduce((acc, contrato) => {
-      const depto = contrato.departamento.nombre_dpto;
+      const depto = contrato.departamento.nombre_departamento;
       acc[depto] = (acc[depto] || 0) + 1;
       return acc;
     }, {} as { [key: string]: number });

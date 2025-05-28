@@ -19,9 +19,9 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog } from '@angular/material/dialog';
-import { 
-  mockProveedor, 
-  mockContrato 
+import {
+  mockProveedor,
+  mockContrato
 } from 'app/mock-api/contrato-fake/fake';
 import { EjecucionService } from 'app/modules/dashboard/services/ejecucion.service';
 import { SuplementoFormComponent } from 'app/modules/suplementos/suplemento-form/suplemento-form.component';
@@ -164,7 +164,7 @@ export class EjecucionContratoComponent implements OnInit {
   updateSelectedRecord(): void {
     if (this.selectedRow && this.selectedRowForm.valid) {
       const updatedEjecucion = { ...this.selectedRow, ...this.selectedRowForm.value };
-      this.ejecucionService.updateEjecucion(this.selectedRow.id, updatedEjecucion).subscribe({
+this.ejecucionService.updateEjecucion(updatedEjecucion).subscribe({
         next: (ejecucion) => {
           this.loadEjecuciones();
         }

@@ -1,3 +1,15 @@
+
+<div class="flex flex-col flex-auto min-w-0">
+
+  <!-- Main -->
+  <div class="flex-auto p-6 sm:p-10">
+ 
+      <!-- CONTENT GOES HERE -->
+      <div class="h-400 min-h-400 max-h-400 border-2   rounded-2xl">
+
+
+
+
 <div class="p-6 space-y-6 w-full">
   <h1 class="text-3xl font-bold mb-6">Dashboard Ejecución</h1>
 
@@ -5,34 +17,42 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-6">
     <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Contratos con mayor cantidad de Ejecuciones</h2>
-      <apx-chart [series]="contratosTopEjecucionesChartOptions.series" [chart]="contratosTopEjecucionesChartOptions.chart" [xaxis]="contratosTopEjecucionesChartOptions.xaxis" [title]="contratosTopEjecucionesChartOptions.title"></apx-chart>
+
+      <apx-chart 
+      [series]="contratosTopEjecucionesChartOptions.series"
+       [chart]="contratosTopEjecucionesChartOptions.chart" 
+       [xaxis]="contratosTopEjecucionesChartOptions.xaxis" 
+       [title]="contratosTopEjecucionesChartOptions.title">
+      </apx-chart>
     </mat-card>
     <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Suplementos con mayor cantidad de Ejecuciones</h2>
+
       <apx-chart [series]="suplementosTopEjecucionesChartOptions.series" [chart]="suplementosTopEjecucionesChartOptions.chart" [xaxis]="suplementosTopEjecucionesChartOptions.xaxis" [title]="suplementosTopEjecucionesChartOptions.title"></apx-chart>
     </mat-card>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-6">
     <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Top 10 Proveedores con mayor monto Ejecutado</h2>
+
       <apx-chart [series]="top10ProveedoresMayorMontoChartOptions.series" [chart]="top10ProveedoresMayorMontoChartOptions.chart" [xaxis]="top10ProveedoresMayorMontoChartOptions.xaxis" [title]="top10ProveedoresMayorMontoChartOptions.title"></apx-chart>
     </mat-card>
     <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Top 10 Proveedores con menor monto Ejecutado</h2>
+
       <apx-chart [series]="top10ProveedoresMenorMontoChartOptions.series" [chart]="top10ProveedoresMenorMontoChartOptions.chart" [xaxis]="top10ProveedoresMenorMontoChartOptions.xaxis" [title]="top10ProveedoresMenorMontoChartOptions.title"></apx-chart>
     </mat-card>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-6">
     <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Top 10 Proveedores con Contrato y Suplemento mayor monto Ejecutado</h2>
+
       <apx-chart [series]="top10ProveedoresContratoSuplementoMayorMontoChartOptions.series" [chart]="top10ProveedoresContratoSuplementoMayorMontoChartOptions.chart" [xaxis]="top10ProveedoresContratoSuplementoMayorMontoChartOptions.xaxis" [title]="top10ProveedoresContratoSuplementoMayorMontoChartOptions.title"></apx-chart>
     </mat-card>
     <mat-card class="p-4">
-      <h2 class="text-xl font-semibold mb-2">Top 10 Proveedores con Contrato y Suplemento menor monto Ejecutado</h2>
+     
       <apx-chart [series]="top10ProveedoresContratoSuplementoMenorMontoChartOptions.series" [chart]="top10ProveedoresContratoSuplementoMenorMontoChartOptions.chart" [xaxis]="top10ProveedoresContratoSuplementoMenorMontoChartOptions.xaxis" [title]="top10ProveedoresContratoSuplementoMenorMontoChartOptions.title"></apx-chart>
     </mat-card>
   </div>
+</div>
+</div>
+</div>
 </div>

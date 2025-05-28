@@ -70,7 +70,7 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
   totalEjecutadoUsd: string = '-';
   montoRestanteUsd: string = '-';
 
-  tiempoRestante: string = '1 año y 362 días';
+  // Eliminar la propiedad tiempoRestante general
 
   columns = [
     { key: 'no_contrato', label: 'No. Contrato', sortable: true },
@@ -84,20 +84,7 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
     { key: 'vigencia', label: 'Vigencia', sortable: true }
   ];
 
-  // Method to get color class for tiempoRestante based on selectedRow's estado
-  getTiempoRestanteColor(): string {
-    if (!this.selectedRow) return '';
-    switch (this.selectedRow.estado) {
-      case 'Activo':
-        return 'text-green-600';
-      case 'Casi a vencer':
-        return 'text-orange-600';
-      case 'Vencido':
-        return 'text-red-600';
-      default:
-        return '';
-    }
-  }
+
 
   // Add missing properties to fix template errors
   isLoading: boolean = false;
@@ -150,8 +137,8 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
     this.dataSource.sortingDataAccessor = (item: Contrato, property: string) => {
       switch(property) {
         case 'proveedor': return item.proveedor?.nombre;
-        case 'tipo_contrato': return item.tipo_contrato?.tipo_contrato;
-        case 'departamento': return item.departamento?.nombre_dpto;
+        case 'tipo_contrato': return item.tipo_contrato?.nombre_tipo_contrato;
+        case 'departamento': return item.departamento?.nombre_departamento;
         case 'vigencia': return item.vigencia?.vigencia;
         case 'valor_cup': return item.valor_cup || 0;
         case 'valor_usd': return item.valor_usd || 0;
@@ -169,8 +156,8 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
       const dataStr = [
         data.no_contrato,
         data.proveedor?.nombre,
-        data.tipo_contrato?.tipo_contrato,
-        data.departamento?.nombre_dpto,
+        data.tipo_contrato?.nombre_tipo_contrato,
+        data.departamento?.nombre_departamento,
         data.estado,
         data.valor_cup?.toString(),
         data.valor_usd?.toString(),
@@ -222,6 +209,10 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
     this.contratoService.getContratos().subscribe({
       next: (contratos) => {
         console.log('Contratos cargados:', contratos);
+        // Calcular tiempo restante individual para cada contrato
+        contratos.forEach(contrato => {
+          contrato['tiempoRestante'] = this.calcularTiempoRestante(contrato);
+        });
         this.data = contratos;
         this.dataSource.data = contratos;
         this.pagination.length = contratos.length;
@@ -235,6 +226,64 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  calcularTiempoRestante(contrato: Contrato): string {
+    const hoy = new Date();
+    let fechaVencimiento: Date | null = null;
+
+    if (contrato.fecha_vencido) {
+      fechaVencimiento = new Date(contrato.fecha_vencido);
+    } else if (contrato.fecha_firmado && contrato.vigencia && contrato.vigencia.vigencia) {
+      // Suponiendo que vigencia.vigencia está en días
+      fechaVencimiento = new Date(contrato.fecha_firmado);
+      fechaVencimiento.setDate(fechaVencimiento.getDate() + contrato.vigencia.vigencia);
+    }
+
+    if (!fechaVencimiento) {
+      return 'N/A';
+    }
+
+    const diffMs = fechaVencimiento.getTime() - hoy.getTime();
+    if (diffMs < 0) {
+      return 'Vencido';
+    }
+
+    let remainingMs = diffMs;
+
+    const msInYear = 1000 * 60 * 60 * 24 * 365;
+    const msInMonth = 1000 * 60 * 60 * 24 * 30;
+    const msInWeek = 1000 * 60 * 60 * 24 * 7;
+    const msInDay = 1000 * 60 * 60 * 24;
+
+    const years = Math.floor(remainingMs / msInYear);
+    remainingMs -= years * msInYear;
+
+    const months = Math.floor(remainingMs / msInMonth);
+    remainingMs -= months * msInMonth;
+
+    const weeks = Math.floor(remainingMs / msInWeek);
+    remainingMs -= weeks * msInWeek;
+
+    const days = Math.floor(remainingMs / msInDay);
+
+    let resultado = '';
+    if (years > 0) {
+      resultado += years + (years === 1 ? ' año' : ' años');
+    }
+    if (months > 0) {
+      if (resultado.length > 0) resultado += ', ';
+      resultado += months + (months === 1 ? ' mes' : ' meses');
+    }
+    if (weeks > 0) {
+      if (resultado.length > 0) resultado += ', ';
+      resultado += weeks + (weeks === 1 ? ' semana' : ' semanas');
+    }
+    if (days > 0) {
+      if (resultado.length > 0) resultado += ' y ';
+      resultado += days + (days === 1 ? ' día' : ' días');
+    }
+    return resultado || 'Menos de un día';
   }
 
   trackByFn(index: number, item: Contrato): number {

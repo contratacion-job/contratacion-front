@@ -1,3 +1,8 @@
+
+
+
+
+
 <div class="flex flex-col min-h-screen p-6 w-full">
   <!-- Card -->
   <div class="relative flex flex-col flex-auto p-6 pr-3 pb-3 bg-card rounded-2xl shadow overflow-hidden mb-6 w-full">
@@ -6,65 +11,8 @@
         class="icon-size-24 opacity-25 text-green-500 dark:text-green-400"
         [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
     </div>
-    <div class="flex items-center">
-      <div class="flex flex-col">
-        <div class="text-lg font-medium tracking-tight leading-6 truncate">Estado Anterior</div>
-        <div class="text-green-600 font-medium text-sm">
-          Datos recientes de proveedores
-        </div>
-      </div>
-      <div class="ml-auto -mt-2">
-        <button
-          mat-icon-button
-          [matMenuTriggerFor]="previousStatementMenu">
-          <mat-icon
-            class="icon-size-5"
-            [svgIcon]="'heroicons_mini:ellipsis-vertical'"></mat-icon>
-        </button>
-        <mat-menu #previousStatementMenu="matMenu">
-          <button mat-menu-item>
-            <span class="flex items-center">
-              <mat-icon
-                class="icon-size-5 mr-3"
-                [svgIcon]="'heroicons_solid:credit-card'"></mat-icon>
-              <span>Ver detalles</span>
-            </span>
-          </button>
-          <button mat-menu-item>
-            <span class="flex items-center">
-              <mat-icon
-                class="icon-size-5 mr-3"
-                [svgIcon]="'heroicons_solid:banknotes'"></mat-icon>
-              <span>Reportes</span>
-            </span>
-          </button>
-          <mat-divider class="my-2"></mat-divider>
-          <button mat-menu-item>
-            <span class="flex items-center">
-              <mat-icon
-                class="icon-size-5 mr-3"
-                [svgIcon]="'heroicons_solid:printer'"></mat-icon>
-              <span>Imprimir</span>
-            </span>
-          </button>
-          <button mat-menu-item>
-            <span class="flex items-center">
-              <mat-icon
-                class="icon-size-5 mr-3"
-                [svgIcon]="'heroicons_solid:envelope'"></mat-icon>
-              <span>Enviar por correo</span>
-            </span>
-          </button>
-        </mat-menu>
-      </div>
-    </div>
-    <div class="flex flex-row flex-wrap mt-4 -mx-6">
-      <div class="flex flex-col mx-6 my-3">
-        <div class="text-sm font-medium leading-none text-secondary">Total Proveedores</div>
-        <div class="mt-2 font-medium text-3xl leading-none">{{data.length}}</div>
-      </div>
-    </div>
-  </div>
+    
+ 
 
   <!-- Proveedores Table -->
   <div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
@@ -78,12 +26,10 @@
       </div>
       <!-- Title -->
       <div class="flex-1 min-w-0">
-        <div class="flex flex-wrap items-center font-medium">
-          <div>Proveedores</div>
-        </div>
+      
         <div class="mt-2">
           <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
-            Lista de Proveedores
+           Proveedores
           </h2>
         </div>
       </div>
@@ -123,44 +69,56 @@
           <div class="grid">
             <!-- Header -->
             <div
-              class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+              class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 overflow-x-auto"
               matSort
               matSortDisableClear
-              style="grid-template-columns: repeat(7, minmax(0, 1fr));">
-              <div [mat-sort-header]="'nombre'">Nombre</div>
-              <div [mat-sort-header]="'codigo'">Código</div>
-              <div [mat-sort-header]="'telefonos'">Teléfonos</div>
-              <div [mat-sort-header]="'domicilio'">Domicilio</div>
-              <div [mat-sort-header]="'municipio'">Municipio</div>
-              <div [mat-sort-header]="'ministerio'">Ministerio</div>
+              style="grid-template-columns: 150px 100px 150px 150px 150px 150px 80px;">
+              <div class="truncate" [matTooltip]="'Nombre completo'" matTooltipPosition="above" [matTooltipDisabled]="false" [matTooltipShowDelay]="500" [matTooltipHideDelay]="100">
+                <span [title]="nombre">Nombre</span>
+              </div>
+              <div class="truncate" [matTooltip]="'Código completo'" matTooltipPosition="above" [matTooltipDisabled]="false" [matTooltipShowDelay]="500" [matTooltipHideDelay]="100">
+                <span [title]="codigo">Código</span>
+              </div>
+              <div class="truncate" [matTooltip]="'Teléfonos completos'" matTooltipPosition="above" [matTooltipDisabled]="false" [matTooltipShowDelay]="500" [matTooltipHideDelay]="100">
+                <span [title]="telefonos">Teléfonos</span>
+              </div>
+              <div class="truncate" [matTooltip]="'Domicilio completo'" matTooltipPosition="above" [matTooltipDisabled]="false" [matTooltipShowDelay]="500" [matTooltipHideDelay]="100">
+                <span [title]="domicilio">Domicilio</span>
+              </div>
+              <div class="truncate" [matTooltip]="'Municipio completo'" matTooltipPosition="above" [matTooltipDisabled]="false" [matTooltipShowDelay]="500" [matTooltipHideDelay]="100">
+                <span [title]="municipio">Municipio</span>
+              </div>
+              <div class="truncate" [matTooltip]="'Ministerio completo'" matTooltipPosition="above" [matTooltipDisabled]="false" [matTooltipShowDelay]="500" [matTooltipHideDelay]="100">
+                <span [title]="ministerio">Ministerio</span>
+              </div>
               <div>Detalles</div>
             </div>
             <!-- Rows -->
             <ng-container *ngFor="let proveedor of dataSource.data; trackBy: trackByFn">
               <div
                 class="inventory-grid grid items-center gap-4 py-3 px-6 md:px-8 border-b"
-                style="grid-template-columns: repeat(7, minmax(0, 1fr));">
-                <div class="truncate">
+                style="grid-template-columns: 150px 100px 150px 150px 150px 150px 80px;">
+                <div class="truncate" [matTooltip]="proveedor.nombre" matTooltipPosition="above">
                   {{proveedor.nombre}}
                 </div>
-                <div class="truncate">
+                <div class="truncate" [matTooltip]="proveedor.codigo" matTooltipPosition="above">
                   {{proveedor.codigo}}
                 </div>
-                <div class="truncate">
+                <div class="truncate" [matTooltip]="proveedor.telefonos" matTooltipPosition="above">
                   {{proveedor.telefonos}}
                 </div>
-                <div class="truncate">
+                <div class="truncate" [matTooltip]="proveedor.domicilio" matTooltipPosition="above">
                   {{proveedor.domicilio}}
                 </div>
-                <div>
+                <div class="truncate" [matTooltip]="proveedor.municipio.nombre_municipio" matTooltipPosition="above">
                   {{proveedor.municipio.nombre_municipio}}
                 </div>
-                <div>
+                <div class="truncate" [matTooltip]="proveedor.ministerio.nombre_ministerio" matTooltipPosition="above">
                   {{proveedor.ministerio.nombre_ministerio}}
                 </div>
-                <div>
+                <div class="sticky-end flex items-center justify-center" style="position: sticky; right: 0; background: inherit; z-index: 10;">
                   <button
-                    class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                    class="min-w-10 min-h-7 h-7 px-2 leading-6 whitespace-nowrap"
                     mat-stroked-button
                     (click)="toggleDetails(proveedor.id)">
                     <mat-icon

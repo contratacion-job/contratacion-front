@@ -6,15 +6,28 @@ export interface TipoProveedor {
 // Table: tipo_contrato
 export interface TipoContrato {
   id: number;
-  tipo_contrato: string;
+   nombre_tipo_contrato: string;
+  descripcion: string;
 }
 
 // Table: vigencia
 export interface Vigencia {
   id: number;
+  vigencia: number; // Add this field
   alerta_vigencia: number;
   tipo_vigencia: string;
   tipo_alerta_vigencia: string;
+}
+
+export interface VigenciaContrato {
+  id: number;
+  vigencia: number;
+  alerta_vigencia: number;
+  tipo_alerta_vigencia: string;
+  tipo_vigencia: string;
+  proveedor: any; // Cambiado para coincidir con Type.ts
+  proveedorId?: number;
+  tipo_contratoId?: number;
 }
 
 // Table: provincia
@@ -52,7 +65,9 @@ export interface Entidad {
 // Table: departamento
 export interface Departamento {
   id: number;
-  nombre_dpto: string;
+   nombre_departamento: string; // Cambiado de nombre_dpto a nombre_departamento
+  codigo: string; // Agregado
+  descripcion: string; // Agregado
 }
 
 // Table: proveedor
@@ -66,21 +81,13 @@ export interface Proveedor {
   domicilio: string;
   municipio: Municipio; // Relationship: belongs to municipio
   ministerio: Ministerio; // Relationship: belongs to ministerio
-  fechaCreacion?: string;
-  estado?: string;
-  tipo?: string;
-  categoria?: string;
+  fechaCreacion: string; // Cambiado de opcional a requerido
+  estado: string; // Cambiado de opcional a requerido
+  tipo: string; // Cambiado de opcional a requerido
+  categoria: string; // Cambiado de opcional a requerido
 }
 
 // Table: vigencia_contrato
-export interface VigenciaContrato {
-  id: number;
-  vigencia: number;
-  alerta_vigencia: number;
-  tipo_vigencia: string;
-  tipo_alerta_vigencia: string;
-  proveedor: Proveedor; // Relationship: belongs to proveedor
-}
 
 // Table: suplemento
 export interface Suplemento {

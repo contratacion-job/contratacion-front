@@ -1,43 +1,43 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { mockEjecucionContrato } from 'app/mock-api/contrato-fake/fake';
-import { EjecucionContrato } from 'app/models/Type';
+import { EjecucionContrato } from '../../../models/Type';
+import { mockEjecucionContrato } from '../../../mock-api/contrato-fake/fake';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EjecucionService {
-  constructor() {}
+
+  constructor() { }
 
   getEjecuciones(): Observable<EjecucionContrato[]> {
-    return of(mockEjecucionContrato);
+    return of(mockEjecucionContrato as EjecucionContrato[]);
   }
 
-  getEjecucion(id: number): Observable<EjecucionContrato | undefined> {
+  getEjecucionById(id: number): Observable<EjecucionContrato | undefined> {
     const ejecucion = mockEjecucionContrato.find(e => e.id === id);
+    return of(ejecucion as EjecucionContrato | undefined);
+  }
+
+  addEjecucion(ejecucion: EjecucionContrato): Observable<EjecucionContrato> {
+    (mockEjecucionContrato as any[]).push(ejecucion as any);
     return of(ejecucion);
   }
 
-  createEjecucion(ejecucion: EjecucionContrato): Observable<EjecucionContrato> {
-    // Mock create: add to array (not persistent)
-    mockEjecucionContrato.push(ejecucion);
-    return of(ejecucion);
-  }
-
-  updateEjecucion(id: number, ejecucion: EjecucionContrato): Observable<EjecucionContrato | undefined> {
-    const index = mockEjecucionContrato.findIndex(e => e.id === id);
+  updateEjecucion(ejecucion: EjecucionContrato): Observable<EjecucionContrato> {
+    const index = mockEjecucionContrato.findIndex(e => e.id === ejecucion.id);
     if (index !== -1) {
-      mockEjecucionContrato[index] = ejecucion;
-      return of(ejecucion);
+      (mockEjecucionContrato as any[])[index] = ejecucion as any;
     }
-    return of(undefined);
+    return of(ejecucion);
   }
 
-  deleteEjecucion(id: number): Observable<void> {
+  deleteEjecucion(id: number): Observable<boolean> {
     const index = mockEjecucionContrato.findIndex(e => e.id === id);
     if (index !== -1) {
       mockEjecucionContrato.splice(index, 1);
+      return of(true);
     }
-    return of();
+    return of(false);
   }
 }

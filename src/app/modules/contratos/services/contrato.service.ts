@@ -12,8 +12,8 @@ export class ContratoService {
   private expired: Contrato[] = [];
 
   constructor() {
-    this.contratos = mockContrato || [];
-    this.expired = expiredContracts || [];
+ this.contratos = mockContrato as Contrato[] || [];
+  this.expired = expiredContracts as Contrato[] || [];
     console.log('Contratos inicializados:', this.contratos);
   }
 
