@@ -2,8 +2,8 @@ import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectionStrategy, V
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { FormControl, FormGroup } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { FormControl, FormGroup, UntypedFormControl } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, map, switchMap, takeUntil } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { ContratoFormComponent } from '../contrato-form/contrato-form.component';
 import { CommonModule } from '@angular/common';
@@ -24,6 +24,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { ContratoService } from '../services/contrato.service';
 import { Contrato, Proveedor, TipoContrato, VigenciaContrato } from 'app/models/Type';
 import { mockProveedor, mockTipoContrato, mockVigenciaContrato, mockDepartamento } from 'app/mock-api/contrato-fake/fake';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-contrato-list',
@@ -69,6 +70,7 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
   montoInicialUsd: string = '-';
   totalEjecutadoUsd: string = '-';
   montoRestanteUsd: string = '-';
+  private _unsubscribeAll: Subject<any> = new Subject<any>();
 
   // Eliminar la propiedad tiempoRestante general
 
@@ -88,7 +90,7 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
 
   // Add missing properties to fix template errors
   isLoading: boolean = false;
-  searchInputControl = new FormControl('');
+  searchInputControl: UntypedFormControl = new UntypedFormControl();
   dataSource = new MatTableDataSource<Contrato>([]);
   noContracts: any = null;
 
@@ -171,18 +173,24 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
 
     // Suscribirse a los cambios en el control de búsqueda
     this.searchInputControl.valueChanges
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged()
-      )
-      .subscribe(value => {
-        this.dataSource.filter = value?.trim() || '';
-        if (this.dataSource.paginator) {
-          this.dataSource.paginator.firstPage();
-        }
-        this.cdr.markForCheck();
-      });
-  }
+            .pipe(
+                takeUntil(this._unsubscribeAll),
+                debounceTime(300),
+                switchMap((query) =>
+                {
+                    this.closeDetails();
+                    this.isLoading = true;
+                    return this.contratoService.getContratos();
+                }),
+                map(() =>
+                {
+                    this.isLoading = false;
+                }),
+            )
+            .subscribe();
+    }
+
+  
 
   ngAfterViewInit(): void {
     // Configurar paginator
@@ -202,6 +210,10 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
     // Forzar detección de cambios
     this.cdr.detectChanges();
   }
+  closeDetails(): void
+    {
+        this.selectedRow = null;
+    }
 
   loadContratos(): void {
     this.isLoading = true;

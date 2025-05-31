@@ -1,7 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import{TrabajadoresComponent} from 'app/modules/organizacion/trabajadores/trabajadores.component'
-import { ExampleComponent } from '../admin/example/example.component';
+
+import { DepartamentoFormComponent } from './departamento-list/departamento-list.component';
+import { LicenseComponent } from 'app/core/soporte/license/license.component';
+import { BDComponent } from 'app/core/soporte/bd/bd.component';
 
 const routes: Routes = [
  {
@@ -10,9 +13,17 @@ const routes: Routes = [
     },
     {
       path: 'departamentos',
-      component: ExampleComponent
+      component: DepartamentoFormComponent
   },
 
+  {
+    path: 'licencia',
+    component: LicenseComponent
+},
+{
+  path: 'bd',
+  component:  BDComponent
+},
 
 ];
 

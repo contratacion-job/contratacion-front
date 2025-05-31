@@ -1,0 +1,24 @@
+::ng-deep .mat-progress-bar {
+    height: 24px !important;
+  }
+  
+  ::ng-deep .mat-progress-bar-fill::after {
+    height: 16px !important;
+    border-radius: 8px !important;
+  }
+  
+  ::ng-deep .mat-progress-bar-buffer {
+    height: 24px !important;
+  }
+::ng-deep .p-progressbar .p-progressbar-value
+
+   {
+
+      border-radius: 2rem !important;
+  }
+  ::ng-deep .p-progressbar 
+
+   {
+
+      border-radius: 2rem !important;
+  }

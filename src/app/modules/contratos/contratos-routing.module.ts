@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ContratoListComponent } from './contrato-list/contrato-list.component';
 import { EjecucionContratoComponent } from './ejecucion-contrato/ejecucion-contrato.component';
 import { ExpiredContractsComponent } from './expired-contracts/expired-contracts.component';
+import { ExpiredComponent } from './ejecucion-contrato/expired/expired.component';
 
 const routes: Routes = [
     {
@@ -12,9 +13,14 @@ const routes: Routes = [
     {
       path: 'contratos',
       component: EjecucionContratoComponent
-  }, {
+  }, 
+  {
     path: 'vencidos',
     component: ExpiredContractsComponent
+},
+{
+  path: 'vencidas',
+  component: ExpiredComponent
 },
 
 ];
