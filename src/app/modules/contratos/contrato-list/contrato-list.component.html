@@ -147,7 +147,7 @@
                   <div class="sticky-end">Detalles</div>
               </div>
               <!-- Rows -->
-              <ng-container *ngFor="let contract of dataSource.data; trackBy: trackByFn">
+              <ng-container *ngFor="let contract of dataSource.filteredData; trackBy: trackByFn">
                 <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b items-center text-m"
                     style="grid-template-columns: 40px repeat(10, minmax(100px, 1fr)) 100px;">
                         <!-- Estado with colored dot -->

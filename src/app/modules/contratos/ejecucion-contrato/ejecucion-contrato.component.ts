@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormControl, FormGroup } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -25,6 +25,7 @@ import {
 } from 'app/mock-api/contrato-fake/fake';
 import { EjecucionService } from 'app/modules/dashboard/services/ejecucion.service';
 import { SuplementoFormComponent } from 'app/modules/suplementos/suplemento-form/suplemento-form.component';
+import { Subject } from 'rxjs';
 
 
 @Component({
@@ -64,7 +65,7 @@ export class EjecucionContratoComponent implements OnInit {
     { key: 'trabajo_ejecutado', label: 'Trabajo Ejecutado', editable: true },
     { key: 'fecha_ejecucion', label: 'Fecha Ejecución', type: 'date', editable: true }
   ];
-
+  private _unsubscribeAll = new Subject<void>();
   title = 'Ejecución de Contratos';
   addButtonText = 'Agregar Ejecución';
   dataSource: MatTableDataSource<any>;
@@ -78,10 +79,12 @@ export class EjecucionContratoComponent implements OnInit {
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
+ 
 
-  constructor(private ejecucionService: EjecucionService, public dialog: MatDialog) {
+  constructor(private ejecucionService: EjecucionService, public dialog: MatDialog, private cdr: ChangeDetectorRef) {
     this.dataSource = new MatTableDataSource([]);
     this.selectedRowForm = new FormGroup({});
+    
   }
 
   ngOnInit(): void {
@@ -89,10 +92,18 @@ export class EjecucionContratoComponent implements OnInit {
     this.loadEjecuciones();
 
     this.searchInputControl.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged())
-      .subscribe(value => {
+    .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntil(this._unsubscribeAll)
+    )
+    .subscribe(value => {
+        console.log('Search query:', value);
         this.dataSource.filter = value?.trim().toLowerCase() || '';
-      });
+        console.log('Filtered data:', this.dataSource.filteredData);
+        this.cdr.detectChanges(); // Force UI update
+        this.dataSource._updateChangeSubscription(); // Ensure table updates
+    });
 
     this.dataSource.filterPredicate = (data: any, filter: string) => {
       const searchStr = Object.keys(data)

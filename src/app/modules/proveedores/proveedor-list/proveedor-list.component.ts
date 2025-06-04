@@ -3,7 +3,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormControl, FormGroup } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -19,11 +19,13 @@ import {MatMenuModule} from '@angular/material/menu';
 import {MatDividerModule} from '@angular/material/divider';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ProveedorFormComponent } from '../proveedor-form/proveedor-form.component';
-import { ProveedorService } from '../services/proveedor.service';
+import {  ProveedorService } from '../services/proveedor.service';
 import { 
   mockMinisterio, 
   mockMunicipio 
 } from 'app/mock-api/contrato-fake/fake'; 
+import { Proveedor } from 'app/models/Type';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-proveedor-list',
@@ -63,14 +65,14 @@ export class ProveedorListComponent implements OnInit {
 
   title = 'Proveedores';
   addButtonText = 'Agregar Proveedor';
-  dataSource: MatTableDataSource<any>;
+  dataSource: MatTableDataSource<Proveedor>;
   displayedColumns: string[] = [];
   searchInputControl = new FormControl('');
   selectedRow: any = null;
   selectedRowForm: FormGroup;
   isLoading = false;
   pagination = { length: 0, page: 0, size: 10 };
-
+  private _unsubscribeAll = new Subject<void>();
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -82,16 +84,34 @@ export class ProveedorListComponent implements OnInit {
     this.dataSource = new MatTableDataSource([]);
     this.selectedRowForm = new FormGroup({});
   }
+  ngOnDestroy(): void {
+    this._unsubscribeAll.next();
+    this._unsubscribeAll.complete();
+}
 
+ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
+    this.cdr.detectChanges();
+}
   ngOnInit(): void {
     this.displayedColumns = this.columns.map(col => col.key).concat('details');
     this.loadProveedores();
 
     this.searchInputControl.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged())
-      .subscribe(value => {
+    .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntil(this._unsubscribeAll)
+    )
+    .subscribe(value => {
+        console.log('Search query:', value);
+        this.closeDetails();
         this.dataSource.filter = value?.trim().toLowerCase() || '';
-      });
+        console.log('Filtered data:', this.dataSource.filteredData);
+        this.cdr.detectChanges(); // Use detectChanges for immediate update
+        this.dataSource._updateChangeSubscription(); // Force table update
+    });
 
     this.dataSource.filterPredicate = (data: any, filter: string) => {
       const searchStr = Object.keys(data)
@@ -103,6 +123,10 @@ export class ProveedorListComponent implements OnInit {
       return searchStr.includes(filter);
     };
   }
+  closeDetails(): void {
+    this.selectedRow = null;
+    this.cdr.detectChanges();
+}
 
   loadProveedores(): void {
     this.isLoading = true;

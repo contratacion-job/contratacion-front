@@ -127,7 +127,7 @@
               <div>Detalles</div>
             </div>
             <!-- Rows -->
-            <ng-container *ngFor="let ejecucion of dataSource.data; trackBy: trackByFn">
+            <ng-container *ngFor="let ejecucion of dataSource.filteredData; trackBy: trackByFn">
               <div
                 class="inventory-grid grid items-center gap-4 py-3 px-6 md:px-8 border-b"
                 style="grid-template-columns: repeat(7, minmax(0, 1fr));">

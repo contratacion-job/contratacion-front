@@ -5,6 +5,7 @@ import{TrabajadoresComponent} from 'app/modules/organizacion/trabajadores/trabaj
 import { DepartamentoFormComponent } from './departamento-list/departamento-list.component';
 import { LicenseComponent } from 'app/core/soporte/license/license.component';
 import { BDComponent } from 'app/core/soporte/bd/bd.component';
+import { MunicipioListComponent } from './municipio-list/municipio-list.component';
 
 const routes: Routes = [
  {
@@ -13,7 +14,7 @@ const routes: Routes = [
     },
     {
       path: 'departamentos',
-      component: DepartamentoFormComponent
+      component: MunicipioListComponent
   },
 
   {

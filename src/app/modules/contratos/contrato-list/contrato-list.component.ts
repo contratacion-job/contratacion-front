@@ -151,43 +151,41 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
     };
 
     // Configurar el filtro
-    this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
-      if (!filter) return true;
+this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
+  if (!filter) return true;
 
-      const searchTerms = filter.toLowerCase().split(' ').filter(term => term.length > 0);
-      const dataStr = [
-        data.no_contrato,
-        data.proveedor?.nombre,
-        data.tipo_contrato?.nombre_tipo_contrato,
-        data.departamento?.nombre_departamento,
-        data.estado,
-        data.valor_cup?.toString(),
-        data.valor_usd?.toString(),
-        data.fecha_entrada,
-        data.fecha_firmado,
-        data.vigencia?.vigencia?.toString()
-      ].join(' ').toLowerCase();
+  const searchTerm = filter.toLowerCase().trim();
+  const dataStr = [
+    data.no_contrato?.toString() || '',
+    data.proveedor?.nombre?.toLowerCase() || '',
+    data.tipo_contrato?.nombre_tipo_contrato?.toLowerCase() || '',
+    data.departamento?.nombre_departamento?.toLowerCase() || '',
+    data.estado?.toLowerCase() || '',
+    data.valor_cup?.toString() || '',
+    data.valor_usd?.toString() || '',
+    data.fecha_entrada || '',
+    data.fecha_firmado || '',
+    data.vigencia?.vigencia?.toString()?.toLowerCase() || '',
+    data.observaciones?.toLowerCase() || '',
+    (data as any).tiempoRestante?.toLowerCase() || ''
+].join(' ');
 
-      return searchTerms.every(term => dataStr.includes(term));
-    };
+return dataStr.includes(searchTerm);
+};
 
     // Suscribirse a los cambios en el control de búsqueda
-    this.searchInputControl.valueChanges
-            .pipe(
-                takeUntil(this._unsubscribeAll),
-                debounceTime(300),
-                switchMap((query) =>
-                {
-                    this.closeDetails();
-                    this.isLoading = true;
-                    return this.contratoService.getContratos();
-                }),
-                map(() =>
-                {
-                    this.isLoading = false;
-                }),
-            )
-            .subscribe();
+this.searchInputControl.valueChanges
+        .pipe(
+            takeUntil(this._unsubscribeAll),
+            debounceTime(300),
+        )
+        .subscribe((query) => {
+          console.log('Search query:', query);
+          this.closeDetails();
+          this.dataSource.filter = query ? query.trim().toLowerCase() : '';
+          console.log('Filtered data:', this.dataSource.filteredData);
+          this.cdr.detectChanges();
+        });
     }
 
   
@@ -223,13 +221,14 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
         console.log('Contratos cargados:', contratos);
         // Calcular tiempo restante individual para cada contrato
         contratos.forEach(contrato => {
-          contrato['tiempoRestante'] = this.calcularTiempoRestante(contrato);
+          (contrato as any).tiempoRestante = this.calcularTiempoRestante(contrato);
         });
         this.data = contratos;
         this.dataSource.data = contratos;
         this.pagination.length = contratos.length;
         this.isLoading = false;
         this.cdr.detectChanges();
+        console.log('DataSource data:', this.dataSource.data);
       },
       error: (err) => {
         console.error('Error al cargar los contratos:', err);
