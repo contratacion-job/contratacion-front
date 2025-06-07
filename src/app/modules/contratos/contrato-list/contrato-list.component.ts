@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectionStrategy, V
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { FormControl, FormGroup, UntypedFormControl } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, UntypedFormControl, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, map, switchMap, takeUntil } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { ContratoFormComponent } from '../contrato-form/contrato-form.component';
@@ -88,7 +88,12 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
 
 
 
-  // Add missing properties to fix template errors
+  // Propiedades para el formulario de adición
+  showAddForm: boolean = false;
+  isAdding: boolean = false;
+  newContratoForm: FormGroup;
+  
+  // Propiedades existentes
   isLoading: boolean = false;
   searchInputControl: UntypedFormControl = new UntypedFormControl();
   dataSource = new MatTableDataSource<Contrato>([]);
@@ -113,20 +118,26 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
   constructor(
     private contratoService: ContratoService,
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private fb: FormBuilder
   ) {
     this.dataSource = new MatTableDataSource<Contrato>([]);
-    this.selectedRowForm = new FormGroup({
-      no_contrato: new FormControl(''),
-      proveedor: new FormControl(null),
-      tipo_contrato: new FormControl(null),
-      valor_cup: new FormControl(0),
-      valor_usd: new FormControl(0),
-      fecha_firmado: new FormControl(''),
-      vigencia: new FormControl(null),
-      observaciones: new FormControl(''),
-      fecha_vencido: new FormControl('')
+    
+    // Formulario para edición
+    this.selectedRowForm = this.fb.group({
+      no_contrato: ['', Validators.required],
+      proveedor: [null, Validators.required],
+      tipo_contrato: [null, Validators.required],
+      valor_cup: [0, [Validators.required, Validators.min(0)]],
+      valor_usd: [0, Validators.min(0)],
+      fecha_firmado: ['', Validators.required],
+      vigencia: [null, Validators.required],
+      observaciones: [''],
+      fecha_vencido: ['']
     });
+    
+    // Inicializar formulario para nuevo contrato
+    this.initNewContratoForm();
   }
 
   ngOnInit(): void {
@@ -368,4 +379,83 @@ this.searchInputControl.valueChanges
       });
     }
   }
+
+  // Métodos para el formulario de adición
+  initNewContratoForm(): void {
+    this.newContratoForm = this.fb.group({
+      no_contrato: ['', Validators.required],
+      proveedor: [null, Validators.required],
+      tipo_contrato: [null, Validators.required],
+      valor_cup: [0, [Validators.required, Validators.min(0)]],
+      valor_usd: [0, [Validators.min(0)]],
+      fecha_firmado: ['', Validators.required],
+      vigencia: [null, Validators.required],
+      observaciones: [''],
+      fecha_entrada: [new Date().toISOString().split('T')[0]]
+    });
+  }
+
+  toggleAddForm(): void {
+    this.showAddForm = !this.showAddForm;
+    if (!this.showAddForm) {
+      this.newContratoForm.reset();
+      this.initNewContratoForm();
+    }
+  }
+
+  cancelAdd(): void {
+    this.showAddForm = false;
+    this.newContratoForm.reset();
+    this.initNewContratoForm();
+  }
+
+  addNewContrato(): void {
+    if (this.newContratoForm.invalid) {
+      this.newContratoForm.markAllAsTouched();
+      return;
+    }
+
+    this.isAdding = true;
+    
+    // Obtener los valores del formulario
+    const formValue = this.newContratoForm.value;
+    
+    // Crear el objeto contrato con los valores del formulario
+    const newContrato: Contrato = {
+      ...formValue,
+      id: 0, // El backend asignará el ID
+      estado: 'Activo',
+      departamento: mockDepartamento[0], // Valor por defecto
+      fecha_entrada: new Date().toISOString().split('T')[0],
+      fecha_vencido: this.calculateExpirationDate(formValue.fecha_firmado, formValue.vigencia.vigencia)
+    };
+
+    this.contratoService.createContrato(newContrato).subscribe({
+      next: (response) => {
+        this.isAdding = false;
+        this.showAddForm = false;
+        this.loadContratos();
+        this.newContratoForm.reset();
+        this.initNewContratoForm();
+        // Mostrar mensaje de éxito
+        // this.snackBar.open('Contrato creado exitosamente', 'Cerrar', { duration: 3000 });
+      },
+      error: (error) => {
+        console.error('Error al crear el contrato:', error);
+        this.isAdding = false;
+        // Mostrar mensaje de error
+        // this.snackBar.open('Error al crear el contrato', 'Cerrar', { duration: 3000 });
+      }
+    });
+  }
+
+  // Método auxiliar para calcular la fecha de vencimiento
+  private calculateExpirationDate(fechaFirmado: string, vigenciaDias: number): string {
+    if (!fechaFirmado || !vigenciaDias) return '';
+    
+    const fecha = new Date(fechaFirmado);
+    fecha.setDate(fecha.getDate() + vigenciaDias);
+    return fecha.toISOString().split('T')[0];
+  }
 }
+

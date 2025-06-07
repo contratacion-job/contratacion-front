@@ -56,7 +56,13 @@ import { Subject } from 'rxjs';
 })
 export class EjecucionContratoComponent implements OnInit {
   data: any[] = [];
+  montoInicialCup: number = 8000;
+  totalEjecutadoCup: number = 6000;
+  montoRestanteCup: number = 2000;
 
+  montoInicialUsd: string = '-';
+  totalEjecutadoUsd: string = '-';
+  montoRestanteUsd: string = '-';
   columns = [
     { key: 'proveedor', label: 'Proveedor', nestedKey: 'nombre', editable: false, selectOptions: mockProveedor },
     { key: 'contrato', label: 'Contrato', nestedKey: 'no_contrato', editable: false, selectOptions: mockContrato },

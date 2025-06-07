@@ -12,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 
@@ -28,6 +29,7 @@ import { RippleModule } from 'primeng/ripple';
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatTooltipModule,
     ButtonModule,
     RippleModule
   ]
