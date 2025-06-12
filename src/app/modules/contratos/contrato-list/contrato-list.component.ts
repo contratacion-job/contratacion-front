@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectionStrategy, V
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { FormBuilder, FormControl, FormGroup, UntypedFormControl, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, map, switchMap, takeUntil } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { ContratoFormComponent } from '../contrato-form/contrato-form.component';
@@ -104,7 +104,8 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
   title = 'Contratos';
   addButtonText = 'Agregar Contrato';
 
-
+  selectedContrato: any | null = null;
+  selectedContratoForm: UntypedFormGroup;
   selectedRow: Contrato | null = null;
   selectedRowForm: FormGroup;
 
@@ -224,6 +225,11 @@ this.searchInputControl.valueChanges
         this.selectedRow = null;
     }
 
+  // Nuevo método para agregar contrato inline
+  private generateTempId(): string {
+        return 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
   loadContratos(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -335,21 +341,28 @@ this.searchInputControl.valueChanges
     this.cdr.markForCheck();
   }
 
-  openNewContratoDialog(): void {
-    const dialogRef = this.dialog.open(ContratoFormComponent, {
-      width: '40%',
-      height: '90%',
-      disableClose: false
-    });
+ openNewContratoDialog(): void {
+  // Configuración del diálogo responsivo
+  const isMobile = window.innerWidth <= 768; // Umbral para móviles
+  
+  const dialogRef = this.dialog.open(ContratoFormComponent, {
+    width: isMobile ? '90vw' : '750px',  // Ancho completo en móvil, fijo en desktop
+    maxWidth: isMobile ? '100vw' : '90vw', // Máximo ancho
+    height: isMobile ? '100vh' : '90vh',   // Altura completa en móvil, 90% en desktop
+    maxHeight: '100vh',                   // No más alto que la pantalla
+    panelClass: 'full-screen-dialog',     // Clase CSS personalizada
+    disableClose: true,                   // Evitar cierre accidental
+    autoFocus: false,                     // Mejor manejo del foco
+    hasBackdrop: !isMobile,               // Fondo oscuro solo en desktop
+    position: isMobile ? { top: '0' } : {} // Posición superior en móvil
+  });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadContratos();
-      }
-    });
-  }
-
-
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      this.loadContratos();
+    }
+  });
+}
 
   updateSelectedRecord(): void {
     if (this.selectedRow && this.selectedRowForm.valid) {
@@ -401,6 +414,7 @@ this.searchInputControl.valueChanges
       this.newContratoForm.reset();
       this.initNewContratoForm();
     }
+    this.cdr.markForCheck();
   }
 
   cancelAdd(): void {
