@@ -92,7 +92,7 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
   showAddForm: boolean = false;
   isAdding: boolean = false;
   newContratoForm: FormGroup;
-  
+
   // Propiedades existentes
   isLoading: boolean = false;
   searchInputControl: UntypedFormControl = new UntypedFormControl();
@@ -104,10 +104,8 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
   title = 'Contratos';
   addButtonText = 'Agregar Contrato';
 
-  selectedContrato: any | null = null;
-  selectedContratoForm: UntypedFormGroup;
-  selectedRow: Contrato | null = null;
-  selectedRowForm: FormGroup;
+  selectedContrato: Contrato | null = null;
+  selectedContratoForm: FormGroup;
 
   errorMessage = '';
   pagination = { length: 0, page: 0, size: 10 };
@@ -123,20 +121,10 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
     private fb: FormBuilder
   ) {
     this.dataSource = new MatTableDataSource<Contrato>([]);
-    
+
     // Formulario para edición
-    this.selectedRowForm = this.fb.group({
-      no_contrato: ['', Validators.required],
-      proveedor: [null, Validators.required],
-      tipo_contrato: [null, Validators.required],
-      valor_cup: [0, [Validators.required, Validators.min(0)]],
-      valor_usd: [0, Validators.min(0)],
-      fecha_firmado: ['', Validators.required],
-      vigencia: [null, Validators.required],
-      observaciones: [''],
-      fecha_vencido: ['']
-    });
-    
+ this.initSelectedContratoForm();
+
     // Inicializar formulario para nuevo contrato
     this.initNewContratoForm();
   }
@@ -200,7 +188,19 @@ this.searchInputControl.valueChanges
         });
     }
 
-  
+initSelectedContratoForm(): void {
+  this.selectedContratoForm = this.fb.group({
+    no_contrato: ['', Validators.required],
+    proveedor: [null, Validators.required],
+    tipo_contrato: [null, Validators.required],
+    valor_cup: [0, [Validators.required, Validators.min(0)]],
+    valor_usd: [0, [Validators.min(0)]],
+    fecha_firmado: ['', Validators.required],
+    vigencia: [null, Validators.required],
+    observaciones: [''],
+    fecha_vencido: ['']
+  });
+}
 
   ngAfterViewInit(): void {
     // Configurar paginator
@@ -220,10 +220,6 @@ this.searchInputControl.valueChanges
     // Forzar detección de cambios
     this.cdr.detectChanges();
   }
-  closeDetails(): void
-    {
-        this.selectedRow = null;
-    }
 
   // Nuevo método para agregar contrato inline
   private generateTempId(): string {
@@ -325,26 +321,54 @@ this.searchInputControl.valueChanges
     return row[key] || '';
   }
 
-  toggleDetails(rowId: number): void {
-    this.selectedRow = this.selectedRow?.id === rowId ? null : this.data.find(row => row.id === rowId) || null;
-    this.selectedRowForm = new FormGroup({
-      no_contrato: new FormControl(this.selectedRow?.no_contrato),
-      proveedor: new FormControl(this.selectedRow?.proveedor),
-      tipo_contrato: new FormControl(this.selectedRow?.tipo_contrato),
-      valor_cup: new FormControl(this.selectedRow?.valor_cup),
-      valor_usd: new FormControl(this.selectedRow?.valor_usd),
-      fecha_firmado: new FormControl(this.selectedRow?.fecha_firmado),
-      vigencia: new FormControl(this.selectedRow?.vigencia),
-      observaciones: new FormControl(this.selectedRow?.observaciones),
-      fecha_vencido: new FormControl(this.selectedRow?.fecha_vencido)
-    });
-    this.cdr.markForCheck();
+toggleDetails(rowId: number): void {
+  console.log('toggleDetails called with rowId:', rowId);
+  console.log('selectedContratoForm exists:', !!this.selectedContratoForm);
+
+  // Si ya está seleccionado el mismo contrato, lo cerramos
+  if (this.selectedContrato?.id === rowId) {
+    this.selectedContrato = null;
+  } else {
+    // Buscar el contrato en los datos
+    this.selectedContrato = this.data.find(row => row.id === rowId) || null;
+    console.log('Found contract:', this.selectedContrato);
+
+    if (this.selectedContrato) {
+      // Verificar que el formulario existe antes de hacer patchValue
+      if (!this.selectedContratoForm) {
+        console.error('selectedContratoForm is not initialized');
+        this.initNewContratoForm(); // Re-inicializar si es necesario
+      }
+
+      // Actualizar el formulario con los datos del contrato seleccionado
+      this.selectedContratoForm.patchValue({
+        no_contrato: this.selectedContrato.no_contrato || '',
+        proveedor: this.selectedContrato.proveedor || null,
+        tipo_contrato: this.selectedContrato.tipo_contrato || null,
+        valor_cup: this.selectedContrato.valor_cup || 0,
+        valor_usd: this.selectedContrato.valor_usd || 0,
+        fecha_firmado: this.selectedContrato.fecha_firmado || '',
+        vigencia: this.selectedContrato.vigencia || null,
+        observaciones: this.selectedContrato.observaciones || '',
+        fecha_vencido: this.selectedContrato.fecha_vencido || ''
+      });
+    }
   }
+
+  console.log('selectedContrato after toggle:', this.selectedContrato);
+  this.cdr.detectChanges();
+}
+
+
+// Update the closeDetails method
+closeDetails(): void {
+  this.selectedContrato = null;
+}
 
  openNewContratoDialog(): void {
   // Configuración del diálogo responsivo
   const isMobile = window.innerWidth <= 768; // Umbral para móviles
-  
+
   const dialogRef = this.dialog.open(ContratoFormComponent, {
     width: isMobile ? '90vw' : '750px',  // Ancho completo en móvil, fijo en desktop
     maxWidth: isMobile ? '100vw' : '90vw', // Máximo ancho
@@ -364,34 +388,8 @@ this.searchInputControl.valueChanges
   });
 }
 
-  updateSelectedRecord(): void {
-    if (this.selectedRow && this.selectedRowForm.valid) {
-      const updatedContrato: Contrato = {
-        ...this.selectedRowForm.value,
-        id: this.selectedRow.id,
-        departamento: this.selectedRow.departamento || mockDepartamento[0],
-        estado: this.selectedRowForm.value.estado || this.selectedRow.estado || 'Activo',
-        proveedor: this.selectedRowForm.value.proveedor || mockProveedor[0]
-      };
-      this.contratoService.updateContrato(this.selectedRow.id, updatedContrato).subscribe({
-        next: () => {
-          this.loadContratos(); // Reload to handle any estado changes
-        }
-      });
-    }
-  }
 
-  deleteSelectedRecord(): void {
-    if (this.selectedRow) {
-      this.contratoService.deleteContrato(this.selectedRow.id).subscribe({
-        next: () => {
-          this.loadContratos();
-          this.selectedRow = null;
-          this.selectedRowForm.reset();
-        }
-      });
-    }
-  }
+
 
   // Métodos para el formulario de adición
   initNewContratoForm(): void {
@@ -430,10 +428,10 @@ this.searchInputControl.valueChanges
     }
 
     this.isAdding = true;
-    
+
     // Obtener los valores del formulario
     const formValue = this.newContratoForm.value;
-    
+
     // Crear el objeto contrato con los valores del formulario
     const newContrato: Contrato = {
       ...formValue,
@@ -466,7 +464,7 @@ this.searchInputControl.valueChanges
   // Método auxiliar para calcular la fecha de vencimiento
   private calculateExpirationDate(fechaFirmado: string, vigenciaDias: number): string {
     if (!fechaFirmado || !vigenciaDias) return '';
-    
+
     const fecha = new Date(fechaFirmado);
     fecha.setDate(fecha.getDate() + vigenciaDias);
     return fecha.toISOString().split('T')[0];
