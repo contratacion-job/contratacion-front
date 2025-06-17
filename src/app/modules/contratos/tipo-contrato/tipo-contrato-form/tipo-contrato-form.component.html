@@ -1,0 +1,110 @@
+<div class="flex flex-col min-h-screen p-6 w-full">
+
+
+  <div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+      <div class="absolute inset-x-0 bottom-0" *ngIf="isLoading">
+        <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
+      </div>
+      <div class="text-4xl font-extrabold tracking-tight">Tipo de Contratos</div>
+      <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+        <mat-form-field class="fuse-mat-dense fuse-mat-rounded min-w-64" [subscriptSizing]="'dynamic'">
+          <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:magnifying-glass'"></mat-icon>
+          <input matInput [formControl]="searchInputControl" [autocomplete]="'off'" placeholder="Buscar departamentos" />
+        </mat-form-field>
+        <button
+          class="ml-4"
+          mat-flat-button
+          color="primary"
+          (click)="openNewDepartamentoDialog()">
+          <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+          <span class="ml-2 mr-1">Agregar</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-auto overflow-hidden">
+      <div class="flex flex-col flex-auto sm:mb-18 overflow-x-auto">
+        <ng-container *ngIf="dataSource.data.length > 0; else noDepartments">
+          <div class="grid">
+            <div class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+              matSort
+              matSortDisableClear
+              style="grid-template-columns: 40px repeat(3, minmax(100px, 1fr)) 100px;">
+              <div></div>
+              <div [mat-sort-header]="'nombre_departamento'">Nombre</div>
+              <div [mat-sort-header]="'descripcion'">Descripción</div>
+              <div class="sticky-end">Detalles</div>
+            </div>
+
+            <ng-container *ngFor="let departamento of dataSource.filteredData; let i = index">
+              <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b items-center text-m"
+                style="grid-template-columns: 40px repeat(3, minmax(100px, 1fr)) 100px;">
+                <div>{{ i + 1 }}</div>
+                <div class="truncate">{{ departamento.nombre_departamento }}</div>
+                <div class="truncate">{{ departamento.descripcion }}</div>
+                <div class="flex items-center justify-center sticky-end">
+                  <button
+                    class="min-w-10 min-h-7 h-7 px-2 leading-6 whitespace-nowrap"
+                    mat-stroked-button
+                    (click)="toggleDetails(departamento.nombre_departamento)">
+                    <mat-icon
+                      class="icon-size-5"
+                      [svgIcon]="selectedRow?.nombre_departamento === departamento.nombre_departamento ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid" *ngIf="selectedRow?.nombre_departamento === departamento.nombre_departamento">
+                <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: { $implicit: departamento }"></ng-container>
+              </div>
+            </ng-container>
+          </div>
+
+          <mat-paginator
+            class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+            [length]="dataSource.data.length"
+            [pageSize]="10"
+            [pageSizeOptions]="[5, 10, 25, 100]"
+            [showFirstLastButtons]="true">
+          </mat-paginator>
+        </ng-container>
+
+        <ng-template #noDepartments>
+          <div class="p-8 sm:p-16 border-b text-4xl font-semibold tracking-tight text-center">
+            ¡No hay departamentos!
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #rowDetailsTemplate let-departamento>
+    <div class="shadow-lg overflow-hidden">
+      <div class="flex border-b">
+        <form class="flex flex-col w-full" [formGroup]="selectedRowForm">
+          <div class="flex flex-col sm:flex-row p-8">
+            <div class="flex flex-auto flex-wrap">
+              <div class="flex flex-col w-full lg:w-2/4 sm:pl-8">
+                <mat-form-field class="w-full">
+                  <mat-label>Nombre del Departamento</mat-label>
+                  <input matInput formControlName="nombre_departamento" />
+                </mat-form-field>
+                <mat-form-field class="w-full">
+                  <mat-label>Descripción</mat-label>
+                  <textarea matInput formControlName="descripcion"></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between w-full border-t px-8 py-4">
+            <button class="-ml-4" mat-button color="warn" (click)="deleteSelectedRecord()">Eliminar</button>
+            <div class="flex items-center">
+              <button class="-ml-4" mat-button color="primary" (click)="updateSelectedRecord()">Actualizar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </ng-template>
+</div>
