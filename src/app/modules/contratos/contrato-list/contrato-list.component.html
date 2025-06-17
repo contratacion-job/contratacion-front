@@ -94,6 +94,15 @@
             <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
             <span class="ml-2 mr-1">Agregar</span>
           </button>
+          <button
+            class="ml-4 mt-4 sm:mt-0"
+            mat-icon-button
+            [color]="'primary'"
+            (click)="exportToCSV()"
+            matTooltip="Exportar tabla a CSV"
+            aria-label="Exportar tabla a CSV">
+            <mat-icon [svgIcon]="'heroicons_outline:arrow-up-tray'"></mat-icon>
+          </button>
         </div>
       </div>
 
@@ -143,7 +152,7 @@
                     {{ contract.proveedor.nombre }}
                   </div>
                   <!-- Contract Type -->
-                  <div class="truncate" matTooltip="contract.tipo_contrato?.nombre_tipo_contrato" matTooltipPosition="above">
+                  <div class="truncate" [matTooltip]="contract.tipo_contrato?.nombre_tipo_contrato" matTooltipPosition="above">
                     {{ contract.tipo_contrato?.nombre_tipo_contrato }}
                   </div>
                   <!-- Departamento -->
@@ -218,34 +227,59 @@
                   <div class="flex flex-col sm:flex-row p-8">
                     <!-- Contract details -->
                     <div class="flex flex-auto flex-wrap">
-                      <!-- Contract No., Provider, Type -->
-                      <div class="flex flex-col w-full lg:w-2/4 sm:pl-8">
-                        <!-- Contract No. -->
-                        <mat-form-field class="w-full">
-                          <mat-label>No. Contrato</mat-label>
-                          <input matInput formControlName="no_contrato" />
-                        </mat-form-field>
-                        <!-- Provider -->
-                        <mat-form-field class="w-full">
-                          <mat-label>Proveedor</mat-label>
-                          <mat-select formControlName="proveedor">
-                            <mat-option *ngFor="let provider of proveedores" [value]="provider">
-                              {{ provider.nombre }}
-                            </mat-option>
-                          </mat-select>
-                        </mat-form-field>
-                        <!-- Contract Type -->
-                        <mat-form-field class="w-full">
-                          <mat-label>Tipo de Contrato</mat-label>
-                          <mat-select formControlName="tipo_contrato">
-                            <mat-option *ngFor="let type of tiposContrato" [value]="type">
-                              {{ type.tipo_contrato }}
-                            </mat-option>
-                          </mat-select>
-                        </mat-form-field>
-                      </div>
+          <!-- Contract No., Provider, Type -->
+          <div class="flex flex-col w-full lg:w-1/3 sm:pl-8">
+            <!-- Contract No. -->
+            <mat-form-field class="w-full">
+              <mat-label>No. Contrato</mat-label>
+              <input matInput formControlName="no_contrato" />
+            </mat-form-field>
+            <!-- Provider -->
+            <mat-form-field class="w-full">
+              <mat-label>Proveedor</mat-label>
+              <mat-select formControlName="proveedor">
+                <mat-option *ngFor="let provider of proveedores" [value]="provider">
+                  {{ provider.nombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <!-- Contract Type -->
+            <mat-form-field class="w-full">
+              <mat-label>Tipo de Contrato</mat-label>
+              <mat-select formControlName="tipo_contrato">
+                <mat-option *ngFor="let type of tiposContrato" [value]="type">
+                  {{ type.tipo_contrato }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <!-- Departamento -->
+            <mat-form-field class="w-full">
+              <mat-label>Departamento</mat-label>
+              <mat-select formControlName="departamento">
+                <mat-option *ngFor="let dept of mockDepartamento" [value]="dept">
+                  {{ dept.nombre_departamento }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <!-- No. Comité Contratación -->
+            <mat-form-field class="w-full">
+              <mat-label>No. Comité Contratación</mat-label>
+              <input matInput formControlName="no_comite_contratacion" />
+            </mat-form-field>
+            <!-- Fecha Comité Contratación -->
+           
+            <!-- Fecha Acuerdo Comité Contratación -->
+            <mat-form-field class="w-full">
+              <mat-label>Fecha Acuerdo Comité Contratación</mat-label>
+              <input matInput type="date" formControlName="fecha_acuerdo_comite_contratacion" />
+            </mat-form-field>
+            <!-- No. Comité Administración -->
+        
+            <!-- Estado -->
+   
+          </div>
                       <!-- Values and Dates -->
-                      <div class="flex flex-col w-full lg:w-1/4 sm:pl-8">
+                      <div class="flex flex-col w-full lg:w-1/3 sm:pl-8">
                         <!-- Value CUP -->
                         <mat-form-field class="w-full">
                           <mat-label>Valor (CUP)</mat-label>
@@ -263,25 +297,58 @@
                           <mat-label>Fecha Firmado</mat-label>
                           <input matInput type="date" formControlName="fecha_firmado" />
                         </mat-form-field>
+                        <mat-form-field class="w-full">
+                          <mat-label>Fecha Comité Contratación</mat-label>
+                          <input matInput type="date" formControlName="fecha_comite_contratacion" />
+                        </mat-form-field>
+                        <!-- No. Acuerdo Comité Contratación -->
+                        <mat-form-field class="w-full">
+                          <mat-label>No. Acuerdo Comité Contratación</mat-label>
+                          <input matInput formControlName="no_acuerdo_comite_contratacion" />
+                        </mat-form-field>
+                        <mat-form-field class="w-full">
+                          <mat-label>Fecha Comité Administración</mat-label>
+                          <input matInput type="date" formControlName="fecha_comite_administracion" />
+                        </mat-form-field>
                       </div>
                       <!-- Vigencia and Observations -->
-                      <div class="flex flex-col w-full lg:w-1/4 sm:pl-8">
-                        <!-- Vigencia -->
+                      <div class="flex flex-col w-full lg:w-1/3 sm:pl-8">
+                      <!-- Vigencia -->
+                      <mat-form-field class="w-full">
+                        <mat-label>Vigencia</mat-label>
+                        <mat-select formControlName="vigencia">
+                          <mat-option *ngFor="let vig of vigencias" [value]="vig">
+                            {{ vig.vigencia }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      <!-- Observations -->
+                      <mat-form-field class="w-full">
+                        <mat-label>Observaciones</mat-label>
+                        <textarea matInput formControlName="observaciones"></textarea>
+                      </mat-form-field>
+                      <!-- Fecha Entrada -->
+                      <mat-form-field class="w-full">
+                        <mat-label>Fecha Entrada</mat-label>
+                        <input matInput type="date" formControlName="fecha_entrada" />
+                      </mat-form-field>
+                      <mat-form-field class="w-full">
+                        <mat-label>Estado</mat-label>
+                        <mat-select formControlName="estado">
+                          <mat-option value="Activo">Activo</mat-option>
+                          <mat-option value="Casi a vencer">Casi a vencer</mat-option>
+                          <mat-option value="Vencido">Vencido</mat-option>
+                        </mat-select>
+                      </mat-form-field>
                         <mat-form-field class="w-full">
-                          <mat-label>Vigencia</mat-label>
-                          <mat-select formControlName="vigencia">
-                            <mat-option *ngFor="let vig of vigencias" [value]="vig">
-                              {{ vig.vigencia }}
-                            </mat-option>
-                          </mat-select>
-                        </mat-form-field>
-                        <!-- Observations -->
-                        <mat-form-field class="w-full">
-                          <mat-label>Observaciones</mat-label>
-                          <textarea matInput formControlName="observaciones"></textarea>
-                        </mat-form-field>
-                      </div>
+              <mat-label>No. Comité Administración</mat-label>
+              <input matInput formControlName="no_comite_administracion" />
+            </mat-form-field>
+            <!-- Fecha Comité Administración -->
+     
                     </div>
+                    
+                  </div>
                   </div>
 
                   <div class="flex flex-col sm:flex-row items-center justify-between w-full border-t px-4 sm:px-8 py-4">

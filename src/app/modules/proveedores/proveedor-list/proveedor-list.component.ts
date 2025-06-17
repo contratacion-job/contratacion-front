@@ -18,6 +18,7 @@ import { MatSelectModule } from '@angular/material/select';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatDividerModule} from '@angular/material/divider';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProveedorFormComponent } from '../proveedor-form/proveedor-form.component';
 import {  ProveedorService } from '../services/proveedor.service';
 import { 
@@ -45,6 +46,7 @@ import { Subject } from 'rxjs';
     MatInputModule,
     MatSelectModule,
     MatMenuModule,
+    MatTooltipModule,
     MatDividerModule,
     MatDialogModule
   ],
@@ -177,10 +179,17 @@ ngAfterViewInit(): void {
   }
 
   addNewProveedor(): void {
+    const isMobile = window.innerWidth <= 768;
     const dialogRef = this.dialog.open(ProveedorFormComponent, {
-      width: '30%',
-      height: '60%',
-      disableClose: false
+      width: isMobile ? '90vw' : '750px',  // Ancho completo en móvil, fijo en desktop
+      maxWidth: isMobile ? '100vw' : '90vw', // Máximo ancho
+      height: isMobile ? '100vh' : '90vh',   // Altura completa en móvil, 90% en desktop
+      maxHeight: '100vh',                   // No más alto que la pantalla
+      panelClass: 'full-screen-dialog',     // Clase CSS personalizada
+      disableClose: false,                   // Evitar cierre accidental
+      autoFocus: false,                     // Mejor manejo del foco
+      hasBackdrop: !isMobile,               // Fondo oscuro solo en desktop
+      position: isMobile ? { top: '0' } : {} // Posición superior en móvil
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -224,5 +233,53 @@ ngAfterViewInit(): void {
         }
       });
     }
+  }
+
+  exportToCSV(): void {
+    if (!this.dataSource.filteredData || this.dataSource.filteredData.length === 0) {
+      return;
+    }
+
+    const csvRows = [];
+    // Headers
+    const headers = [
+      'Nombre',
+      'Código',
+      'Teléfonos',
+      'Domicilio',
+      'Municipio',
+      'Ministerio'
+    ];
+    csvRows.push(headers.join(','));
+
+    // Data
+    this.dataSource.filteredData.forEach(proveedor => {
+      const row = [
+        proveedor.nombre || '',
+        proveedor.codigo || '',
+        proveedor.telefonos || '',
+        proveedor.domicilio || '',
+        proveedor.municipio?.nombre_municipio || '',
+        proveedor.ministerio?.nombre_ministerio || ''
+      ];
+      // Escape commas and quotes in values
+      const escapedRow = row.map(value => {
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          return `"${value.replace(/"/g, '""')}"`;
+        }
+        return value;
+      });
+      csvRows.push(escapedRow.join(','));
+    });
+
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'proveedores_export.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
   }
 }

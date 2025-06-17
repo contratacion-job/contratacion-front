@@ -87,7 +87,7 @@
             [autocomplete]="'off'"
             [placeholder]="'Buscar ejecuciones'">
         </mat-form-field>
-        <!-- Add ejecucion button -->
+      <!-- Add ejecucion button -->
         <button
           class="ml-4 mt-4 sm:mt-0 w-40 text-lg"
           mat-flat-button
@@ -95,6 +95,15 @@
           (click)="createRecord()">
           <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
           <span class="ml-2 mr-1">Agregar</span>
+        </button>
+        <button
+          class="ml-4 mt-4 sm:mt-0"
+          mat-icon-button
+          [color]="'primary'"
+          (click)="exportToCSV()"
+          matTooltip="Exportar tabla a CSV"
+          aria-label="Exportar tabla a CSV">
+          <mat-icon [svgIcon]="'heroicons_outline:arrow-up-tray'"></mat-icon>
         </button>
       </div>
     </div>

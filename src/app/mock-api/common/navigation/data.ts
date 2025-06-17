@@ -58,7 +58,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
     },
 
     // Suplementos section
-  
+
 
     // Proveedores section
     {

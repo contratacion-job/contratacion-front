@@ -199,4 +199,52 @@ this.ejecucionService.updateEjecucion(updatedEjecucion).subscribe({
       });
     }
   }
+
+  exportToCSV(): void {
+    if (!this.dataSource.filteredData || this.dataSource.filteredData.length === 0) {
+      return;
+    }
+
+    const csvRows = [];
+    // Headers
+    const headers = [
+      'Proveedor',
+      'Contrato',
+      'Costo (CUP)',
+      'Costo (CL)',
+      'Trabajo Ejecutado',
+      'Fecha Ejecución'
+    ];
+    csvRows.push(headers.join(','));
+
+    // Data
+    this.dataSource.filteredData.forEach(ejecucion => {
+      const row = [
+        ejecucion.proveedor?.nombre || '',
+        ejecucion.contrato?.no_contrato || '',
+        ejecucion.costo_cup,
+        ejecucion.costo_cl,
+        ejecucion.trabajo_ejecutado || '',
+        ejecucion.fecha_ejecucion || ''
+      ];
+      // Escape commas and quotes in values
+      const escapedRow = row.map(value => {
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          return `"${value.replace(/"/g, '""')}"`;
+        }
+        return value;
+      });
+      csvRows.push(escapedRow.join(','));
+    });
+
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ejecuciones_export.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
 }

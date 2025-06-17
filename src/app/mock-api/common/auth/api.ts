@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FuseMockApiService } from '@fuse/lib/mock-api';
-import { user as userData } from 'app/mock-api/common/user/data';
+import { users } from 'app/mock-api/common/user/data';
 import Base64 from 'crypto-js/enc-base64';
 import Utf8 from 'crypto-js/enc-utf8';
 import HmacSHA256 from 'crypto-js/hmac-sha256';
@@ -10,7 +10,7 @@ import { cloneDeep } from 'lodash-es';
 export class AuthMockApi
 {
     private readonly _secret: any;
-    private _user: any = userData;
+    private _users: any[] = users;
 
     /**
      * Constructor
@@ -64,13 +64,16 @@ export class AuthMockApi
             .onPost('api/auth/sign-in', 1500)
             .reply(({request}) =>
             {
-                // Sign in successful
-                if ( request.body.email === 'hughes.brian@company.com' && request.body.password === 'admin' )
+                const { username, password } = request.body;
+
+                const user = this._users.find(u => u.username === username && u.password === password);
+
+                if (user)
                 {
                     return [
                         200,
                         {
-                            user       : cloneDeep(this._user),
+                            user       : cloneDeep(user),
                             accessToken: this._generateJWTToken(),
                             tokenType  : 'bearer',
                         },
@@ -100,7 +103,7 @@ export class AuthMockApi
                     return [
                         200,
                         {
-                            user       : cloneDeep(this._user),
+                            user       : cloneDeep(this._users[0]),
                             accessToken: this._generateJWTToken(),
                             tokenType  : 'bearer',
                         },
@@ -137,13 +140,16 @@ export class AuthMockApi
             .onPost('api/auth/unlock-session', 1500)
             .reply(({request}) =>
             {
-                // Sign in successful
-                if ( request.body.email === 'hughes.brian@company.com' && request.body.password === 'admin' )
+                const { username, password } = request.body;
+
+                const user = this._users.find(u => u.username === username && u.password === password);
+
+                if (user)
                 {
                     return [
                         200,
                         {
-                            user       : cloneDeep(this._user),
+                            user       : cloneDeep(user),
                             accessToken: this._generateJWTToken(),
                             tokenType  : 'bearer',
                         },

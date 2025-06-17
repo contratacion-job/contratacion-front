@@ -40,6 +40,7 @@ export interface Provincia {
 export interface Ministerio {
   id: number;
   nombre_ministerio: string;
+  descripcion: string;
 }
 
 // Table: municipio
@@ -193,8 +194,11 @@ export interface Log {
 // Table: notificacion
 export interface Notificacion {
   id: number;
+  tipo: 'Suplemento' | 'Contrato' | 'EjecucionContrato' | 'Proveedor'| 'Licencia';
   texto: string;
   fecha: Date;
+   color: string;
+  icono: string; // Usando los iconos de tu ejemplo anterior
 }
 
 // Table: revision

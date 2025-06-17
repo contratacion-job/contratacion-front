@@ -1,8 +1,23 @@
 /* eslint-disable */
-export const user = {
-    id    : 'cfaad35d-07a3-4447-a6c3-d8c3d54fd5df',
-    name  : 'Brian Hughes',
-    email : 'hughes.brian@company.com',
-    avatar: 'assets/images/avatars/brian-hughes.jpg',
-    status: 'online',
-};
+export const users = [
+    {
+        id    : '1',
+        username: 'admin',
+        password: 'admin',
+        name  : 'Admin User',
+        email : 'admin@company.com',
+        avatar: 'assets/admin.png',
+        status: 'online',
+        roles : ['admin']
+    },
+    {
+        id    : '2',
+        username: 'user',
+        password: 'user',
+        name  : 'Normal User',
+        email : 'user@company.com',
+        avatar: 'assets/admin.png',
+        status: 'online',
+        roles : ['user']
+    }
+];

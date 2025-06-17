@@ -1,10 +1,22 @@
 export const mockProvincia = [
-  { id: 1, nombre_provincia: "Havana" },
-  { id: 2, nombre_provincia: "Santiago de Cuba" },
-  { id: 3, nombre_provincia: "Villa Clara" },
-  { id: 4, nombre_provincia: "Matanzas" },
-  { id: 5, nombre_provincia: "Pinar del Río" }
+  { id: 1, nombre_provincia: "Pinar del Río" },
+  { id: 2, nombre_provincia: "Artemisa" },
+  { id: 3, nombre_provincia: "Mayabeque" },
+  { id: 4, nombre_provincia: "La Habana" },
+  { id: 5, nombre_provincia: "Matanzas" },
+  { id: 6, nombre_provincia: "Villa Clara" },
+  { id: 7, nombre_provincia: "Cienfuegos" },
+  { id: 8, nombre_provincia: "Sancti Spiritus" },
+  { id: 9, nombre_provincia: "Ciego de Avila" },
+  { id: 10, nombre_provincia: "Camagüey" },
+  { id: 11, nombre_provincia: "Las Tunas" },
+  { id: 12, nombre_provincia: "Holguín" },
+  { id: 13, nombre_provincia: "Granma" },
+  { id: 14, nombre_provincia: "Santiago de Cuba" },
+  { id: 15, nombre_provincia: "Guantánamo" },
+  { id: 16, nombre_provincia: "Isla de la Juventud" }
 ];
+
 // Mock data for Municipio
 export const mockMunicipio = [
   {
@@ -35,23 +47,40 @@ export const mockMunicipio = [
 
 // Mock data for Ministerio
 export const mockMinisterio = [
-  {
-    id: 1,
-    nombre_ministerio: "Ministerio de Educación"
-  },
-  {
-    id: 2,
-    nombre_ministerio: "Ministerio de Salud Pública"
-  },
-  {
-    id: 3,
-    nombre_ministerio: "Ministerio de la Construcción"
-  },
-  {
-    id: 4,
-    nombre_ministerio: "Ministerio de Transporte"
-  }
+  { id: 1, nombre_ministerio: "MEP", descripcion: "Ministerio de Economía y Planificación" },
+  { id: 2, nombre_ministerio: "MFP", descripcion: "Ministerio de Finanzas y Precios" },
+  { id: 3, nombre_ministerio: "MTSS", descripcion: "Ministerio de Trabajo y Seguridad Social" },
+  { id: 4, nombre_ministerio: "MINCOM", descripcion: "Ministerio de Comunicaciones" },
+  { id: 5, nombre_ministerio: "MINDUS", descripcion: "Ministerio de Industrias" },
+  { id: 6, nombre_ministerio: "MINEM", descripcion: "Ministerio de Energía y Minas" },
+  { id: 7, nombre_ministerio: "MINAG", descripcion: "Ministerio de Agricultura" },
+  { id: 8, nombre_ministerio: "MINAZ", descripcion: "Ministerio del Azúcar" },
+  { id: 9, nombre_ministerio: "MINAL", descripcion: "Ministerio de la Industria Alimentaria" },
+  { id: 10, nombre_ministerio: "MINCIN", descripcion: "Ministerio del Comercio Interior" },
+  { id: 11, nombre_ministerio: "MINSAP", descripcion: "Ministerio de Salud Pública" },
+  { id: 12, nombre_ministerio: "MINTUR", descripcion: "Ministerio de Turismo" },
+  { id: 13, nombre_ministerio: "MICONS", descripcion: "Ministerio de la Construcción" },
+  { id: 14, nombre_ministerio: "MITRANS", descripcion: "Ministerio del Transporte" },
+  { id: 15, nombre_ministerio: "MINCULT", descripcion: "Ministerio de Cultura" },
+  { id: 16, nombre_ministerio: "MINED", descripcion: "Ministerio de Educación" },
+  { id: 17, nombre_ministerio: "MES", descripcion: "Ministerio de Educación Superior" },
+  { id: 18, nombre_ministerio: "MINREX", descripcion: "Ministerio de Relaciones Exteriores" },
+  { id: 19, nombre_ministerio: "MINCEX", descripcion: "Ministerio del Comercio Exterior y la Inversión Extranjera" },
+  { id: 20, nombre_ministerio: "MINJUS", descripcion: "Ministerio de Justicia" },
+  { id: 21, nombre_ministerio: "MINFAR", descripcion: "Ministerio de las Fuerzas Armadas Revolucionarias" },
+  { id: 22, nombre_ministerio: "MININT", descripcion: "Ministerio del Interior" },
+  { id: 23, nombre_ministerio: "CITMA", descripcion: "Ministerio de Ciencia, Tecnología y Medio Ambiente" },
+  { id: 24, nombre_ministerio: "INRH", descripcion: "Instituto Nacional de Recursos Hidráulicos" },
+  { id: 25, nombre_ministerio: "INDER", descripcion: "Instituto Nacional de Deportes, Educación Física y Recreación" },
+  { id: 26, nombre_ministerio: "INOTU", descripcion: "Instituto Nacional de Ordenamiento Territorial y Urbanismo" },
+  { id: 27, nombre_ministerio: "ICS", descripcion: "Instituto de Información y Comunicación Social" },
+  { id: 28, nombre_ministerio: "BCC", descripcion: "Banco Central de Cuba" },
+  { id: 29, nombre_ministerio: "TSP", descripcion: "Tribunal Supremo Popular" },
+  { id: 30, nombre_ministerio: "FGR", descripcion: "Fiscalía General de la República" },
+  { id: 31, nombre_ministerio: "CGR", descripcion: "Contraloría General de la República" }
 ];
+
+
 // Mock data for TipoContrato
 
 // Mock data for Departamento

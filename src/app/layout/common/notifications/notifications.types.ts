@@ -1,12 +1,9 @@
-export interface Notification
-{
-    id: string;
-    icon?: string;
-    image?: string;
-    title?: string;
-    description?: string;
-    time: string;
-    link?: string;
-    useRouter?: boolean;
-    read: boolean;
+
+export interface Notification {
+  id: string;
+  tipo: 'Suplemento' | 'Contrato' | 'EjecucionContrato' | 'Proveedor'| 'Licencia';
+  texto: string;
+  fecha: Date;
+   color: string;
+  icono: string; // Usando los iconos de tu ejemplo anterior
 }

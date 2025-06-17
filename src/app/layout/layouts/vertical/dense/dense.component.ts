@@ -24,7 +24,7 @@ import { SettingsComponent } from "../../../common/settings/settings.component";
     templateUrl  : './dense.component.html',
     encapsulation: ViewEncapsulation.None,
     standalone   : true,
-    imports: [FuseLoadingBarComponent, FuseVerticalNavigationComponent, MatButtonModule, MatIconModule, LanguagesComponent, FuseFullscreenComponent, SearchComponent, ShortcutsComponent, MessagesComponent, NotificationsComponent, UserComponent, NgIf, RouterOutlet, QuickChatComponent, SettingsComponent],
+    imports: [FuseLoadingBarComponent, FuseVerticalNavigationComponent, MatButtonModule, MatIconModule, LanguagesComponent, FuseFullscreenComponent, SearchComponent, NotificationsComponent, UserComponent, NgIf, RouterOutlet, SettingsComponent],
 })
 export class DenseLayoutComponent implements OnInit, OnDestroy
 {

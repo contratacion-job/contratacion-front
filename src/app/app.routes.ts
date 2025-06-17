@@ -2,7 +2,10 @@ import { Route } from '@angular/router';
 import { initialDataResolver } from 'app/app.resolvers';
 import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
+
+
 import { LayoutComponent } from 'app/layout/layout.component';
+import { AdminGuard } from './core/auth/guards/admin.guard';
 
 // @formatter:off
 /* eslint-disable max-len */
@@ -80,35 +83,35 @@ export const appRoutes: Route[] = [
                 {path: 'finance', loadChildren: () => import('app/modules/admin/dashboards/finance/finance.routes')},
                 {path: 'crypto', loadChildren: () => import('app/modules/admin/dashboards/crypto/crypto.routes')},
             ]},
-            
+
             {path: 'apps', children: [
-             
+
                 {path: 'ecommerce', loadChildren: () => import('app/modules/admin/apps/ecommerce/ecommerce.routes')},
-           
+
             ]},
 
             // Contratos module
             {path: 'contratos', loadChildren: () => import('app/modules/contratos/contratos-routing.module').then(m => m.ContratosRoutingModule)},
-            
+
             // Suplementos module
             {path: 'suplementos', loadChildren: () => import('app/modules/suplementos/suplementos-routing.module').then(m => m.SuplementosRoutingModule)},
-            
+
             // Proveedores module
             {path: 'proveedores', loadChildren: () => import('app/modules/proveedores/proveedores-routing.module').then(m => m.ProveedoresRoutingModule)},
-            
+
             // Dashboard module
             {path: 'dashboard', loadChildren: () => import('app/modules/dashboard/dashboard-routing.module').then(m => m.DashboardRoutingModule)},
-            
+
             // Organización module
-            {path: 'organizacion', loadChildren: () => import('app/modules/organizacion/organizacion-routing.module').then(m => m.OrganizacionRoutingModule)},
-            
+{path: 'organizacion', canActivate: [AdminGuard], loadChildren: () => import('app/modules/organizacion/organizacion-routing.module').then(m => m.OrganizacionRoutingModule)},
+
             // Reportes module
             {path: 'reportes', loadChildren: () => import('app/modules/reportes/reportes-routing.module').then(m => m.ReportesRoutingModule)},
-            
+
             // Notificaciones module
             {path: 'notificaciones', loadChildren: () => import('app/modules/notificaciones/notificaciones-routing.module').then(m => m.NotificacionesRoutingModule)},
-            
-            
+
+
             {path: 'example', loadChildren: () => import('app/modules/admin/example/example.routes')},
         ]
     }

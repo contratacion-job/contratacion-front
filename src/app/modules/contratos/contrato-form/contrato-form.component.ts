@@ -15,6 +15,7 @@ import { mockProveedor, mockTipoContrato, mockVigenciaContrato, mockDepartamento
 import { MatIconModule } from '@angular/material/icon';
 import { ProveedorFormComponent } from 'app/modules/proveedores/proveedor-form/proveedor-form.component';
 import { DepartamentoFormComponent } from 'app/modules/organizacion/departamento-list/departamento-list.component';
+import { TipoContratoFormComponent } from '../tipo-contrato/tipo-contrato-form/tipo-contrato-form.component';
 @Component({
   selector: 'app-contrato-form',
   standalone: true,
@@ -95,10 +96,17 @@ export class ContratoFormComponent implements OnInit {
     }
   }
   openNewProveedorDialog() {
+      const isMobile = window.innerWidth <= 768; //
     const dialogRef = this.dialog.open(ProveedorFormComponent, {
-      width: '30%',
-      height: '60%',
-      disableClose: false
+   width: isMobile ? '90vw' : '750px',  // Ancho completo en móvil, fijo en desktop
+    maxWidth: isMobile ? '100vw' : '90vw', // Máximo ancho
+    height: isMobile ? '100vh' : '90vh',   // Altura completa en móvil, 90% en desktop
+    maxHeight: '100vh',                   // No más alto que la pantalla
+    panelClass: 'full-screen-dialog',     // Clase CSS personalizada
+    disableClose: false,                   // Evitar cierre accidental
+    autoFocus: false,                     // Mejor manejo del foco
+    hasBackdrop: !isMobile,               // Fondo oscuro solo en desktop
+    position: isMobile ? { top: '0' } : {} // Posición superior en móvil
     });
   
     dialogRef.afterClosed().subscribe(result => {
@@ -107,11 +115,19 @@ export class ContratoFormComponent implements OnInit {
       }
     });
   }
+  
   openNewDepartamentoDialog() {
+    const isMobile = window.innerWidth <= 768; //
     const dialogRef = this.dialog.open(DepartamentoFormComponent, {
-      width: '30%',
-      height: '60%',
-      disableClose: false
+     width: isMobile ? '90vw' : '750px',  // Ancho completo en móvil, fijo en desktop
+    maxWidth: isMobile ? '100vw' : '90vw', // Máximo ancho
+    height: isMobile ? '100vh' : '90vh',   // Altura completa en móvil, 90% en desktop
+    maxHeight: '100vh',                   // No más alto que la pantalla
+    panelClass: 'full-screen-dialog',     // Clase CSS personalizada
+    disableClose: false,                   // Evitar cierre accidental
+    autoFocus: false,                     // Mejor manejo del foco
+    hasBackdrop: !isMobile,               // Fondo oscuro solo en desktop
+    position: isMobile ? { top: '0' } : {}
     });
   
     dialogRef.afterClosed().subscribe(result => {
@@ -121,6 +137,31 @@ export class ContratoFormComponent implements OnInit {
         // Seleccionar el nuevo departamento
         this.contratoForm.patchValue({
           departamento: result
+        });
+      }
+    });
+  }
+    openNewTipoContratoDialog() {
+   const isMobile = window.innerWidth <= 768; //
+    const dialogRef = this.dialog.open(TipoContratoFormComponent, {
+     width: isMobile ? '90vw' : '750px',  // Ancho completo en móvil, fijo en desktop
+    maxWidth: isMobile ? '100vw' : '90vw', // Máximo ancho
+    height: isMobile ? '100vh' : '90vh',   // Altura completa en móvil, 90% en desktop
+    maxHeight: '100vh',                   // No más alto que la pantalla
+    panelClass: 'full-screen-dialog',     // Clase CSS personalizada
+    disableClose: false,                   // Evitar cierre accidental
+    autoFocus: false,                     // Mejor manejo del foco
+    hasBackdrop: !isMobile,               // Fondo oscuro solo en desktop
+    position: isMobile ? { top: '0' } : {}
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Agregar el nuevo departamento a la lista
+        this.tiposContrato = [...this.tiposContrato, result];
+        // Seleccionar el nuevo departamento
+        this.contratoForm.patchValue({
+          tiposContrato: result
         });
       }
     });

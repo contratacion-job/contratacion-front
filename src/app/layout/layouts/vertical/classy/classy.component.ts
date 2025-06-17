@@ -31,6 +31,7 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy
 {
     isScreenSmall: boolean;
     navigation: Navigation;
+    filteredNavigation: Navigation;
     user: User;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -75,14 +76,16 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy
             .subscribe((navigation: Navigation) =>
             {
                 this.navigation = navigation;
+                this._filterNavigation();
             });
 
         // Subscribe to the user service
         this._userService.user$
-            .pipe((takeUntil(this._unsubscribeAll)))
+            .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((user: User) =>
             {
                 this.user = user;
+                this._filterNavigation();
             });
 
         // Subscribe to media changes
@@ -124,5 +127,50 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy
             // Toggle the opened status
             navigation.toggle();
         }
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Private methods
+    // -----------------------------------------------------------------------------------------------------
+
+    /**
+     * Filter navigation items based on user roles
+     */
+    private _filterNavigation(): void
+    {
+        if ( !this.navigation || !this.user )
+        {
+            this.filteredNavigation = this.navigation;
+            return;
+        }
+
+        const userRoles = this.user.roles ?? [];
+        console.log('User roles:', userRoles);
+
+        const filterItems = (items) =>
+        {
+            return items
+                .filter(item =>
+                {
+                    if ( !item.roles || item.roles.length === 0 )
+                    {
+                        return true;
+                    }
+
+                    return item.roles.some(role => userRoles.includes(role));
+                })
+                .map(item =>
+                {
+                    if ( item.children )
+                    {
+                        item = { ...item };
+                        item.children = filterItems(item.children);
+                    }
+                    return item;
+                });
+        };
+
+        this.filteredNavigation = filterItems(this.navigation);
+        console.log('Filtered navigation:', this.filteredNavigation);
     }
 }

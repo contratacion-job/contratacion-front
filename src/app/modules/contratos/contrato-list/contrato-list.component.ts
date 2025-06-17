@@ -25,7 +25,7 @@ import { ContratoService } from '../services/contrato.service';
 import { Contrato, Proveedor, TipoContrato, VigenciaContrato } from 'app/models/Type';
 import { mockProveedor, mockTipoContrato, mockVigenciaContrato, mockDepartamento } from 'app/mock-api/contrato-fake/fake';
 import { Subject } from 'rxjs';
-
+import { MatTooltipModule } from '@angular/material/tooltip';
 @Component({
   selector: 'app-contrato-list',
   standalone: true,
@@ -46,6 +46,7 @@ import { Subject } from 'rxjs';
     CurrencyPipe,
     DatePipe,
     MatMenuModule,
+    MatTooltipModule,
     MatDividerModule,
   ],
   templateUrl: './contrato-list.component.html',
@@ -193,6 +194,14 @@ initSelectedContratoForm(): void {
     no_contrato: ['', Validators.required],
     proveedor: [null, Validators.required],
     tipo_contrato: [null, Validators.required],
+    departamento: [null, Validators.required],
+    no_comite_contratacion: ['', Validators.required],
+    fecha_comite_contratacion: ['', Validators.required],
+    no_acuerdo_comite_contratacion: ['', Validators.required],
+    fecha_acuerdo_comite_contratacion: ['', Validators.required],
+    no_comite_administracion: ['', Validators.required],
+    fecha_comite_administracion: ['', Validators.required],
+    estado: ['', Validators.required],
     valor_cup: [0, [Validators.required, Validators.min(0)]],
     valor_usd: [0, [Validators.min(0)]],
     fecha_firmado: ['', Validators.required],
@@ -250,6 +259,66 @@ initSelectedContratoForm(): void {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  exportToCSV(): void {
+    if (!this.dataSource.filteredData || this.dataSource.filteredData.length === 0) {
+      return;
+    }
+
+    const csvRows = [];
+    // Headers
+    const headers = [
+      'No. Contrato',
+      'Proveedor',
+      'Tipo de Contrato',
+      'Departamento',
+      'Valor (CUP)',
+      'Valor (USD)',
+      'Fecha Entrada',
+      'Fecha Firmado',
+      'Vigencia',
+      'Tiempo Restante',
+      'Estado',
+      'Observaciones'
+    ];
+    csvRows.push(headers.join(','));
+
+    // Data
+    this.dataSource.filteredData.forEach(contract => {
+      const row = [
+        contract.no_contrato,
+        contract.proveedor?.nombre || '',
+        contract.tipo_contrato?.nombre_tipo_contrato || '',
+        contract.departamento?.nombre_departamento || '',
+        contract.valor_cup,
+        contract.valor_usd,
+        contract.fecha_entrada,
+        contract.fecha_firmado,
+        contract.vigencia?.vigencia,
+        (contract as any).tiempoRestante || '',
+        contract.estado || '',
+        contract.observaciones || ''
+      ];
+      // Escape commas and quotes in values
+      const escapedRow = row.map(value => {
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          return `"${value.replace(/"/g, '""')}"`;
+        }
+        return value;
+      });
+      csvRows.push(escapedRow.join(','));
+    });
+
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'contratos_export.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
   }
 
   calcularTiempoRestante(contrato: Contrato): string {
@@ -375,7 +444,7 @@ closeDetails(): void {
     height: isMobile ? '100vh' : '90vh',   // Altura completa en móvil, 90% en desktop
     maxHeight: '100vh',                   // No más alto que la pantalla
     panelClass: 'full-screen-dialog',     // Clase CSS personalizada
-    disableClose: true,                   // Evitar cierre accidental
+    disableClose: false,                   // Evitar cierre accidental
     autoFocus: false,                     // Mejor manejo del foco
     hasBackdrop: !isMobile,               // Fondo oscuro solo en desktop
     position: isMobile ? { top: '0' } : {} // Posición superior en móvil

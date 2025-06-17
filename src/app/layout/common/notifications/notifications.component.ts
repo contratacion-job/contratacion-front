@@ -57,10 +57,8 @@ export class NotificationsComponent implements OnInit, OnDestroy
             {
                 // Load the notifications
                 this.notifications = notifications;
-
                 // Calculate the unread count
-                this._calculateUnreadCount();
-
+                this.unreadCount = notifications.filter(notification => !notification).length;
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -118,23 +116,6 @@ export class NotificationsComponent implements OnInit, OnDestroy
     /**
      * Mark all notifications as read
      */
-    markAllAsRead(): void
-    {
-        // Mark all as read
-        this._notificationsService.markAllAsRead().subscribe();
-    }
-
-    /**
-     * Toggle read status of the given notification
-     */
-    toggleRead(notification: Notification): void
-    {
-        // Toggle the read status
-        notification.read = !notification.read;
-
-        // Update the notification
-        this._notificationsService.update(notification.id, notification).subscribe();
-    }
 
     /**
      * Delete the given notification
@@ -209,20 +190,35 @@ export class NotificationsComponent implements OnInit, OnDestroy
         });
     }
 
-    /**
-     * Calculate the unread count
-     *
-     * @private
-     */
-    private _calculateUnreadCount(): void
-    {
-        let count = 0;
-
-        if ( this.notifications && this.notifications.length )
-        {
-            count = this.notifications.filter(notification => !notification.read).length;
+    public getColor(tipo: string): string {
+        switch (tipo) {
+            case 'Contrato': return '#ef4444';       // rojo
+            case 'Suplemento': return '#f59e42';     // naranja
+            case 'EjecucionContrato': return '#22c55e'; // verde
+            case 'Proveedor': return '#f59e42';  
+               case 'Licencia': return '#f59e43';     // naranja
+            default: return 'transparent';
         }
+    }
 
-        this.unreadCount = count;
+    public getBackgroundColor(tipo: string): string {
+        switch (tipo) {
+            case 'Contrato': return '#fee2e2';       // rojo claro
+            case 'Suplemento': return '#fff7ed';     // naranja claro
+            case 'EjecucionContrato': return '#dcfce7'; // verde claro
+            case 'Proveedor': return '#fff7ed'; 
+              case 'Licencia': return '#fff7es';      // naranja claro
+            default: return 'transparent';
+        }
+    }
+
+    // Método para obtener el estilo completo de la notificación
+    public getNotificationStyle(notification: Notification): any {
+        return {
+            'border-left': '4px solid ' + this.getColor(notification.tipo),
+            'background-color': this.getBackgroundColor(notification.tipo),
+            'padding': '12px',
+            'margin-bottom': '8px'
+        };
     }
 }
