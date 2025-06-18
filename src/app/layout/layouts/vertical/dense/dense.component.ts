@@ -9,6 +9,7 @@ import { FuseNavigationService, FuseVerticalNavigationComponent } from '@fuse/co
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { NavigationService } from 'app/core/navigation/navigation.service';
 import { Navigation } from 'app/core/navigation/navigation.types';
+import { UserService } from 'app/core/user/user.service'; // Agregar import
 import { LanguagesComponent } from 'app/layout/common/languages/languages.component';
 import { MessagesComponent } from 'app/layout/common/messages/messages.component';
 import { NotificationsComponent } from 'app/layout/common/notifications/notifications.component';
@@ -16,7 +17,7 @@ import { QuickChatComponent } from 'app/layout/common/quick-chat/quick-chat.comp
 import { SearchComponent } from 'app/layout/common/search/search.component';
 import { ShortcutsComponent } from 'app/layout/common/shortcuts/shortcuts.component';
 import { UserComponent } from 'app/layout/common/user/user.component';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, filter, switchMap } from 'rxjs';
 import { SettingsComponent } from "../../../common/settings/settings.component";
 
 @Component({
@@ -24,7 +25,7 @@ import { SettingsComponent } from "../../../common/settings/settings.component";
     templateUrl  : './dense.component.html',
     encapsulation: ViewEncapsulation.None,
     standalone   : true,
-    imports: [FuseLoadingBarComponent, FuseVerticalNavigationComponent, MatButtonModule, MatIconModule, LanguagesComponent, FuseFullscreenComponent, SearchComponent, NotificationsComponent, UserComponent, NgIf, RouterOutlet, SettingsComponent],
+    imports: [FuseLoadingBarComponent, FuseVerticalNavigationComponent, MatButtonModule, MatIconModule, FuseFullscreenComponent, SearchComponent, NotificationsComponent, UserComponent, NgIf, RouterOutlet, SettingsComponent],
 })
 export class DenseLayoutComponent implements OnInit, OnDestroy
 {
@@ -40,6 +41,7 @@ export class DenseLayoutComponent implements OnInit, OnDestroy
         private _activatedRoute: ActivatedRoute,
         private _router: Router,
         private _navigationService: NavigationService,
+        private _userService: UserService, // Agregar UserService
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseNavigationService: FuseNavigationService,
     )
@@ -67,11 +69,21 @@ export class DenseLayoutComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+        // Esperar a que el usuario esté cargado antes de cargar la navegación
+        this._userService.user$
+            .pipe(
+                filter(user => !!user), // Solo continuar cuando el usuario esté disponible
+                switchMap(() => this._navigationService.get()), // Cargar navegación después del usuario
+                takeUntil(this._unsubscribeAll)
+            )
+            .subscribe();
+
         // Subscribe to navigation data
         this._navigationService.navigation$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((navigation: Navigation) =>
             {
+                console.log('Navigation received in dense component:', navigation);
                 this.navigation = navigation;
             });
 
