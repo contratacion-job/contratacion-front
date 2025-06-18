@@ -125,6 +125,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
         subtitle: 'Organización interna - Solo Admin',
         type: 'collapsable',
         icon: 'heroicons_outline:office-building',
+         roles: ['admin'],
         children: [
             {
                 id: 'departamentos',
