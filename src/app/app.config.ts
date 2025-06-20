@@ -6,7 +6,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { PreloadAllModules, provideRouter, withInMemoryScrolling, withPreloading } from '@angular/router';
 import { provideFuse } from '@fuse';
 import { provideTransloco, TranslocoService } from '@ngneat/transloco';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, timeout, catchError, of } from 'rxjs';
 import { appRoutes } from 'app/app.routes';
 import { provideAuth } from 'app/core/auth/auth.provider';
 import { provideIcons } from 'app/core/icons/icons.provider';
@@ -21,7 +21,6 @@ export const appConfig: ApplicationConfig = {
             withPreloading(PreloadAllModules),
             withInMemoryScrolling({scrollPositionRestoration: 'enabled'}),
         ),
-
         // Material Date Adapter
         {
             provide : DateAdapter,
@@ -41,7 +40,6 @@ export const appConfig: ApplicationConfig = {
                 },
             },
         },
-
         // Transloco Config
         provideTransloco({
             config: {
@@ -62,19 +60,44 @@ export const appConfig: ApplicationConfig = {
             },
             loader: TranslocoHttpLoader,
         }),
-        {
-            // Preload the default language before the app starts to prevent empty/jumping content
-            provide   : APP_INITIALIZER,
-            useFactory: () =>
-            {
-                const translocoService = inject(TranslocoService);
-                const defaultLang = translocoService.getDefaultLang();
-                translocoService.setActiveLang(defaultLang);
+ {
+    provide   : APP_INITIALIZER,
+    useFactory: () => {
+        const translocoService = inject(TranslocoService);
+        const defaultLang = translocoService.getDefaultLang();
+        translocoService.setActiveLang(defaultLang);
+        
+        return () => new Promise((resolve) => {
+            // Intentar cargar las traducciones con múltiples fallbacks
+            const loadTranslations = () => {
+                translocoService.load(defaultLang).pipe(
+                    timeout(5000),
+                    catchError((error) => {
+                        console.warn('Failed to load translations, using fallback:', error);
+                        // Retornar un observable que emite un valor vacío
+                        return of({});
+                    })
+                ).subscribe({
+                    next: (translations) => {
+                        console.log('Translations loaded successfully');
+                        resolve(true);
+                    },
+                    error: (error) => {
+                        console.warn('Translation loading failed completely:', error);
+                        resolve(true); // Resolver de todas formas para no bloquear el bootstrap
+                    },
+                    complete: () => {
+                        resolve(true);
+                    }
+                });
+            };
 
-                return () => firstValueFrom(translocoService.load(defaultLang));
-            },
-            multi     : true,
-        },
+            // Pequeño delay para evitar race conditions con extensiones
+            setTimeout(loadTranslations, 100);
+        });
+    },
+    multi     : true,
+},
 
         // Fuse
         provideAuth(),

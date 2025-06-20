@@ -128,6 +128,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
          roles: ['admin'],
         children: [
             {
+                id   : 'Entidad',
+                title: 'Entidad',
+                type : 'basic',
+                icon : 'heroicons_outline:user-group',
+                link : '/organizacion/entidad'
+            },
+            {
                 id: 'departamentos',
                 title: 'Departamentos',
                 type: 'basic',
@@ -175,6 +182,24 @@ export const defaultNavigation: FuseNavigationItem[] = [
             },
         ],
     },
+    // En tu navegación, agregar:
+  {
+        id      : 'gestion-usuarios-group',
+        title   : 'Administración',
+        subtitle: 'Gestión del sistema',
+        type    : 'group',
+        icon    : 'heroicons_outline:cog-6-tooth',
+        children: [
+            {
+                id   : 'gestion-usuarios',
+                title: 'Gestión de Usuarios',
+                type : 'basic',
+                icon : 'heroicons_outline:user-group',
+                link : '/admin/usuarios'
+            }
+        ]
+    }
+
 ];
 
 export const compactNavigation: FuseNavigationItem[] = [

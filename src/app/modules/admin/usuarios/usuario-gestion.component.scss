@@ -1,0 +1,119 @@
+.inventory-grid {
+    display: grid;
+    grid-template-columns: 25px repeat(9, 1fr) 35px;
+    gap: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Asegurar que el formulario de adición sea visible y responsivo */
+  .add-form-container {
+    padding: 1rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
+    max-width: 100%;
+    margin: 1rem auto;
+    overflow: visible;
+  }
+  
+  /* En pantallas pequeñas, el formulario debe ocupar todo el ancho */
+  @media (max-width: 640px) {
+    .add-form-container {
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+    }
+  }
+  
+  .inventory-grid.z-3 {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 20;
+    box-shadow: 0 2px 5px -2px rgba(0, 0, 0, 0.1);
+    overflow: visible;
+  }
+  
+  .dark .inventory-grid.z-3 {
+    background: #1E1E1E;
+  }
+  
+  .inventory-grid > div:last-child {
+    position: sticky;
+    right: 0;
+    background: white;
+    z-index: 10;
+    box-shadow: -2px 0 5px -2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dark .inventory-grid > div:last-child {
+    background: #0F172A;
+  }
+  
+  .sticky-end {
+    position: sticky;
+    right: 0;
+    background: white;
+    z-index: 11;
+    box-shadow: -2px 0 5px -2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dark .sticky-end {
+    background: #0F172A;
+  }
+  
+  .dark .inventory-grid > div {
+    color: #E0E0E0;
+  }
+  
+  .dark .sticky-end .mat-stroked-button {
+    background: #0F172A !important;
+    color: #FFF !important;
+    border-color: #0F172A !important;
+  }
+  
+  .dark .sticky-end .mat-stroked-button .mat-icon {
+    color: #FFF !important;
+  }
+  
+  .inventory-grid > div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  :host {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+  /* ORDEN CORRECTO: De mayor a menor */
+  
+  
+  @media (max-width: 768px) {
+    .inventory-grid {
+      grid-template-columns: 25px 70px 110px 90px 90px 80px 80px 80px 80px 80px 35px;
+    }
+  }
+  
+  
+  // Estilos para el diálogo a pantalla completa
+  .full-screen-dialog {
+    max-width: 100vw !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  
+    .mat-dialog-container {
+      padding: 0 !important;
+      border-radius: 0 !important;
+    }
+  }
+  
+  // Asegurar que el contenido del diálogo sea scrollable
+  .mat-dialog-content {
+    max-height: 65vh !important;
+    overflow-y: auto !important;
+  }
+  
+  

@@ -60,6 +60,8 @@ export interface Entidad {
   domicilio_legal: string;
   telefonos: string;
   logo: string;
+  tipo_empresa: string;
+   provincia?: Provincia; 
   municipio: Municipio; // Relationship: belongs to municipio
 }
 
@@ -213,7 +215,7 @@ export interface Usuario {
   username: string;
   roles: string;
   password: string;
-  nombre: string;
+  name: string;
   apellidos: string;
   cargo: string;
   correo: string;

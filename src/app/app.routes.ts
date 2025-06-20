@@ -110,6 +110,8 @@ export const appRoutes: Route[] = [
 
             // Notificaciones module
             {path: 'notificaciones', loadChildren: () => import('app/modules/notificaciones/notificaciones-routing.module').then(m => m.NotificacionesRoutingModule)},
+            {path: 'admin', loadChildren: () => import('app/modules/admin/admin.module').then(m => m.AdminModule)},
+
 
 
             {path: 'example', loadChildren: () => import('app/modules/admin/example/example.routes')},

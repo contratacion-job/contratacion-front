@@ -14,7 +14,7 @@ export const AdminGuard: CanActivateFn = (route, state) => {
         }),
         map(user => {
             const hasAdminRole = user && user.roles && user.roles.includes(Role.ADMIN);
-            console.log('AdminGuard hasAdminRole:', hasAdminRole);
+           // console.log('AdminGuard hasAdminRole:', hasAdminRole);
             if (hasAdminRole) {
                 return true;
             } else {

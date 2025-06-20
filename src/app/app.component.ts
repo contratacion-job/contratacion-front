@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TranslocoService } from '@ngneat/transloco';
 
 @Component({
     selector   : 'app-root',
@@ -8,12 +9,19 @@ import { RouterOutlet } from '@angular/router';
     standalone : true,
     imports    : [RouterOutlet],
 })
-export class AppComponent
-{
-    /**
-     * Constructor
-     */
-    constructor()
-    {
+export class AppComponent implements OnInit {
+    private translocoService = inject(TranslocoService);
+
+    constructor() {}
+
+    ngOnInit(): void {
+        // Cargar traducciones después del bootstrap
+        const defaultLang = this.translocoService.getDefaultLang();
+        this.translocoService.setActiveLang(defaultLang);
+        
+        this.translocoService.load(defaultLang).subscribe({
+            next: () => console.log('Translations loaded'),
+            error: (error) => console.warn('Translation loading failed:', error)
+        });
     }
 }

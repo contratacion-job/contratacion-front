@@ -4,13 +4,11 @@
 // Methods are derivations of the Auth0 Angular-JWT helper service methods
 // https://github.com/auth0/angular2-jwt
 // -----------------------------------------------------------------------------------------------------
-
 export class AuthUtils
 {
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
-
     /**
      * Is token expired?
      *
@@ -20,14 +18,20 @@ export class AuthUtils
     static isTokenExpired(token: string, offsetSeconds?: number): boolean
     {
         // Return if there is no token
-        if ( !token || token === '' )
+        if ( !token || token === '' || token === 'null' || token === 'undefined' )
         {
+            return true;
+        }
+
+        // Validar formato JWT antes de procesar
+        if ( !this._isValidJWTFormat(token) )
+        {
+        //    console.error('Invalid JWT format detected:', token);
             return true;
         }
 
         // Get the expiration date
         const date = this._getTokenExpirationDate(token);
-
         offsetSeconds = offsetSeconds || 0;
 
         if ( date === null )
@@ -44,6 +48,23 @@ export class AuthUtils
     // -----------------------------------------------------------------------------------------------------
 
     /**
+     * Validate JWT format
+     *
+     * @param token
+     * @private
+     */
+    private static _isValidJWTFormat(token: string): boolean
+    {
+        if ( !token || typeof token !== 'string' )
+        {
+            return false;
+        }
+
+        const parts = token.split('.');
+        return parts.length === 3 && parts.every(part => part.length > 0);
+    }
+
+    /**
      * Base64 decoder
      * Credits: https://github.com/atk
      *
@@ -54,16 +75,13 @@ export class AuthUtils
     {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
         let output = '';
-
         str = String(str).replace(/=+$/, '');
-
         if ( str.length % 4 === 1 )
         {
             throw new Error(
                 '\'atob\' failed: The string to be decoded is not correctly encoded.',
             );
         }
-
         /* eslint-disable */
         for (
             // initialize result and counters
@@ -86,7 +104,6 @@ export class AuthUtils
             buffer = chars.indexOf(buffer);
         }
         /* eslint-enable */
-
         return output;
     }
 
@@ -139,7 +156,7 @@ export class AuthUtils
     }
 
     /**
-     * Decode token
+     * Decode token with better error handling
      *
      * @param token
      * @private
@@ -147,51 +164,74 @@ export class AuthUtils
     private static _decodeToken(token: string): any
     {
         // Return if there is no token
-        if ( !token )
+        if ( !token || typeof token !== 'string' )
         {
+          //  console.warn('Token is null, undefined, or not a string');
             return null;
         }
 
+        // Clean token (remove any whitespace or quotes)
+        token = token.trim().replace(/^["']|["']$/g, '');
+
         // Split the token
         const parts = token.split('.');
-
         if ( parts.length !== 3 )
         {
+          //  console.error('Invalid JWT format. Token parts:', parts.length, 'Token:', token);
             throw new Error('The inspected token doesn\'t appear to be a JWT. Check to make sure it has three parts and see https://jwt.io for more.');
         }
 
-        // Decode the token using the Base64 decoder
-        const decoded = this._urlBase64Decode(parts[1]);
-
-        if ( !decoded )
+        try
         {
-            throw new Error('Cannot decode the token.');
-        }
+            // Decode the token using the Base64 decoder
+            const decoded = this._urlBase64Decode(parts[1]);
+            if ( !decoded )
+            {
+                throw new Error('Cannot decode the token.');
+            }
 
-        return JSON.parse(decoded);
+            return JSON.parse(decoded);
+        }
+        catch (error)
+        {
+    // console.error('Error decoding JWT token:', error);
+            throw new Error('Cannot decode the token: ' + error.message);
+        }
     }
 
     /**
-     * Get token expiration date
+     * Get token expiration date with better error handling
      *
      * @param token
      * @private
      */
     private static _getTokenExpirationDate(token: string): Date | null
     {
-        // Get the decoded token
-        const decodedToken = this._decodeToken(token);
-
-        // Return if the decodedToken doesn't have an 'exp' field
-        if ( !decodedToken.hasOwnProperty('exp') )
+        try
         {
+            // Get the decoded token
+            const decodedToken = this._decodeToken(token);
+
+            if ( !decodedToken )
+            {
+                return null;
+            }
+
+            // Return if the decodedToken doesn't have an 'exp' field
+            if ( !decodedToken.hasOwnProperty('exp') )
+            {
+                return null;
+            }
+
+            // Convert the expiration date
+            const date = new Date(0);
+            date.setUTCSeconds(decodedToken.exp);
+            return date;
+        }
+        catch (error)
+        {
+           // console.error('Error getting token expiration date:', error);
             return null;
         }
-
-        // Convert the expiration date
-        const date = new Date(0);
-        date.setUTCSeconds(decodedToken.exp);
-
-        return date;
     }
 }

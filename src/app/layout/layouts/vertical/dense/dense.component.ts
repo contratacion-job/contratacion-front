@@ -83,7 +83,7 @@ export class DenseLayoutComponent implements OnInit, OnDestroy
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((navigation: Navigation) =>
             {
-                console.log('Navigation received in dense component:', navigation);
+               
                 this.navigation = navigation;
             });
 

@@ -27,28 +27,13 @@ export class NavigationService
             )
         ]).pipe(
             map(([navigation, user]) => {
-                console.log('Navigation filtering - User:', user);
-                console.log('Navigation filtering - User roles:', user?.roles);
-                
+               
                 if (!user || !user.roles) {
-                    console.log('No user or roles, returning full navigation');
+                  
                     return navigation;
                 }
 
-                const userRoles = user.roles;
-                const isAdmin = userRoles.includes('admin') || userRoles.includes('ADMIN');
-                const isUser = userRoles.includes('user') || userRoles.includes('USER');
-                
-                console.log('Is Admin:', isAdmin, 'Is User:', isUser);
-                
-                // Si es solo usuario (no admin)
-                if (isUser && !isAdmin) {
-                    console.log('Applying user role filter');
-                    return this.filterAdminOnlyItems(navigation);
-                }
-                
-                console.log('User is admin or no specific role, showing full navigation');
-                return navigation;
+                return this.filterNavigationByRole(navigation, user.roles);
             })
         );
     }
@@ -65,29 +50,74 @@ export class NavigationService
         return this._httpClient.get<Navigation>('api/common/navigation').pipe(
             tap((navigation) =>
             {
-                console.log('Raw navigation loaded:', navigation);
+            
                 this._navigation.next(navigation);
             }),
         );
     }
 
     /**
-     * Filter out admin-only navigation items
+     * Filter navigation based on user roles
      */
-    private filterAdminOnlyItems(navigation: Navigation): Navigation
+    private filterNavigationByRole(navigation: Navigation, userRoles: string[]): Navigation
     {
-        const adminOnlyIds = ['mi-entidad-group'];
         
-        console.log('Original navigation items:', navigation.default?.map(item => item.id));
+        // Roles que pueden ver "Mi Entidad"
+        const canAccessMiEntidad = this.hasAnyRole(userRoles, ['admin', 'administrador', 'superadmin']);
         
+        // Roles que pueden ver "Gestión de Usuarios"
+        const canAccessUserManagement = this.hasAnyRole(userRoles, ['admin', 'administrador', 'superadmin']);
+        
+     
+        
+        // Determinar qué elementos filtrar
+        const itemsToFilter = [];
+        
+        if (!canAccessMiEntidad) {
+            itemsToFilter.push('mi-entidad-group');
+        }
+        
+        if (!canAccessUserManagement) {
+            itemsToFilter.push('gestion-usuarios-group');
+        }
+        
+        // Si no hay elementos que filtrar, devolver navegación completa
+        if (itemsToFilter.length === 0) {
+          
+            return navigation;
+        }
+        
+        // Filtrar elementos según los permisos
+       
+        return this.filterSpecificItems(navigation, itemsToFilter);
+    }
+
+    /**
+     * Check if user has any of the specified roles
+     */
+    private hasAnyRole(userRoles: string[], allowedRoles: string[]): boolean
+    {
+        return userRoles.some(role => 
+            allowedRoles.includes(role.toLowerCase()) || 
+            allowedRoles.includes(role.toUpperCase()) ||
+            allowedRoles.includes(role)
+        );
+    }
+
+    /**
+     * Filter out specific navigation items
+     */
+    private filterSpecificItems(navigation: Navigation, excludeIds: string[]): Navigation
+    {
+     
         const filtered = {
             ...navigation,
-            default: this.filterNavigationItems(navigation.default, adminOnlyIds),
-            horizontal: this.filterNavigationItems(navigation.horizontal, adminOnlyIds),
-            compact: this.filterNavigationItems(navigation.compact, adminOnlyIds)
+            default: this.filterNavigationItems(navigation.default, excludeIds),
+            horizontal: this.filterNavigationItems(navigation.horizontal, excludeIds),
+            compact: this.filterNavigationItems(navigation.compact, excludeIds)
         };
         
-        console.log('Filtered navigation items:', filtered.default?.map(item => item.id));
+       
         return filtered;
     }
 
@@ -102,7 +132,7 @@ export class NavigationService
             .filter(item => {
                 const shouldExclude = excludeIds.includes(item.id);
                 if (shouldExclude) {
-                    console.log('Excluding navigation item:', item.id);
+                  
                 }
                 return !shouldExclude;
             })

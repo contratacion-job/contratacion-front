@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { User } from 'app/core/user/user.types';
-import { map, Observable, ReplaySubject, tap } from 'rxjs';
+import { map, Observable, ReplaySubject, tap, of } from 'rxjs';
+import { users } from 'app/mock-api/common/user/data';
 
 @Injectable({providedIn: 'root'})
 export class UserService
@@ -45,6 +46,33 @@ export class UserService
             }),
         );
     }
+
+    /**
+     * Get the list of fake users
+     */
+
+    getUsers(): Observable<User[]> {
+
+
+        // Transform the data to match the User interface (name -> name)
+        const transformedUsers = users.map(user => {
+            const transformedUser = {
+                ...user,
+                // Ensure all required properties are present
+                name: user.name || user.username, // Use name or fallback to username
+            };
+            return transformedUser;
+        });
+
+
+
+        return of(transformedUsers as User[]).pipe(
+            tap(users => {
+
+            })
+        );
+    }
+
 
     /**
      * Update the user

@@ -16,7 +16,7 @@ export class ContratoService {
  this.contratos = mockContrato as Contrato[] || [];
   this.tipoContrato = mockTipoContrato as TipoContrato[] || [];
   this.expired = expiredContracts as Contrato[] || [];
-    console.log('Contratos inicializados:', this.contratos);
+   // console.log('Contratos inicializados:', this.contratos);
   }
 
   getContratos(): Observable<Contrato[]> {
@@ -94,7 +94,7 @@ export class ContratoService {
     const newContrato: TipoContrato = {
       ...contrato,
       id: this.tipoContrato.length + this.expired.length + 1,
-      
+
 
     };
     this.tipoContrato.push(newContrato);

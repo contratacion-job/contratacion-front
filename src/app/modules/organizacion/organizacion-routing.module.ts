@@ -6,8 +6,14 @@ import { DepartamentoFormComponent } from './departamento-list/departamento-list
 import { LicenseComponent } from 'app/core/soporte/license/license.component';
 import { BDComponent } from 'app/core/soporte/bd/bd.component';
 import { DepartamentoComponent } from './municipio-list/municipio-list.component';
+import { EntidadListComponent } from './entidad-list/entidad-list.component';
 
 const routes: Routes = [
+
+  {
+    path: 'entidad',
+    component: EntidadListComponent
+},
  {
         path: 'trabajadores',
         component: TrabajadoresComponent

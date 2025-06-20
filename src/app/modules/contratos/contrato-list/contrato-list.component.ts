@@ -184,7 +184,7 @@ this.searchInputControl.valueChanges
           console.log('Search query:', query);
           this.closeDetails();
           this.dataSource.filter = query ? query.trim().toLowerCase() : '';
-          console.log('Filtered data:', this.dataSource.filteredData);
+         // console.log('Filtered data:', this.dataSource.filteredData);
           this.cdr.detectChanges();
         });
     }
@@ -240,7 +240,7 @@ initSelectedContratoForm(): void {
     this.errorMessage = '';
     this.contratoService.getContratos().subscribe({
       next: (contratos) => {
-        console.log('Contratos cargados:', contratos);
+      //  console.log('Contratos cargados:', contratos);
         // Calcular tiempo restante individual para cada contrato
         contratos.forEach(contrato => {
           (contrato as any).tiempoRestante = this.calcularTiempoRestante(contrato);
@@ -250,10 +250,10 @@ initSelectedContratoForm(): void {
         this.pagination.length = contratos.length;
         this.isLoading = false;
         this.cdr.detectChanges();
-        console.log('DataSource data:', this.dataSource.data);
+       /// console.log('DataSource data:', this.dataSource.data);
       },
       error: (err) => {
-        console.error('Error al cargar los contratos:', err);
+       // console.error('Error al cargar los contratos:', err);
         this.errorMessage = 'Error al cargar los contratos. Por favor, intente nuevamente.';
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -391,8 +391,8 @@ initSelectedContratoForm(): void {
   }
 
 toggleDetails(rowId: number): void {
-  console.log('toggleDetails called with rowId:', rowId);
-  console.log('selectedContratoForm exists:', !!this.selectedContratoForm);
+ // console.log('toggleDetails called with rowId:', rowId);
+ // console.log('selectedContratoForm exists:', !!this.selectedContratoForm);
 
   // Si ya está seleccionado el mismo contrato, lo cerramos
   if (this.selectedContrato?.id === rowId) {
@@ -400,12 +400,12 @@ toggleDetails(rowId: number): void {
   } else {
     // Buscar el contrato en los datos
     this.selectedContrato = this.data.find(row => row.id === rowId) || null;
-    console.log('Found contract:', this.selectedContrato);
+   // console.log('Found contract:', this.selectedContrato);
 
     if (this.selectedContrato) {
       // Verificar que el formulario existe antes de hacer patchValue
       if (!this.selectedContratoForm) {
-        console.error('selectedContratoForm is not initialized');
+       // console.error('selectedContratoForm is not initialized');
         this.initNewContratoForm(); // Re-inicializar si es necesario
       }
 
@@ -424,7 +424,7 @@ toggleDetails(rowId: number): void {
     }
   }
 
-  console.log('selectedContrato after toggle:', this.selectedContrato);
+ // console.log('selectedContrato after toggle:', this.selectedContrato);
   this.cdr.detectChanges();
 }
 
