@@ -1,1 +1,419 @@
-<p>suplemento-list works!</p>
+<div class="flex flex-col min-h-screen p-6 w-full">
+  <!-- Card -->
+  <div class="relative flex flex-col flex-auto p-6 pr-3 pb-3 bg-card rounded-2xl shadow overflow-hidden mb-6 w-full">
+    <div class="absolute bottom-0 right-0 w-24 h-24 -m-6">
+      <mat-icon
+        class="icon-size-24 opacity-25 text-green-500 dark:text-green-400"
+        [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
+    </div>
+
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <h2 class="text-2xl font-semibold">Lista de Suplementos</h2>
+      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+        <button mat-raised-button color="primary" (click)="openAddSuplementoDialog()" class="w-full sm:w-auto">
+          <mat-icon>add</mat-icon>
+          <span>Agregar Suplemento</span>
+        </button>
+        <button mat-stroked-button (click)="applyFilters()" class="w-full sm:w-auto">
+          <mat-icon>filter_alt</mat-icon>
+          <span>Aplicar Filtros</span>
+        </button>
+        <button mat-button (click)="clearFilters()" class="w-full sm:w-auto">
+          <mat-icon>clear_all</mat-icon>
+          <span>Limpiar</span>
+        </button>
+      </div>
+    </div>
+
+  <div class="flex flex-row flex-wrap mt-4 -mx-6">
+      <div class="flex flex-col mx-6 my-3">
+        <div class="text-sm font-medium leading-none text-secondary">
+          Monto Inicial CUP
+        </div>
+        <div class="mt-2 font-medium text-3xl leading-none">
+          {{ 0 | currency : "CUP" }}
+        </div>
+      </div>
+      <div class="flex flex-col mx-6 my-3">
+        <div class="text-sm font-medium leading-none text-secondary">
+          Total Ejecutado CUP
+        </div>
+        <div class="mt-2 font-medium text-3xl leading-none">
+          {{ 0 | currency : "CUP" }}
+        </div>
+      </div>
+      <div class="flex flex-col mx-6 my-3">
+        <div class="text-sm font-medium leading-none text-secondary">
+          Monto Restante CUP
+        </div>
+        <div class="mt-2 font-medium text-3xl leading-none">
+          {{ 0 | currency : "CUP" }}
+        </div>
+      </div>
+      <div class="flex flex-col mx-6 my-3">
+        <div class="text-sm font-medium leading-none text-secondary">
+          Monto Inicial USD
+        </div>
+        <div class="mt-2 font-medium text-3xl leading-none">
+          {{ 0 }}
+        </div>
+      </div>
+      <div class="flex flex-col mx-6 my-3">
+        <div class="text-sm font-medium leading-none text-secondary">
+          Total Ejecutado USD
+        </div>
+        <div class="mt-2 font-medium text-3xl leading-none">
+          {{ 0 }}
+        </div>
+      </div>
+      <div class="flex flex-col mx-6 my-3">
+        <div class="text-sm font-medium leading-none text-secondary">
+          Monto Restante USD
+        </div>
+        <div class="mt-2 font-medium text-3xl leading-none">
+          {{ 0 }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suplementos Table -->
+  <div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
+    <!-- Header -->
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+      <!-- Loader -->
+      <div class="absolute inset-x-0 bottom-0" *ngIf="isLoading">
+        <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
+      </div>
+      <!-- Title -->
+      <div class="text-4xl font-extrabold tracking-tight">Suplementos</div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-col sm:flex-row shrink-0 items-center justify-between py-4 px-6 md:px-8 border-b">
+      <!-- Search -->
+      <mat-form-field
+        class="fuse-mat-dense fuse-mat-rounded min-w-64"
+        [subscriptSizing]="'dynamic'">
+        <mat-icon
+          class="icon-size-5"
+          matPrefix
+          [svgIcon]="'heroicons_solid:magnifying-glass'"></mat-icon>
+        <input
+          matInput
+          [formControl]="searchInputControl"
+          [autocomplete]="'off'"
+          [placeholder]="'Buscar suplementos'" />
+      </mat-form-field>
+
+      <!-- Action buttons -->
+      <div class="flex items-center gap-4 mt-4 sm:mt-0">
+        <!-- Export button -->
+        <button
+          mat-icon-button
+          [color]="'primary'"
+          (click)="exportToCSV()"
+          matTooltip="Exportar tabla a CSV"
+          aria-label="Exportar tabla a CSV">
+          <mat-icon [svgIcon]="'heroicons_outline:arrow-up-tray'"></mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-auto overflow-hidden">
+      <!-- Suplementos list -->
+      <div class="flex flex-col flex-auto sm:mb-18 overflow-x-auto">
+        <ng-container *ngIf="dataSource.data.length > 0; else noSuplementos">
+          <div class="flex flex-col h-full overflow-y-auto">
+            <!-- Header -->
+            <div class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+              matSort
+              matSortDisableClear
+              style="grid-template-columns: repeat(11, minmax(100px, 1fr)) 100px;">
+              <div [mat-sort-header]="'no_contrato_contratacion'">No. Contrato</div>
+              <div [mat-sort-header]="'proveedor'">Proveedor</div>
+              <div [mat-sort-header]="'tipo_contrato'">Tipo de Contrato</div>
+              <div [mat-sort-header]="'departamento'">Departamento</div>
+              <div [mat-sort-header]="'valor_cup'">Valor (CUP)</div>
+              <div [mat-sort-header]="'valor_usd'">Valor (USD)</div>
+              <div [mat-sort-header]="'fecha_entrada'">Fecha Entrada</div>
+              <div [mat-sort-header]="'fecha_firmado'">Fecha Firmado</div>
+              <div [mat-sort-header]="'vigencia'">Vigencia</div>
+              <div [mat-sort-header]="'fecha_vencido'">Fecha Vencido</div>
+              <div [mat-sort-header]="'observaciones'">Observaciones</div>
+              <div class="sticky-end">Detalles</div>
+            </div>
+
+            <!-- Filters Row dentro de la tabla -->
+            <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b bg-gray-50 dark:bg-gray-800"
+                 style="grid-template-columns: repeat(11, minmax(100px, 1fr)) 100px;"
+                 [formGroup]="filterForm">
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <input matInput placeholder="No. Contrato" formControlName="no_contrato_contratacion_filter">
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <mat-select formControlName="proveedor_id" placeholder="Proveedor">
+                    <mat-option value="">Todos</mat-option>
+                    <mat-option *ngFor="let prov of proveedores" [value]="prov.id">{{ prov.nombre }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <mat-select formControlName="tipo_contrato_id" placeholder="Tipo de Contrato">
+                    <mat-option value="">Todos</mat-option>
+                    <mat-option *ngFor="let tipo of tiposContrato" [value]="tipo.id">{{ tipo.nombre_tipo_contrato }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <mat-select formControlName="departamento_id" placeholder="Departamento">
+                    <mat-option value="">Todos</mat-option>
+                    <mat-option *ngFor="let dept of departamentos" [value]="dept.id">{{ dept.nombre_departamento }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <input matInput type="number" placeholder="Valor CUP" formControlName="valor_cup_filter">
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <input matInput type="number" placeholder="Valor USD" formControlName="valor_usd_filter">
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <input matInput type="date" formControlName="fecha_entrada_filter">
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <input matInput type="date" formControlName="fecha_firmado_filter">
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <mat-select formControlName="vigencia_id" placeholder="Vigencia">
+                    <mat-option value="">Todos</mat-option>
+                    <mat-option *ngFor="let vig of vigencias" [value]="vig.id">{{ vig.vigencia }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <input matInput placeholder="Observaciones" formControlName="observaciones_filter">
+                </mat-form-field>
+              </div>
+              <div class="flex gap-1 sticky-end">
+                <button 
+                  mat-icon-button 
+                  color="primary" 
+                  (click)="applyFilters()" 
+                  type="button"
+                  matTooltip="Aplicar filtros"
+                  class="!w-8 !h-8 !min-w-8">
+                  <mat-icon class="!text-sm">search</mat-icon>
+                </button>
+                <button 
+                  mat-icon-button 
+                  color="warn" 
+                  (click)="clearFilters()" 
+                  type="button"
+                  matTooltip="Limpiar filtros"
+                  class="!w-8 !h-8 !min-w-8">
+                  <mat-icon class="!text-sm">clear</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- Rows -->
+            <ng-container *ngFor="let suplemento of dataSource.filteredData; trackBy: trackByFn">
+              <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b items-center text-m hover:bg-gray-50 dark:hover:bg-gray-800"
+                style="grid-template-columns: repeat(11, minmax(100px, 1fr)) 100px;">
+                <div class="truncate">{{ suplemento.no_contrato_contratacion || 'N/A' }}</div>
+                <div class="truncate" [matTooltip]="suplemento.proveedor.nombre" matTooltipPosition="above">
+                  {{ suplemento.proveedor.nombre }}
+                </div>
+                <div class="truncate" [matTooltip]="suplemento.tipo_contrato?.nombre_tipo_contrato" matTooltipPosition="above">
+                  {{ suplemento.tipo_contrato?.nombre_tipo_contrato }}
+                </div>
+                <div class="truncate" [matTooltip]="suplemento.departamento?.nombre_departamento" matTooltipPosition="above">
+                  {{ suplemento.departamento?.nombre_departamento }}
+                </div>
+                <div class="truncate">
+                  {{ suplemento.valor_cup | currency : "CUP" : "symbol" : "1.0-0" }}
+                </div>
+                <div class="truncate">
+                  {{ suplemento.valor_usd | currency : "USD" : "symbol" : "1.0-0" }}
+                </div>
+                <div class="truncate">
+                  {{ suplemento.fecha_entrada | date : "d/M/yy" }}
+                </div>
+                <div class="truncate">
+                  {{ suplemento.fecha_firmado | date : "d/M/yy" }}
+                </div>
+                <div class="truncate">
+                  {{ suplemento.vigencia.vigencia }}
+                </div>
+                <div class="truncate">
+                  {{ suplemento.fecha_vencido | date : "d/M/yy" }}
+                </div>
+                <div class="truncate" [matTooltip]="suplemento.observaciones" matTooltipPosition="above">
+                  {{ suplemento.observaciones }}
+                </div>
+                <div class="flex items-center justify-end gap-2 sticky-end">
+                  <button 
+                    mat-icon-button 
+                    color="primary" 
+                    (click)="$event.stopPropagation(); openEditSuplementoDialog(suplemento)" 
+                    matTooltip="Editar">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button 
+                    mat-icon-button 
+                    color="warn" 
+                    (click)="$event.stopPropagation(); deleteSuplemento(suplemento)" 
+                    matTooltip="Eliminar">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                  <button
+                    class="min-w-10 min-h-7 h-7 px-2 leading-6 whitespace-nowrap"
+                    mat-stroked-button
+                    (click)="$event.stopPropagation(); toggleDetails(suplemento.id)">
+                    <mat-icon
+                      class="icon-size-5"
+                      [svgIcon]="selectedSuplemento?.id === suplemento.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                    </mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Details Row -->
+              <div class="grid" *ngIf="selectedSuplemento?.id === suplemento.id">
+                <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: { $implicit: suplemento }">
+                </ng-container>
+              </div>
+            </ng-container>
+          </div>
+
+          <mat-paginator
+            class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+            [length]="pagination.length"
+            [pageIndex]="pagination.page"
+            [pageSize]="pagination.size"
+            [pageSizeOptions]="[5, 10, 25, 100]"
+            [showFirstLastButtons]="true"></mat-paginator>
+        </ng-container>
+
+        <!-- Details Template -->
+        <ng-template #rowDetailsTemplate let-suplemento>
+          <div class="shadow-lg overflow-hidden">
+            <div class="flex border-b">
+              <!-- Selected suplemento form -->
+              <form class="responsive-form flex flex-col w-full mx-auto p-8"
+                    [formGroup]="selectedSuplementoForm">
+                <div class="flex flex-auto flex-wrap">
+                  <div class="flex flex-col w-full lg:w-1/3 sm:pl-8">
+                    <mat-form-field class="w-full">
+                      <mat-label>No. Contrato</mat-label>
+                      <input matInput formControlName="no_contrato_contratacion" />
+                    </mat-form-field>
+                    <mat-form-field class="w-full">
+                      <mat-label>Proveedor</mat-label>
+                      <mat-select formControlName="proveedor">
+                        <mat-option *ngFor="let provider of proveedores" [value]="provider">
+                          {{ provider.nombre }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="w-full">
+                      <mat-label>Tipo de Contrato</mat-label>
+                      <mat-select formControlName="tipo_contrato">
+                        <mat-option *ngFor="let type of tiposContrato" [value]="type">
+                          {{ type.nombre_tipo_contrato }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="w-full">
+                      <mat-label>Departamento</mat-label>
+                      <mat-select formControlName="departamento">
+                        <mat-option *ngFor="let dept of departamentos" [value]="dept">
+                          {{ dept.nombre_departamento }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div class="flex flex-col w-full lg:w-1/3 sm:pl-8">
+                    <mat-form-field class="w-full">
+                      <mat-label>Fecha Entrada</mat-label>
+                      <input matInput type="date" formControlName="fecha_entrada" />
+                    </mat-form-field>
+                    <mat-form-field class="w-full">
+                      <mat-label>Fecha Firmado</mat-label>
+                      <input matInput type="date" formControlName="fecha_firmado" />
+                    </mat-form-field>
+                    <mat-form-field class="w-full">
+                      <mat-label>Valor (CUP)</mat-label>
+                      <span matPrefix>CUP</span>
+                      <input matInput type="number" formControlName="valor_cup" />
+                    </mat-form-field>
+                    <mat-form-field class="w-full">
+                      <mat-label>Valor (USD)</mat-label>
+                      <span matPrefix>$</span>
+                      <input matInput type="number" formControlName="valor_usd" />
+                    </mat-form-field>
+                  </div>
+                  <div class="flex flex-col w-full lg:w-1/3 sm:pl-8">
+                    <mat-form-field class="w-full">
+                      <mat-label>Vigencia</mat-label>
+                      <mat-select formControlName="vigencia">
+                        <mat-option *ngFor="let vig of vigencias" [value]="vig">
+                          {{ vig.vigencia }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="w-full">
+                      <mat-label>Fecha Vencido</mat-label>
+                      <input matInput type="date" formControlName="fecha_vencido" />
+                    </mat-form-field>
+                    <mat-form-field class="w-full">
+                      <mat-label>Observaciones</mat-label>
+                      <textarea matInput formControlName="observaciones"></textarea>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="flex flex-col sm:flex-row items-center justify-end w-full border-t px-4 py-4 gap-3">
+                  <button
+                    class="w-full sm:w-auto px-6"
+                    mat-stroked-button
+                    [color]="'primary'">
+                    Actualizar
+                  </button>
+                  <button
+                    class="w-full sm:w-auto px-6"
+                    mat-stroked-button
+                    [color]="'warn'">
+                    Eliminar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template #noSuplementos>
+          <div class="p-8 sm:p-16 border-b text-4xl font-semibold tracking-tight text-center">
+            ¡No hay suplementos!
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

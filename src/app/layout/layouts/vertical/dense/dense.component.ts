@@ -9,7 +9,7 @@ import { FuseNavigationService, FuseVerticalNavigationComponent } from '@fuse/co
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { NavigationService } from 'app/core/navigation/navigation.service';
 import { Navigation } from 'app/core/navigation/navigation.types';
-import { UserService } from 'app/core/user/user.service'; // Agregar import
+import { UserService } from 'app/core/user/user.service';
 import { LanguagesComponent } from 'app/layout/common/languages/languages.component';
 import { MessagesComponent } from 'app/layout/common/messages/messages.component';
 import { NotificationsComponent } from 'app/layout/common/notifications/notifications.component';
@@ -17,7 +17,7 @@ import { QuickChatComponent } from 'app/layout/common/quick-chat/quick-chat.comp
 import { SearchComponent } from 'app/layout/common/search/search.component';
 import { ShortcutsComponent } from 'app/layout/common/shortcuts/shortcuts.component';
 import { UserComponent } from 'app/layout/common/user/user.component';
-import { Subject, takeUntil, filter, switchMap } from 'rxjs';
+import { Subject, takeUntil, filter } from 'rxjs';
 import { SettingsComponent } from "../../../common/settings/settings.component";
 
 @Component({
@@ -32,108 +32,70 @@ export class DenseLayoutComponent implements OnInit, OnDestroy
     isScreenSmall: boolean;
     navigation: Navigation;
     navigationAppearance: 'default' | 'dense' = 'dense';
+    logoSrc: string = 'assets/images/logo/logo.jpg';
+    backgroundColor: string = 'rebeccapurple';
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-    /**
-     * Constructor
-     */
     constructor(
         private _activatedRoute: ActivatedRoute,
         private _router: Router,
         private _navigationService: NavigationService,
-        private _userService: UserService, // Agregar UserService
+        private _userService: UserService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseNavigationService: FuseNavigationService,
     )
     {
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Accessors
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Getter for current year
-     */
-    get currentYear(): number
-    {
-        return new Date().getFullYear();
-    }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Lifecycle hooks
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * On init
-     */
     ngOnInit(): void
     {
-        // Esperar a que el usuario esté cargado antes de cargar la navegación
         this._userService.user$
             .pipe(
-                filter(user => !!user), // Solo continuar cuando el usuario esté disponible
-                switchMap(() => this._navigationService.get()), // Cargar navegación después del usuario
+                filter(user => !!user),
                 takeUntil(this._unsubscribeAll)
             )
-            .subscribe();
+            .subscribe((user) => {
+                if (user.roles && user.roles.includes('admin')) {
+                    this.logoSrc = 'assets/admin.png';
+                    this.backgroundColor = 'rebeccapurple';
+                } else {
+                    this.logoSrc = 'assets/images/logo/logo.jpg';
+                    this.backgroundColor = 'rebeccapurple';
+                }
+            });
 
-        // Subscribe to navigation data
         this._navigationService.navigation$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((navigation: Navigation) =>
             {
-               
                 this.navigation = navigation;
             });
 
-        // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(({matchingAliases}) =>
             {
-                // Check if the screen is small
                 this.isScreenSmall = !matchingAliases.includes('md');
-
-                // Change the navigation appearance
                 this.navigationAppearance = this.isScreenSmall ? 'default' : 'dense';
             });
     }
 
-    /**
-     * On destroy
-     */
     ngOnDestroy(): void
     {
-        // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Toggle navigation
-     *
-     * @param name
-     */
     toggleNavigation(name: string): void
     {
-        // Get the navigation
         const navigation = this._fuseNavigationService.getComponent<FuseVerticalNavigationComponent>(name);
 
         if ( navigation )
         {
-            // Toggle the opened status
             navigation.toggle();
         }
     }
 
-    /**
-     * Toggle the navigation appearance
-     */
     toggleNavigationAppearance(): void
     {
         this.navigationAppearance = (this.navigationAppearance === 'default' ? 'dense' : 'default');

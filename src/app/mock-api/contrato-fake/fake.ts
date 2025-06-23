@@ -257,6 +257,173 @@ export const mockProveedor = [
   }
 ];
 
+// Mock data for Representantes
+export const mockRepresentantes = [
+  // Representante para Empresa de Suministros S.A.
+  {
+    id: 1,
+    entidad_id: 1,
+    nombre: "Carlos",
+    apellidos: "Martínez López",
+    cargo: "Director General",
+    telefono: "555-0102",
+    email: "carlos.martinez@suministros.cu",
+    activo: true,
+    entidad: {
+      id: 1,
+      municipio_id: 1,
+      nombre_entidad: "Empresa de Suministros S.A.",
+      codigo_entidad: "PRV001",
+      domicilio_legal: "Calle Principal #123",
+      telefonos: "555-0101",
+      logo: "suministros_logo.png",
+      tipo_empresa: "Empresa Estatal",
+      provincia: null,
+      municipio: mockMunicipio[0]
+    },
+    contrato_id: 1
+  },
+  // Representante para Servicios Educativos C.A.
+  {
+    id: 2,
+    entidad_id: 2,
+    nombre: "Ana María",
+    apellidos: "González Pérez",
+    cargo: "Directora Académica",
+    telefono: "555-0203",
+    email: "ana.gonzalez@serviciosedu.cu",
+    activo: true,
+    entidad: {
+      id: 2,
+      municipio_id: 2,
+      nombre_entidad: "Importadora Caribeña S.A.",
+      codigo_entidad: "PRV005",
+      domicilio_legal: "Avenida del Puerto #500",
+      telefonos: "555-0505",
+      logo: "logo_importadora.png",
+      tipo_empresa: "Importadora",
+      municipio: mockMunicipio[0]
+    },
+    contrato_id: 2
+  },
+  // Representante para Constructora del Este
+  {
+    id: 3,
+    entidad_id: 3,
+    nombre: "Roberto",
+    apellidos: "Fernández Díaz",
+    cargo: "Gerente de Proyectos",
+    telefono: "555-0304",
+    email: "roberto.fernandez@constructoraeste.cu",
+    activo: true,
+    entidad: {
+      id: 3,
+      municipio_id: 3,
+      nombre_entidad: "Constructora del Este",
+      codigo_entidad: "PRV003",
+      domicilio_legal: "Carrera 7 #789",
+      telefonos: "555-0303",
+      logo: "logo_constructora.png",
+      tipo_empresa: "Empresa Privada",
+      municipio: mockMunicipio[2]
+    },
+    contrato_id: 3
+  },
+  // Representante para Consultoría Técnica Ltda.
+  {
+    id: 4,
+    entidad_id: 4,
+    nombre: "Laura",
+    apellidos: "Sánchez Rodríguez",
+    cargo: "Jefa de Consultoría",
+    telefono: "555-0405",
+    email: "laura.sanchez@consultoriatec.cu",
+    activo: true,
+    entidad: {
+      id: 4,
+      municipio_id: 1,
+      nombre_entidad: "Consultoría Técnica Ltda.",
+      codigo_entidad: "PRV004",
+      domicilio_legal: "Calle 10 #11-12",
+      telefonos: "555-0404",
+      logo: "logo_consultoria.png",
+      tipo_empresa: "Consultora",
+      municipio: mockMunicipio[3]
+    },
+    contrato_id: 4
+  },
+  // Representante para Eventos Culturales S.A.
+  {
+    id: 5,
+    entidad_id: 5,
+    nombre: "Jorge",
+    apellidos: "Hernández Mena",
+    cargo: "Director de Eventos",
+    telefono: "555-0506",
+    email: "jorge.hernandez@eventosculturales.cu",
+    activo: true,
+    entidad: {
+      id: 5,
+      municipio_id: 2,
+      nombre_entidad: "Empresa de Suministros S.A.",
+      codigo_entidad: "PRV001",
+      domicilio_legal: "Calle Principal #123",
+      telefonos: "555-0101",
+      logo: "logo_empresa_1.png",
+      tipo_empresa: "Empresa Privada",
+      municipio: mockMunicipio[0]
+    },
+    contrato_id: 5
+  },
+  // Representante para Transportes Unidos
+  {
+    id: 6,
+    entidad_id: 6,
+    nombre: "Marta",
+    apellidos: "Díaz Suárez",
+    cargo: "Gerente de Operaciones",
+    telefono: "555-0607",
+    email: "marta.diaz@transportesunidos.cu",
+    activo: true,
+    entidad: {
+      id: 6,
+      municipio_id: 3,
+      nombre_entidad: "Transportes Unidos",
+      codigo_entidad: "PRV006",
+      domicilio_legal: "Avenida Principal #987",
+      telefonos: "555-0606",
+      logo: "logo_transportes.png",
+      tipo_empresa: "Empresa Estatal",
+      municipio: mockMunicipio[2]
+    },
+    contrato_id: 6
+  },
+  // Representante para Tecnología Avanzada Corp.
+  {
+    id: 7,
+    entidad_id: 7,
+    nombre: "David",
+    apellidos: "García Pérez",
+    cargo: "Director de Tecnología",
+    telefono: "555-0708",
+    email: "david.garcia@tecnologia-avanzada.cu",
+    activo: true,
+    entidad: {
+      id: 7,
+      municipio_id: 4,
+      nombre_entidad: "Tecnologías Avanzadas",
+      codigo_entidad: "PRV002",
+      domicilio_legal: "Avenida Tecnológica #456",
+      telefonos: "555-0202",
+      logo: "logo_tecnologia.png",
+      tipo_empresa: "Empresa de Tecnología",
+      municipio: mockMunicipio[1]
+    },
+    contrato_id: 7
+  }
+  
+];
+
 
 
 // Mock data for VigenciaContrato (interface completa con proveedor)

@@ -1,1 +1,153 @@
-<p>ejecucion-suplemento works!</p>
+<div class="flex flex-col min-h-screen p-6 w-full">
+  <div class="relative flex flex-col flex-auto p-6 pr-3 pb-3 bg-card rounded-2xl shadow overflow-hidden mb-6 w-full">
+    <div class="absolute bottom-0 right-0 w-24 h-24 -m-6">
+      <mat-icon
+        class="icon-size-24 opacity-25 text-green-500 dark:text-green-400"
+        [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
+    </div>
+
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <h2 class="text-2xl font-semibold">Ejecución de Suplementos</h2>
+      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+        <button mat-raised-button color="primary" (click)="openAddEjecucionDialog()" class="w-full sm:w-auto">
+          <mat-icon>add</mat-icon>
+          <span>Agregar Ejecución</span>
+        </button>
+        <button mat-stroked-button (click)="applyFilters()" class="w-full sm:w-auto">
+          <mat-icon>filter_alt</mat-icon>
+          <span>Aplicar Filtros</span>
+        </button>
+        <button mat-button (click)="clearFilters()" class="w-full sm:w-auto">
+          <mat-icon>clear_all</mat-icon>
+          <span>Limpiar</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row shrink-0 items-center justify-between py-4 px-6 md:px-8 border-b">
+      <mat-form-field
+        class="fuse-mat-dense fuse-mat-rounded min-w-64"
+        [subscriptSizing]="'dynamic'">
+        <mat-icon
+          class="icon-size-5"
+          matPrefix
+          [svgIcon]="'heroicons_solid:magnifying-glass'"></mat-icon>
+        <input
+          matInput
+          [formControl]="searchInputControl"
+          autocomplete="off"
+          placeholder="Buscar ejecuciones" />
+      </mat-form-field>
+
+      <div class="flex items-center gap-4 mt-4 sm:mt-0">
+        <button
+          mat-icon-button
+          [color]="'primary'"
+          (click)="exportToCSV()"
+          matTooltip="Exportar tabla a CSV"
+          aria-label="Exportar tabla a CSV">
+          <mat-icon [svgIcon]="'heroicons_outline:arrow-up-tray'"></mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-auto overflow-hidden">
+      <div class="flex flex-col flex-auto sm:mb-18 overflow-x-auto">
+        <ng-container *ngIf="dataSource.data.length > 0; else noEjecuciones">
+          <div class="flex flex-col h-full overflow-y-auto">
+            <div class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+              matSort
+              matSortDisableClear
+              style="grid-template-columns: repeat(11, minmax(100px, 1fr)) 100px;">
+              <div [mat-sort-header]="'no_suplemento_id'">No. Suplemento</div>
+              <div [mat-sort-header]="'proveedor'">Proveedor</div>
+              <div [mat-sort-header]="'contrato'">Contrato</div>
+              <div [mat-sort-header]="'trabajo_ejecutado'">Trabajo Ejecutado</div>
+              <div [mat-sort-header]="'costo_cup'" class="text-right">Costo (CUP)</div>
+              <div [mat-sort-header]="'costo_cl'" class="text-right">Costo (CL)</div>
+              <div [mat-sort-header]="'fecha_ejecucion'">Fecha de Ejecución</div>
+              <div class="sticky-end">Acciones</div>
+            </div>
+
+            <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b bg-gray-50 dark:bg-gray-800"
+                 style="grid-template-columns: repeat(11, minmax(100px, 1fr)) 100px;"
+                 [formGroup]="filterForm">
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <input matInput placeholder="No. Suplemento" formControlName="no_suplemento_id_filter" />
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <input matInput placeholder="Proveedor" formControlName="proveedor_filter" />
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <input matInput placeholder="Contrato" formControlName="contrato_filter" />
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <input matInput placeholder="Trabajo Ejecutado" formControlName="trabajo_ejecutado_filter" />
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <input matInput type="number" placeholder="Costo CUP" formControlName="costo_cup_filter" />
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <input matInput type="number" placeholder="Costo CL" formControlName="costo_cl_filter" />
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                  <input matInput type="date" placeholder="Fecha Ejecución" formControlName="fecha_ejecucion_filter" />
+                </mat-form-field>
+              </div>
+              <div></div>
+            </div>
+
+            <ng-container *ngFor="let element of dataSource.filteredData; trackBy: trackByFn">
+              <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b items-center text-m hover:bg-gray-50 dark:hover:bg-gray-800"
+                style="grid-template-columns: repeat(11, minmax(100px, 1fr)) 100px;">
+                <div class="truncate" [matTooltip]="element.no_suplemento_id">{{ element.no_suplemento_id || 'N/A' }}</div>
+                <div class="truncate" [matTooltip]="element.proveedor?.nombre">{{ element.proveedor?.nombre || 'N/A' }}</div>
+                <div class="truncate" [matTooltip]="element.contrato?.no_contrato_contratacion">{{ element.contrato?.no_contrato_contratacion || 'N/A' }}</div>
+                <div class="truncate max-w-xs" [matTooltip]="element.trabajo_ejecutado">{{ element.trabajo_ejecutado || 'N/A' }}</div>
+                <div class="text-right">{{ element.costo_cup | number:'1.2-2' }}</div>
+                <div class="text-right">{{ element.costo_cl | number:'1.2-2' }}</div>
+                <div>{{ element.fecha_ejecucion | date:'dd/MM/yyyy' }}</div>
+                <div class="flex items-center justify-end gap-2 sticky-end">
+                  <button mat-icon-button color="primary" (click)="openEditEjecucionDialog(element)" matTooltip="Editar">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="deleteEjecucion(element)" matTooltip="Eliminar">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+
+          <mat-paginator
+            class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+            [length]="pagination.length"
+            [pageIndex]="pagination.page"
+            [pageSize]="pagination.size"
+            [pageSizeOptions]="[5, 10, 25, 100]"
+            [showFirstLastButtons]="true">
+          </mat-paginator>
+        </ng-container>
+
+        <ng-template #noEjecuciones>
+          <div class="p-8 sm:p-16 border-b text-4xl font-semibold tracking-tight text-center">
+            ¡No hay ejecuciones!
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

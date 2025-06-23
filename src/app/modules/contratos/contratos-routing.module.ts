@@ -7,13 +7,13 @@ import { ExpiredComponent } from './ejecucion-contrato/expired/expired.component
 
 const routes: Routes = [
     {
-        path: 'tipos',
+        path: 'list',
         component: ContratoListComponent
     },
     {
-      path: 'contratos',
+      path: 'ejecucion',
       component: EjecucionContratoComponent
-  }, 
+  },
   {
     path: 'vencidos',
     component: ExpiredContractsComponent

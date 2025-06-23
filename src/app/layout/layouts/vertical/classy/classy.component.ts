@@ -33,6 +33,8 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy
     navigation: Navigation;
     filteredNavigation: Navigation;
     user: User;
+    logoSrc: string = 'assets/images/logo/logo.svg';
+    backgroundColor: string = 'rebeccapurple';
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -86,6 +88,15 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy
             {
                 this.user = user;
                 this._filterNavigation();
+
+                // Set logo and background color based on user role
+                if (user.roles && user.roles.includes('admin')) {
+                    this.logoSrc = 'assets/admin.png';
+                    this.backgroundColor = 'rebeccapurple';
+                } else {
+                    this.logoSrc = 'assets/images/logo/logo.svg';
+                    this.backgroundColor = 'rebeccapurple';
+                }
             });
 
         // Subscribe to media changes

@@ -1,1 +1,45 @@
-<p>representante-form works!</p>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-form-field appearance="fill" class="w-full">
+    <mat-label>Nombre</mat-label>
+    <input matInput formControlName="nombre" required />
+    <mat-error *ngIf="form.get('nombre')?.hasError('required')">El nombre es obligatorio</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="w-full">
+    <mat-label>Apellidos</mat-label>
+    <input matInput formControlName="apellidos" required />
+    <mat-error *ngIf="form.get('apellidos')?.hasError('required')">Los apellidos son obligatorios</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="w-full">
+    <mat-label>Teléfono</mat-label>
+    <input matInput formControlName="telefono" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="w-full">
+    <mat-label>Email</mat-label>
+    <input matInput formControlName="email" required />
+    <mat-error *ngIf="form.get('email')?.hasError('required')">El email es obligatorio</mat-error>
+    <mat-error *ngIf="form.get('email')?.hasError('email')">Email inválido</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="w-full">
+    <mat-label>Cargo</mat-label>
+    <input matInput formControlName="cargo" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="w-full">
+    <mat-label>Entidad</mat-label>
+    <mat-select formControlName="entidad" required>
+      <mat-option *ngFor="let entidad of entidades" [value]="entidad">
+        {{ entidad.nombre_entidad }}
+      </mat-option>
+    </mat-select>
+    <mat-error *ngIf="form.get('entidad')?.hasError('required')">La entidad es obligatoria</mat-error>
+  </mat-form-field>
+
+  <div class="flex justify-end space-x-4 mt-4">
+    <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Guardar</button>
+  </div>
+</form>

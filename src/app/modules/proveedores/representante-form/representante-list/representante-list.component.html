@@ -4,10 +4,10 @@
     <div class="absolute bottom-0 right-0 w-24 h-24 -m-6">
       <mat-icon
         class="icon-size-24 opacity-25 text-green-500 dark:text-green-400"
-        [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
+        [svgIcon]="'heroicons_outline:users'"></mat-icon>
     </div>
 
-    <!-- Proveedores Table -->
+    <!-- Representantes Table -->
     <div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
       <!-- Header -->
       <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b">
@@ -21,7 +21,7 @@
         <div class="flex-1 min-w-0">
           <div class="mt-2">
             <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
-             Proveedores
+             Representantes
             </h2>
           </div>
         </div>
@@ -37,37 +37,28 @@
               [svgIcon]="'heroicons_solid:magnifying-glass'"></mat-icon>
             <input
               matInput
-              [formControl]="searchInputControl"
+              [formControl]="searchControl"
               [autocomplete]="'off'"
-              [placeholder]="'Buscar proveedores'">
+              [placeholder]="'Buscar representantes'">
           </mat-form-field>
-        <!-- Add proveedor button -->
+          <!-- Add representante button -->
           <button
             class="ml-4 mt-4 sm:mt-0 w-50 text-lg"
             mat-flat-button
             [color]="'primary'"
-            (click)="addNewProveedor()">
+            (click)="openAddDialog()">
             <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-            <span class="ml-2 hidden sm:inline">Agregar Proveedor</span>
+            <span class="ml-2 hidden sm:inline">Agregar Representante</span>
             <span class="ml-2 sm:hidden">Agregar</span>
-          </button>
-          <button
-            class="ml-4 mt-4 sm:mt-0"
-            mat-icon-button
-            [color]="'primary'"
-            (click)="exportToCSV()"
-            matTooltip="Exportar tabla a CSV"
-            aria-label="Exportar tabla a CSV">
-            <mat-icon [svgIcon]="'heroicons_outline:arrow-up-tray'"></mat-icon>
           </button>
         </div>
       </div>
 
       <!-- Main -->
       <div class="flex flex-auto overflow-hidden">
-        <!-- Proveedores list -->
+        <!-- Representantes list -->
         <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden">
-          <ng-container *ngIf="dataSource.data.length > 0; else noProveedores">
+          <ng-container *ngIf="dataSource?.data?.length > 0; else noRepresentantes">
             
             <!-- Desktop Table View (hidden on mobile) -->
             <div class="hidden lg:block w-full">
@@ -81,66 +72,69 @@
                   <div class="truncate" [matTooltip]="'Nombre completo'" matTooltipPosition="above">
                     <span>Nombre</span>
                   </div>
-                  <div class="truncate" [matTooltip]="'Código completo'" matTooltipPosition="above">
-                    <span>Código</span>
+                  <div class="truncate" [matTooltip]="'Apellidos completos'" matTooltipPosition="above">
+                    <span>Apellidos</span>
                   </div>
-                  <div class="truncate" [matTooltip]="'Representante completo'" matTooltipPosition="above">
-                    <span>Representante</span>
+                  <div class="truncate" [matTooltip]="'Cargo completo'" matTooltipPosition="above">
+                    <span>Cargo</span>
                   </div>
-                  <div class="truncate" [matTooltip]="'Teléfonos completos'" matTooltipPosition="above">
-                    <span>Teléfonos</span>
+                  <div class="truncate" [matTooltip]="'Teléfono completo'" matTooltipPosition="above">
+                    <span>Teléfono</span>
                   </div>
-                  <div class="truncate" [matTooltip]="'Domicilio completo'" matTooltipPosition="above">
-                    <span>Domicilio</span>
+                  <div class="truncate" [matTooltip]="'Email completo'" matTooltipPosition="above">
+                    <span>Email</span>
                   </div>
-                  <div class="truncate" [matTooltip]="'Municipio completo'" matTooltipPosition="above">
-                    <span>Municipio</span>
+                  <div class="truncate" [matTooltip]="'Estado completo'" matTooltipPosition="above">
+                    <span>Estado</span>
                   </div>
-                  <div class="truncate" [matTooltip]="'Ministerio completo'" matTooltipPosition="above">
-                    <span>Ministerio</span>
+                  <div class="truncate" [matTooltip]="'Entidad completa'" matTooltipPosition="above">
+                    <span>Entidad</span>
                   </div>
                   <div>Detalles</div>
                 </div>
                 <!-- Rows -->
-                <ng-container *ngFor="let proveedor of dataSource.filteredData; trackBy: trackByFn">
+                <ng-container *ngFor="let representante of dataSource.filteredData; trackBy: trackByFn">
                   <div
                     class="inventory-grid grid items-center gap-4 py-3 px-6 md:px-8 border-b"
                     style="grid-template-columns: 1fr 150px 200px 180px 1fr 200px 200px 100px;">
-                    <div class="truncate" [matTooltip]="proveedor.nombre" matTooltipPosition="above">
-                      {{proveedor.nombre}}
+                    <div class="truncate" [matTooltip]="representante.nombre" matTooltipPosition="above">
+                      {{representante.nombre}}
                     </div>
-                    <div class="truncate" [matTooltip]="proveedor.codigo" matTooltipPosition="above">
-                      {{proveedor.codigo}}
+                    <div class="truncate" [matTooltip]="representante.apellidos" matTooltipPosition="above">
+                      {{representante.apellidos}}
                     </div>
-                    <div class="truncate" [matTooltip]="proveedor.representante" matTooltipPosition="above">
-                      {{proveedor.representante || 'Sin representante'}}
+                    <div class="truncate" [matTooltip]="representante.cargo" matTooltipPosition="above">
+                      {{representante.cargo}}
                     </div>
-                    <div class="truncate" [matTooltip]="proveedor.telefonos" matTooltipPosition="above">
-                      {{proveedor.telefonos}}
+                    <div class="truncate" [matTooltip]="representante.telefono" matTooltipPosition="above">
+                      {{representante.telefono}}
                     </div>
-                    <div class="truncate" [matTooltip]="proveedor.domicilio" matTooltipPosition="above">
-                      {{proveedor.domicilio}}
+                    <div class="truncate" [matTooltip]="representante.email" matTooltipPosition="above">
+                      {{representante.email}}
                     </div>
-                    <div class="truncate" [matTooltip]="proveedor.municipio.nombre_municipio" matTooltipPosition="above">
-                      {{proveedor.municipio.nombre_municipio}}
+                    <div class="truncate" [matTooltip]="representante.activo ? 'Activo' : 'Inactivo'" matTooltipPosition="above">
+                      <span class="px-2 py-1 rounded-full text-xs font-medium"
+                            [ngClass]="representante.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                        {{ representante.activo ? 'Activo' : 'Inactivo' }}
+                      </span>
                     </div>
-<div class="truncate" [matTooltip]="proveedor.ministerio.descripcion" matTooltipPosition="above">
-  {{proveedor.ministerio.nombre_ministerio}}
-</div>
+                    <div class="truncate" [matTooltip]="representante.entidad?.nombre_entidad" matTooltipPosition="above">
+                      {{representante.entidad?.nombre_entidad}}
+                    </div>
                     <div class="flex items-center justify-center">
                       <button
                         class="min-w-10 min-h-7 h-7 px-2 leading-6"
                         mat-stroked-button
-                        (click)="toggleDetails(proveedor.id)">
+                        (click)="toggleDetails(representante.id)">
                         <mat-icon
                           class="icon-size-5"
-                          [svgIcon]="selectedRow?.id === proveedor.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                          [svgIcon]="selectedRow?.id === representante.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
                       </button>
                     </div>
                   </div>
                   <div class="grid">
-                    <ng-container *ngIf="selectedRow?.id === proveedor.id">
-                      <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: proveedor}"></ng-container>
+                    <ng-container *ngIf="selectedRow?.id === representante.id">
+                      <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: representante}"></ng-container>
                     </ng-container>
                   </div>
                 </ng-container>
@@ -149,28 +143,25 @@
 
             <!-- Mobile/Tablet Card View (shown on smaller screens) -->
             <div class="lg:hidden">
-              <ng-container *ngFor="let proveedor of dataSource.filteredData; trackBy: trackByFn">
+              <ng-container *ngFor="let representante of dataSource.filteredData; trackBy: trackByFn">
                 <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg mb-4 mx-4 shadow-sm">
                   <!-- Card Header -->
                   <div class="p-4 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex items-center justify-between">
                       <div class="flex-1 min-w-0">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                          {{proveedor.nombre}}
+                          {{representante.nombre}} {{representante.apellidos}}
                         </h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400">
-                          {{proveedor.codigo}}
-                        </p>
-                        <p class="text-sm text-gray-700 dark:text-gray-300 mt-1" *ngIf="proveedor.representante">
-                          <span class="font-medium">Representante:</span> {{proveedor.representante}}
+                          {{representante.cargo}}
                         </p>
                       </div>
                       <button
                         class="ml-4 flex-shrink-0"
                         mat-icon-button
-                        (click)="toggleDetails(proveedor.id)">
+                        (click)="toggleDetails(representante.id)">
                         <mat-icon
-                          [svgIcon]="selectedRow?.id === proveedor.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                          [svgIcon]="selectedRow?.id === representante.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
                       </button>
                     </div>
                   </div>
@@ -179,28 +170,33 @@
                   <div class="p-4 space-y-3">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Teléfonos</label>
-                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{proveedor.telefonos}}</p>
+                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Teléfono</label>
+                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{representante.telefono}}</p>
                       </div>
                       <div>
-                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Domicilio</label>
-                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{proveedor.domicilio}}</p>
+                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Email</label>
+                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{representante.email}}</p>
                       </div>
                       <div>
-                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Municipio</label>
-                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{proveedor.municipio.nombre_municipio}}</p>
+                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Estado</label>
+                        <p class="mt-1 text-sm text-gray-900 dark:text-white">
+                          <span class="px-2 py-1 rounded-full text-xs font-medium"
+                                [ngClass]="representante.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                            {{ representante.activo ? 'Activo' : 'Inactivo' }}
+                          </span>
+                        </p>
                       </div>
                       <div>
-                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Ministerio</label>
-                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{proveedor.ministerio.nombre_ministerio}}</p>
+                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Entidad</label>
+                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{representante.entidad?.nombre_entidad}}</p>
                       </div>
                     </div>
                   </div>
 
                   <!-- Expanded Details -->
-                  <ng-container *ngIf="selectedRow?.id === proveedor.id">
+                  <ng-container *ngIf="selectedRow?.id === representante.id">
                     <div class="border-t border-gray-200 dark:border-gray-700">
-                      <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: proveedor}"></ng-container>
+                      <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: representante}"></ng-container>
                     </div>
                   </ng-container>
                 </div>
@@ -219,16 +215,16 @@
 
           <ng-template
             #rowDetailsTemplate
-            let-proveedor>
+            let-representante>
             <div class="shadow-lg overflow-hidden bg-white dark:bg-gray-800">
               <div class="flex border-b">
-                <!-- Selected proveedor form -->
+                <!-- Selected representante form -->
                 <form
                   class="responsive-form flex flex-col w-full max-w-full mx-auto box-border"
                   [formGroup]="selectedRowForm"
                   style="width: 100%; max-width: 500px; padding: 0 16px; box-sizing: border-box;">
                   <div class="flex flex-col sm:flex-row p-8">
-                    <!-- Proveedor details -->
+                    <!-- Representante details -->
                     <div class="flex flex-auto flex-wrap">
                       <div class="flex flex-col w-full lg:w-1/3 sm:pl-8">
                         <mat-form-field class="w-full">
@@ -238,46 +234,38 @@
                             formControlName="nombre">
                         </mat-form-field>
                         <mat-form-field class="w-full">
-                          <mat-label>Código</mat-label>
+                          <mat-label>Apellidos</mat-label>
                           <input
                             matInput
-                            formControlName="codigo">
+                            formControlName="apellidos">
                         </mat-form-field>
                         <mat-form-field class="w-full">
-                          <mat-label>Teléfonos</mat-label>
+                          <mat-label>Teléfono</mat-label>
                           <input
                             matInput
-                            formControlName="telefonos">
-                        </mat-form-field>
-                        <mat-form-field class="w-full">
-                          <mat-label>Representante</mat-label>
-                          <input
-                            matInput
-                            formControlName="representante">
+                            formControlName="telefono">
                         </mat-form-field>
                       </div>
                       <div class="flex flex-col w-full lg:w-1/3 sm:pl-8">
                         <mat-form-field class="w-full">
-                          <mat-label>Domicilio</mat-label>
+                          <mat-label>Email</mat-label>
                           <input
                             matInput
-                            formControlName="domicilio">
+                            formControlName="email">
                         </mat-form-field>
                         <mat-form-field class="w-full">
-                          <mat-label>Municipio</mat-label>
-                            <mat-select formControlName="municipio">
-                              <mat-option *ngFor="let municipio of mockMunicipio" [value]="municipio">
-                                {{municipio.nombre_municipio}}
-                              </mat-option>
-                            </mat-select>
+                          <mat-label>Cargo</mat-label>
+                          <input
+                            matInput
+                            formControlName="cargo">
                         </mat-form-field>
                       </div>
                       <div class="flex flex-col w-full lg:w-1/3 sm:pl-8">
                         <mat-form-field class="w-full">
-                          <mat-label>Ministerio</mat-label>
-                          <mat-select formControlName="ministerio">
-                            <mat-option *ngFor="let ministerio of mockMinisterio" [value]="ministerio">
-                              {{ministerio.nombre_ministerio}}
+                          <mat-label>Entidad</mat-label>
+                          <mat-select formControlName="entidad">
+                            <mat-option *ngFor="let entidad of entidades" [value]="entidad">
+                              {{entidad.nombre_entidad}}
                             </mat-option>
                           </mat-select>
                         </mat-form-field>
@@ -309,8 +297,8 @@
             </div>
           </ng-template>
 
-          <ng-template #noProveedores>
-            <div class="p-8 sm:p-16 border-b text-4xl font-semibold tracking-tight text-center">¡No hay proveedores!</div>
+          <ng-template #noRepresentantes>
+            <div class="p-8 sm:p-16 border-b text-4xl font-semibold tracking-tight text-center">¡No hay representantes!</div>
           </ng-template>
         </div>
       </div>

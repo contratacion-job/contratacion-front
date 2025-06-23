@@ -1,16 +1,258 @@
-<div class="flex flex-col flex-auto min-w-0">
-
-    <!-- Main -->
-    <div class="flex-auto p-6 sm:p-10">
-   
-        <!-- CONTENT GOES HERE -->
-        <div class="h-400 min-h-400 max-h-400 border-2 border-dashed border-gray-300 rounded-2xl">
-            <div class="card">
-         
-                <p-progressBar [value]="50" [style]="'border-radius: 2rem;'"/>
- </div>
+<div class="license-container">
+  <!-- Header -->
+  <div class="license-card">
+    <div class="header-section">
+      <div class="header-content">
+        <div class="title-section">
+          <div class="logo-section" *ngIf="licenseData.entidad.logo">
+            <img [src]="licenseData.entidad.logo" 
+                 [alt]="licenseData.entidad.nombre_entidad + ' Logo'" 
+                 class="entity-logo">
+          </div>
+          <div class="text-section">
+            <h1 class="main-title">Licencia de Software</h1>
+            <h2 class="subtitle">{{ licenseData.entidad.nombre_entidad }}</h2>
+            <p class="license-number">
+              Licencia: <span class="license-code">{{ licenseData.numero_licencia }}</span>
+            </p>
+            <p class="entity-code">
+              Código Entidad: <span class="license-code">{{ licenseData.entidad.codigo_entidad }}</span>
+            </p>
+          </div>
         </div>
-   
+        <button class="btn-renovar" (click)="onRenovar()">
+          RENOVAR
+        </button>
+      </div>
     </div>
 
+    <!-- Tabs Navigation -->
+    <div class="tabs-container">
+      <div class="tabs-nav">
+        <button 
+          class="tab-button"
+          [class.active]="activeTab === 'estado'"
+          (click)="setActiveTab('estado')">
+          Estado
+        </button>
+        <button 
+          class="tab-button"
+          [class.active]="activeTab === 'historial'"
+          (click)="setActiveTab('historial')">
+          Historial de Activaciones
+        </button>
+        <button 
+          class="tab-button"
+          [class.active]="activeTab === 'detalles'"
+          (click)="setActiveTab('detalles')">
+          Detalles del Plan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content-card">
+    
+    <!-- Tab Estado -->
+    <div *ngIf="activeTab === 'estado'" class="content-section">
+      <!-- Status Cards -->
+      <div class="status-grid">
+        <div class="status-card">
+          <div class="status-header">
+            <i class="icon-calendar"></i>
+            <span class="status-label">Activación</span>
+          </div>
+          <p class="status-value">{{ formatDate(licenseData.fecha_emision) }}</p>
+        </div>
+
+        <div class="status-card">
+          <div class="status-header">
+            <i class="icon-clock"></i>
+            <span class="status-label">Expiración</span>
+          </div>
+          <p class="status-value">{{ formatDate(licenseData.fecha_vencimiento) }}</p>
+        </div>
+
+        <div class="status-card">
+          <div class="status-header">
+            <i class="icon-shield"></i>
+            <span class="status-label">Estado</span>
+          </div>
+          <div class="status-badge" [ngClass]="getStatusColor()">
+            <i [class]="'icon-' + getStatusIcon()"></i>
+            {{ licenseData.estado }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Days Remaining -->
+      <div class="days-remaining-card">
+        <div class="days-content">
+          <div class="days-number">{{ daysRemaining }}</div>
+          <div class="days-label">días restantes</div>
+        </div>
+      </div>
+
+      <!-- License Details -->
+      <div class="details-grid">
+        <div class="details-section">
+          <h3 class="section-title">Detalles de la Licencia</h3>
+          <div class="details-list">
+            <div class="detail-item">
+              <span class="detail-label">Tipo:</span>
+              <span class="detail-value">{{ licenseData.tipo_licencia }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">ID:</span>
+              <span class="detail-value detail-code">{{ licenseData.id }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Entidad ID:</span>
+              <span class="detail-value detail-code">{{ licenseData.entidad_id }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="details-section">
+          <h3 class="section-title">Información de la Entidad</h3>
+          <div class="details-list">
+            <div class="detail-item">
+              <span class="detail-label">Nombre:</span>
+              <span class="detail-value">{{ licenseData.entidad.nombre_entidad }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Código:</span>
+              <span class="detail-value detail-code">{{ licenseData.entidad.codigo_entidad }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Tipo Empresa:</span>
+              <span class="detail-value">{{ licenseData.entidad.tipo_empresa }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Domicilio Legal:</span>
+              <span class="detail-value">{{ licenseData.entidad.domicilio_legal }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Teléfonos:</span>
+              <span class="detail-value">{{ licenseData.entidad.telefonos }}</span>
+            </div>
+            <div class="detail-item" *ngIf="licenseData.entidad.municipio && licenseData.entidad.provincia">
+              <span class="detail-label">Ubicación:</span>
+              <span class="detail-value">{{ licenseData.entidad.municipio.nombre }}, {{ licenseData.entidad.provincia.nombre }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Observaciones -->
+      <div *ngIf="licenseData.observaciones" class="observaciones-card">
+        <h4 class="observaciones-title">Observaciones</h4>
+        <p class="observaciones-text">{{ licenseData.observaciones }}</p>
+      </div>
+    </div>
+
+    <!-- Tab Historial -->
+    <div *ngIf="activeTab === 'historial'" class="content-section">
+      <div class="historial-grid">
+        <div class="historial-section">
+          <h3 class="section-title">Historial de Activaciones</h3>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>No. de serie</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let activacion of historialActivaciones" class="table-row">
+                  <td class="table-cell table-code">{{ activacion.serie }}</td>
+                  <td class="table-cell">{{ activacion.fecha }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="historial-section">
+          <h3 class="section-title">Usuarios Vinculados</h3>
+          <div class="usuarios-list">
+            <div *ngFor="let activacion of historialActivaciones" class="usuario-card">
+              <i class="icon-user"></i>
+              <div class="usuario-info">
+                <p class="usuario-email">{{ activacion.usuario }}</p>
+                <p class="usuario-fecha">Activado: {{ activacion.fecha }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Detalles -->
+    <div *ngIf="activeTab === 'detalles'" class="content-section">
+      <div class="detalles-container">
+        <h3 class="section-title">Detalles del Plan {{ licenseData.tipo_licencia }}</h3>
+        
+        <div class="plan-sections">
+          <div class="caracteristicas-card">
+            <h4 class="caracteristicas-title">Características Incluidas</h4>
+            <ul class="caracteristicas-list">
+              <li class="caracteristica-item">
+                <i class="icon-check-circle"></i>
+                Acceso completo al sistema ERP
+              </li>
+              <li class="caracteristica-item">
+                <i class="icon-check-circle"></i>
+                Usuarios ilimitados
+              </li>
+              <li class="caracteristica-item">
+                <i class="icon-check-circle"></i>
+                Soporte técnico 24/7
+              </li>
+              <li class="caracteristica-item">
+                <i class="icon-check-circle"></i>
+                Actualizaciones automáticas
+              </li>
+              <li class="caracteristica-item">
+                <i class="icon-check-circle"></i>
+                Respaldo en la nube
+              </li>
+            </ul>
+          </div>
+
+          <div class="tecnica-card">
+            <h4 class="tecnica-title">Información Técnica</h4>
+            <div class="tecnica-grid">
+              <div class="tecnica-item">
+                <p class="tecnica-label">Versión:</p>
+                <p class="tecnica-value">v2.4.1</p>
+              </div>
+              <div class="tecnica-item">
+                <p class="tecnica-label">Última actualización:</p>
+                <p class="tecnica-value">15 de mayo, 2025</p>
+              </div>
+              <div class="tecnica-item">
+                <p class="tecnica-label">Compatibilidad:</p>
+                <p class="tecnica-value">Windows, macOS, Linux</p>
+              </div>
+              <div class="tecnica-item">
+                <p class="tecnica-label">Base de datos:</p>
+                <p class="tecnica-value">PostgreSQL 14+</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Download Button -->
+    <div class="download-section">
+      <button class="btn-download" (click)="onDescargarLicencia()">
+        <i class="icon-download"></i>
+        Descargar Licencia
+      </button>
+    </div>
+  </div>
 </div>

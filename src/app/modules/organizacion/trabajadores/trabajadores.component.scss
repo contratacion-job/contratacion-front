@@ -1,0 +1,37 @@
+/* Styles for TrabajadoresComponent */
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.mat-table {
+  overflow: auto;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(100px, 1fr));
+  gap: 16px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
+
+.details-panel {
+  padding: 16px;
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+}
+
+.sticky-end {
+  position: sticky;
+  right: 0;
+  background: inherit;
+  z-index: 1;
+}
+
+.mat-form-field {
+  width: 100%;
+}

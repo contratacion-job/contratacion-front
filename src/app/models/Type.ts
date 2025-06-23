@@ -1,3 +1,4 @@
+// Table: tipo_proveedor
 export interface TipoProveedor {
   id: number;
   tipo_proveedor: string;
@@ -6,14 +7,14 @@ export interface TipoProveedor {
 // Table: tipo_contrato
 export interface TipoContrato {
   id: number;
-   nombre_tipo_contrato: string;
+  nombre_tipo_contrato: string;
   descripcion: string;
 }
 
 // Table: vigencia
 export interface Vigencia {
   id: number;
-  vigencia: number; // Add this field
+  vigencia: number;
   alerta_vigencia: number;
   tipo_vigencia: string;
   tipo_alerta_vigencia: string;
@@ -25,7 +26,7 @@ export interface VigenciaContrato {
   alerta_vigencia: number;
   tipo_alerta_vigencia: string;
   tipo_vigencia: string;
-  proveedor: any; // Cambiado para coincidir con Type.ts
+  proveedor: any;
   proveedorId?: number;
   tipo_contratoId?: number;
 }
@@ -48,7 +49,7 @@ export interface Municipio {
   id: number;
   provincia_id: number;
   nombre_municipio: string;
-  provincia: Provincia; // Relationship: belongs to provincia
+  provincia: Provincia;
 }
 
 // Table: entidad
@@ -61,16 +62,16 @@ export interface Entidad {
   telefonos: string;
   logo: string;
   tipo_empresa: string;
-   provincia?: Provincia; 
-  municipio: Municipio; // Relationship: belongs to municipio
+  provincia?: Provincia;
+  municipio: Municipio;
 }
 
 // Table: departamento
 export interface Departamento {
   id: number;
-   nombre_departamento: string; // Cambiado de nombre_dpto a nombre_departamento
-  codigo: string; // Agregado
-  descripcion: string; // Agregado
+  nombre_departamento: string;
+  codigo: string;
+  descripcion: string;
 }
 
 // Table: proveedor
@@ -82,15 +83,11 @@ export interface Proveedor {
   codigo: string;
   telefonos: string;
   domicilio: string;
-  municipio: Municipio; // Relationship: belongs to municipio
-  ministerio: Ministerio; // Relationship: belongs to ministerio
-  fechaCreacion: string; // Cambiado de opcional a requerido
-  estado: string; // Cambiado de opcional a requerido
-  tipo: string; // Cambiado de opcional a requerido
-  categoria: string; // Cambiado de opcional a requerido
+  municipio: Municipio;
+  ministerio: Ministerio;
+  fechaCreacion: string;
+   representantes?: Representante[];
 }
-
-// Table: vigencia_contrato
 
 // Table: suplemento
 export interface Suplemento {
@@ -117,10 +114,10 @@ export interface Suplemento {
   no_acuerdo_comite_administracion: number;
   fecha_vencido: Date;
   valor_monto_restante: number;
-  vigencia: Vigencia; // Relationship: belongs to vigencia
-  proveedor: Proveedor; // Relationship: belongs to proveedor
-  tipo_contrato: TipoContrato; // Relationship: belongs to tipo_contrato
-  departamento: Departamento; // Relationship: belongs to departamento
+  vigencia: Vigencia;
+  proveedor: Proveedor;
+  tipo_contrato: TipoContrato;
+  departamento: Departamento;
 }
 
 // Table: contrato
@@ -149,10 +146,10 @@ export interface Contrato {
   fecha_vencido: Date;
   valor_monto_restante: number;
   entidad: string[];
-  vigencia: Vigencia; // Relationship: belongs to vigencia
-  proveedor: Proveedor; // Relationship: belongs to proveedor
-  tipo_contrato: TipoContrato; // Relationship: belongs to tipo_contrato
-  departamento: Departamento; // Relationship: belongs to departamento
+  vigencia: Vigencia;
+  proveedor: Proveedor;
+  tipo_contrato: TipoContrato;
+  departamento: Departamento;
   estado?: string;
 }
 
@@ -165,8 +162,8 @@ export interface EjecucionContrato {
   costo_cl: number;
   trabajo_ejecutado: string;
   fecha_ejecucion: Date;
-  proveedor: Proveedor; // Relationship: belongs to proveedor
-  contrato: Contrato; // Relationship: belongs to contrato
+  proveedor: Proveedor;
+  contrato: Contrato;
 }
 
 // Table: ejecucion_suplemento
@@ -179,9 +176,9 @@ export interface EjecucionSuplemento {
   costo_cl: number;
   trabajo_ejecutado: string;
   fecha_ejecucion: Date;
-  proveedor: Proveedor; // Relationship: belongs to proveedor
-  contrato: Contrato; // Relationship: belongs to contrato
-  suplemento: Suplemento; // Relationship: belongs to suplemento
+  proveedor: Proveedor;
+  contrato: Contrato;
+  suplemento: Suplemento;
 }
 
 // Table: log
@@ -196,18 +193,15 @@ export interface Log {
 // Table: notificacion
 export interface Notificacion {
   id: number;
-  tipo: 'Suplemento' | 'Contrato' | 'EjecucionContrato' | 'Proveedor'| 'Licencia';
+  tipo: 'Suplemento' | 'Contrato' | 'EjecucionContrato' | 'Proveedor' | 'Licencia';
   texto: string;
   fecha: Date;
-   color: string;
-  icono: string; // Usando los iconos de tu ejemplo anterior
+  color: string;
+  icono: string;
 }
 
 // Table: revision
-export interface Revision {
-  id: number;
-  fecha_ultima_revision: Date;
-}
+
 
 // Table: usuario
 export interface Usuario {
@@ -221,4 +215,127 @@ export interface Usuario {
   correo: string;
   movil: number;
   extension: number;
+}
+
+// ===== INTERFACES AGREGADAS =====
+
+// Table: licencia (Agregada)
+export interface Licencia {
+  id: number;
+  entidad_id: number;
+  numero_licencia: string;
+  tipo_licencia: string;
+  fecha_emision: Date;
+  fecha_vencimiento: Date;
+  estado: string;
+  observaciones?: string;
+  entidad: Entidad;
+}
+
+// Table: representantes (Agregada)
+export interface Representante {
+  id: number;
+  entidad_id: number;
+  nombre: string;
+  apellidos: string;
+  cargo: string;
+  telefono?: string;
+  email?: string;
+  activo: boolean;
+  entidad: Entidad;
+}
+
+// Table: contratos_entidad (Tabla de relación agregada)
+export interface ContratoEntidad {
+  id: number;
+  contrato_id: number;
+  entidad_id: number;
+  fecha_asignacion: Date;
+  activo: boolean;
+  contrato: Contrato;
+  entidad: Entidad;
+}
+
+// Table: suplementos_entidad (Tabla de relación agregada)
+export interface SuplementoEntidad {
+  id: number;
+  suplemento_id: number;
+  entidad_id: number;
+  fecha_asignacion: Date;
+  activo: boolean;
+  suplemento: Suplemento;
+  entidad: Entidad;
+}
+
+// Table: documentos (Agregada)
+
+// Table: configuracion (Agregada para configuraciones del sistema)
+export interface Configuracion {
+  id: number;
+  clave: string;
+  valor: string;
+  descripcion?: string;
+  tipo: 'string' | 'number' | 'boolean' | 'json';
+  fecha_modificacion: Date;
+  usuario_modificacion_id: number;
+}
+
+// Table: alertas (Agregada para alertas del sistema)
+export interface Alerta {
+  id: number;
+  tipo: 'vencimiento_contrato' | 'vencimiento_licencia' | 'presupuesto' | 'sistema';
+  titulo: string;
+  mensaje: string;
+  fecha_creacion: Date;
+  fecha_vencimiento?: Date;
+  prioridad: 'baja' | 'media' | 'alta' | 'critica';
+  estado: 'activa' | 'vista' | 'cerrada';
+  usuario_id?: number;
+  entidad_tipo?: string;
+  entidad_id?: number;
+  color: string;
+  icono: string;
+  usuario?: Usuario;
+}
+
+// Table: trabajador
+export interface Trabajador {
+  id: number;
+  nombre: string;
+  apellido: string;
+  cargo: string;
+  departamentoId: number;
+  departamento: Departamento;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+  timeZone: string;
+}
+
+// ===== TIPOS AUXILIARES AGREGADOS =====
+
+// Tipos para estados comunes
+export type EstadoContrato = 'activo' | 'vencido' | 'cancelado' | 'suspendido' | 'renovado';
+export type EstadoProveedor = 'activo' | 'inactivo' | 'suspendido' | 'bloqueado';
+export type EstadoLicencia = 'vigente' | 'vencida' | 'renovada' | 'cancelada';
+export type TipoMoneda = 'CUP' | 'USD' | 'CL';
+
+
+// Interfaces para estadísticas y reportes
+export interface EstadisticaContrato {
+  total_contratos: number;
+  valor_total_cup: number;
+  valor_total_usd: number;
+  contratos_activos: number;
+  contratos_vencidos: number;
+  contratos_por_vencer: number;
+  promedio_valor_contrato: number;
+}
+
+export interface EstadisticaProveedor {
+  total_proveedores: number;
+  proveedores_activos: number;
+  proveedores_con_contratos: number;
+  valor_total_contratado: number;
+  promedio_contratos_por_proveedor: number;
 }

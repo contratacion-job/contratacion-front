@@ -13,6 +13,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ContratoService } from '../../services/contrato.service';
+import { MatDialog } from '@angular/material/dialog';
+import { TipoContratoComponent } from '../tipo-contrato.component';
 @Component({
   selector: 'app-tipo-contrato-form',
   standalone: true,
@@ -42,7 +44,8 @@ export class TipoContratoFormComponent implements OnInit, AfterViewInit {
 
   constructor(
     private departamentoService: ContratoService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private dialog: MatDialog
   ) {
     this.selectedRowForm = new FormGroup({
       nombre_departamento: new FormControl(''),
@@ -98,9 +101,30 @@ export class TipoContratoFormComponent implements OnInit, AfterViewInit {
     this.selectedRow = null;
   }
 
-  openNewDepartamentoDialog(): void {
-    // TODO: Implement dialog open logic here or reuse existing form component
-    console.log('Open new departamento dialog');
+  openNewFormDialog(): void {
+    const isMobile = window.innerWidth <= 768;
+    const dialogRef = this.dialog.open(TipoContratoComponent, {
+      width: isMobile ? '90vw' : '750px',
+      maxWidth: isMobile ? '100vw' : '90vw',
+      height: isMobile ? '100vh' : '90vh',
+      maxHeight: '100vh',
+      panelClass: 'full-screen-dialog',
+      disableClose: false,
+      autoFocus: false,
+      hasBackdrop: !isMobile,
+      position: isMobile ? { top: '0' } : {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.isLoading = true;
+        this.departamentoService.getTipoContratos().subscribe((data) => {
+          this.dataSource.data = data;
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        });
+      }
+    });
   }
 
   updateSelectedRecord(): void {

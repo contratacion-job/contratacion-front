@@ -7,6 +7,7 @@ import { LicenseComponent } from 'app/core/soporte/license/license.component';
 import { BDComponent } from 'app/core/soporte/bd/bd.component';
 import { DepartamentoComponent } from './municipio-list/municipio-list.component';
 import { EntidadListComponent } from './entidad-list/entidad-list.component';
+import { SystemComponent } from './system/system.component';
 
 const routes: Routes = [
 
@@ -22,6 +23,10 @@ const routes: Routes = [
       path: 'departamentos',
       component: DepartamentoComponent
   },
+  {
+    path: 'log',
+    component: SystemComponent
+},
 
   {
     path: 'licencia',

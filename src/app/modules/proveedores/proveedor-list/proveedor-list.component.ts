@@ -3,7 +3,8 @@ import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormControl, FormGroup } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil, switchMap, map } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -15,18 +16,19 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import {MatMenuModule} from '@angular/material/menu';
-import {MatDividerModule} from '@angular/material/divider';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProveedorFormComponent } from '../proveedor-form/proveedor-form.component';
-import {  ProveedorService } from '../services/proveedor.service';
+import { ProveedorService } from '../services/proveedor.service';
+import { RepresentanteService } from '../services/representante.service';
 import { 
   mockMinisterio, 
   mockMunicipio 
 } from 'app/mock-api/contrato-fake/fake'; 
-import { Proveedor } from 'app/models/Type';
-import { Subject } from 'rxjs';
+import { Proveedor, Representante } from 'app/models/Type';
+import { Subject, of, combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-proveedor-list',
@@ -59,6 +61,7 @@ export class ProveedorListComponent implements OnInit {
   columns = [
     { key: 'nombre', label: 'Nombre', editable: true },
     { key: 'codigo', label: 'Código', editable: true },
+    { key: 'representante', label: 'Representante', editable: true },
     { key: 'telefonos', label: 'Teléfonos', editable: true },
     { key: 'domicilio', label: 'Domicilio', editable: true },
     { key: 'municipio', label: 'Municipio', nestedKey: 'nombre_municipio', editable: false, selectOptions: mockMunicipio },
@@ -78,9 +81,12 @@ export class ProveedorListComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
+  proveedoresConRepresentantes: any[] = [];
+
   constructor(
     private dialog: MatDialog,
     private proveedorService: ProveedorService,
+    private representanteService: RepresentanteService,
     private cdr: ChangeDetectorRef
   ) {
     this.dataSource = new MatTableDataSource([]);
@@ -132,9 +138,24 @@ ngAfterViewInit(): void {
 
   loadProveedores(): void {
     this.isLoading = true;
-    this.proveedorService.getProveedores().subscribe({
-      next: (proveedores) => {
-        this.data = proveedores;
+    
+    // Obtener proveedores y representantes en paralelo
+    forkJoin([
+      this.proveedorService.getProveedores(),
+      this.representanteService.getRepresentantes()
+    ]).subscribe({
+      next: ([proveedores, representantes]) => {
+        // Mapear los representantes a sus respectivos proveedores
+        this.data = proveedores.map(proveedor => {
+          const representanteProveedor = representantes.find(r => r.entidad_id === proveedor.id);
+          return {
+            ...proveedor,
+            representante: representanteProveedor 
+              ? `${representanteProveedor.nombre} ${representanteProveedor.apellidos}`
+              : 'Sin representante'
+          };
+        });
+
         this.dataSource.data = this.data;
         this.pagination.length = this.data.length;
         this.dataSource.sort = this.sort;
@@ -143,7 +164,7 @@ ngAfterViewInit(): void {
         this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Error loading proveedores:', error);
+        console.error('Error loading data:', error);
         this.isLoading = false;
         this.cdr.markForCheck();
       }
@@ -169,7 +190,8 @@ ngAfterViewInit(): void {
       telefonos: new FormControl(this.selectedRow?.telefonos),
       domicilio: new FormControl(this.selectedRow?.domicilio),
       municipio: new FormControl(this.selectedRow?.municipio),
-      ministerio: new FormControl(this.selectedRow?.ministerio)
+      ministerio: new FormControl(this.selectedRow?.ministerio),
+      representante: new FormControl(this.selectedRow?.representante)
     });
     this.cdr.markForCheck();
   }

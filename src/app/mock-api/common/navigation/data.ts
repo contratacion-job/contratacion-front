@@ -19,10 +19,10 @@ export const defaultNavigation: FuseNavigationItem[] = [
             },
             {
                 id: 'tipos-contratos',
-                title: 'Tipos',
+                title: 'Lista de Contratos',
                 type: 'basic',
                 icon: 'heroicons_outline:document-check',
-                link: '/contratos/tipos',
+                link: '/contratos/list',
             },
             {
                 id: 'monto-vencimiento',
@@ -32,9 +32,9 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 link: '/contratos/vencidos',
             },
             {
-                id: 'suplementos-group',
-                title: 'Suplementos',
-                subtitle: 'Gestión de suplementos',
+                id: 'ejecucion',
+                title: 'Ejecucion',
+                subtitle: 'Gestión de ejecuciones',
                 type: 'collapsable',
                 icon: 'heroicons_outline:document-duplicate',
                 children: [
@@ -46,11 +46,18 @@ export const defaultNavigation: FuseNavigationItem[] = [
                         link: '/dashboard/dashboard-suplimento',
                     },
                     {
-                        id: 'suplementos-vencidos',
+                        id: 'ejecucion-contrato',
+                        title: 'Ejecucion de contrato',
+                        type: 'basic',
+                        icon: 'heroicons_outline:currency-dollar',
+                        link: '/contratos/ejecucion',
+                    },
+                    {
+                        id: 'ejecucion-vencidos',
                         title: 'Vencidos',
                         type: 'basic',
                         icon: 'heroicons_outline:currency-dollar',
-                        link: '/suplementos/vencidos',
+                        link: '/contratos/vencidas',
                     },
                 ],
             },
@@ -58,7 +65,6 @@ export const defaultNavigation: FuseNavigationItem[] = [
     },
 
     // Suplementos section
-
 
     // Proveedores section
     {
@@ -76,26 +82,32 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 link: '/dashboard/dashboard-proveedor',
             },
             {
-                id: 'proveedores-representantes',
-                title: 'Representantes',
+                id: 'proveedores',
+                title: 'Lista de Proveedores',
                 type: 'basic',
                 icon: 'heroicons_outline:user',
                 link: '/proveedores/lista',
-            }
-
+            },
+            {
+                id: 'representantes',
+                title: 'Representantes',
+                type: 'basic',
+                icon: 'heroicons_outline:user',
+                link: '/proveedores/representantes',
+            },
         ],
     },
 
     // Ejecución Contratos section
     {
-        id: 'ejecucion-group',
-        title: 'Ejecución Contratos',
-        subtitle: 'Seguimiento de ejecución',
+        id: 'suplemento-group',
+        title: 'Suplementos',
+        subtitle: 'Gestión de suplementos',
         type: 'collapsable',
         icon: 'heroicons_outline:chart-bar',
         children: [
             {
-                id: 'ejecucion-tablero',
+                id: 'suplemento-tablero',
                 title: 'Tablero',
                 type: 'basic',
                 icon: 'heroicons_outline:check-circle',
@@ -106,14 +118,44 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 title: 'Suplementos',
                 type: 'basic',
                 icon: 'heroicons_outline:document-duplicate',
-                link: '/contratos/contratos',
+                link: '/suplementos/list',
             },
             {
                 id: 'ejecucion-vencidas',
                 title: 'Vencidas',
                 type: 'basic',
                 icon: 'heroicons_outline:currency-dollar',
-                link: '/contratos/vencidas',
+                link: '/suplementos/vencidas',
+            },
+            {
+                id: 'suplementos-group',
+                title: 'Ejecucion',
+                subtitle: 'Gestión de suplementos',
+                type: 'collapsable',
+                icon: 'heroicons_outline:document-duplicate',
+                children: [
+                    {
+                        id: 'suplementos-tablero',
+                        title: 'Tablero',
+                        type: 'basic',
+                        icon: 'heroicons_outline:archive-box',
+                        link: '/dashboard/dashboard-suplimento',
+                    },
+                    {
+                        id: 'suplementos-vencidos',
+                        title: 'Ejecucion de suplementos',
+                        type: 'basic',
+                        icon: 'heroicons_outline:currency-dollar',
+                        link: '/suplementos/ejecucion',
+                    },
+                    {
+                        id: 'suplementos-vencidos',
+                        title: 'Vencidos',
+                        type: 'basic',
+                        icon: 'heroicons_outline:currency-dollar',
+                        link: '/suplementos/vencidos',
+                    },
+                ],
             },
         ],
     },
@@ -125,14 +167,14 @@ export const defaultNavigation: FuseNavigationItem[] = [
         subtitle: 'Organización interna - Solo Admin',
         type: 'collapsable',
         icon: 'heroicons_outline:office-building',
-         roles: ['admin'],
+        roles: ['admin'],
         children: [
             {
-                id   : 'Entidad',
+                id: 'Entidad',
                 title: 'Entidad',
-                type : 'basic',
-                icon : 'heroicons_outline:user-group',
-                link : '/organizacion/entidad'
+                type: 'basic',
+                icon: 'heroicons_outline:user-group',
+                link: '/organizacion/entidad',
             },
             {
                 id: 'departamentos',
@@ -154,6 +196,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type: 'basic',
                 icon: 'heroicons_outline:envelope',
                 link: '/organizacion/configuracion-correo',
+            },
+               {
+                id: 'logs',
+                title: 'Logs del sistema',
+                type: 'basic',
+                icon: 'heroicons_outline:envelope',
+                link: '/organizacion/log',
             },
         ],
     },
@@ -183,23 +232,22 @@ export const defaultNavigation: FuseNavigationItem[] = [
         ],
     },
     // En tu navegación, agregar:
-  {
-        id      : 'gestion-usuarios-group',
-        title   : 'Administración',
+    {
+        id: 'gestion-usuarios-group',
+        title: 'Administración',
         subtitle: 'Gestión del sistema',
-        type    : 'group',
-        icon    : 'heroicons_outline:cog-6-tooth',
+        type: 'group',
+        icon: 'heroicons_outline:cog-6-tooth',
         children: [
             {
-                id   : 'gestion-usuarios',
+                id: 'gestion-usuarios',
                 title: 'Gestión de Usuarios',
-                type : 'basic',
-                icon : 'heroicons_outline:user-group',
-                link : '/admin/usuarios'
-            }
-        ]
-    }
-
+                type: 'basic',
+                icon: 'heroicons_outline:user-group',
+                link: '/admin/usuarios',
+            },
+        ],
+    },
 ];
 
 export const compactNavigation: FuseNavigationItem[] = [
