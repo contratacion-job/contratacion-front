@@ -1,0 +1,305 @@
+.contratos-expired-component {
+    .mat-mdc-table {
+        .mat-mdc-header-row {
+            height: 56px;
+        }
+
+        .mat-mdc-row {
+            height: 72px;
+
+            &:hover {
+                @apply bg-gray-50 dark:bg-hover;
+            }
+        }
+
+        .mat-mdc-cell,
+        .mat-mdc-header-cell {
+            border-bottom: 1px solid;
+            @apply border-gray-200 dark:border-gray-700;
+        }
+    }
+
+    .order-row {
+        cursor: pointer;
+        transition: background-color 150ms cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+}
+
+/* Currency styling */
+.currency-amount {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 500;
+}
+
+/* Status badges */
+.status-expired {
+    @apply text-red-600 bg-red-100 dark:bg-red-900 dark:text-red-300;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Action buttons */
+.action-buttons {
+    .mat-mdc-button {
+        min-width: 32px;
+        padding: 0 8px;
+
+        .mat-icon {
+            margin: 0;
+        }
+
+        &:hover {
+            background-color: var(--fuse-bg-hover);
+        }
+    }
+}
+
+/* Table styling to match Fuse theme */
+.mat-mdc-table {
+    background: transparent;
+
+    .mat-mdc-header-cell {
+        font-weight: 600;
+        color: var(--fuse-text-secondary);
+        border-bottom-color: var(--fuse-border);
+    }
+
+    .mat-mdc-cell {
+        border-bottom-color: var(--fuse-border);
+    }
+
+    .mat-mdc-row:hover {
+        background-color: var(--fuse-bg-hover);
+    }
+}
+
+/* Search field styling */
+.fuse-mat-dense {
+    .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+    }
+}
+
+/* Button styling */
+.mat-mdc-outlined-button {
+    border-color: var(--fuse-border);
+
+    &:hover {
+        background-color: var(--fuse-bg-hover);
+    }
+}
+
+/* Progress bar */
+.mat-mdc-progress-bar {
+    --mdc-linear-progress-active-indicator-color: var(--fuse-primary);
+}
+
+/* Tooltip styling */
+.mat-mdc-tooltip {
+    font-size: 12px;
+}
+
+/* Empty state styling */
+.text-center {
+    .mat-icon {
+        opacity: 0.5;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .contratos-expired-component {
+        .mat-mdc-table {
+            .mat-mdc-cell,
+            .mat-mdc-header-cell {
+                padding: 8px 4px;
+                font-size: 12px;
+            }
+        }
+
+        .action-buttons {
+            .mat-mdc-button {
+                min-width: 28px;
+                padding: 0 4px;
+            }
+        }
+    }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .mat-mdc-table {
+        .mat-mdc-header-cell {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+    }
+
+    .status-expired {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: rgb(252, 165, 165);
+    }
+}
+
+/* Loading state */
+.mat-mdc-progress-bar {
+    height: 4px;
+    border-radius: 2px;
+}
+
+/* Paginator styling */
+.mat-mdc-paginator {
+    border-top: 1px solid var(--fuse-border);
+    background-color: var(--fuse-bg-card);
+}
+
+/* Custom scrollbar for table container */
+.overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: var(--fuse-bg-default);
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: var(--fuse-text-hint);
+    border-radius: 3px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: var(--fuse-text-secondary);
+}
+
+/* Table cell content alignment */
+.mat-mdc-cell {
+    .flex.flex-col {
+        gap: 2px;
+    }
+}
+
+/* Icon sizing consistency */
+.icon-size-4 {
+    width: 16px;
+    height: 16px;
+}
+
+.icon-size-5 {
+    width: 20px;
+    height: 20px;
+}
+
+.icon-size-24 {
+    width: 96px;
+    height: 96px;
+}
+
+/* Button hover effects */
+.mat-mdc-outlined-button {
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Table row animations */
+.mat-mdc-row {
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Error message styling */
+.text-red-600 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    &::before {
+        content: '⚠️';
+        font-size: 1.2em;
+    }
+}
+
+/* Success message styling for future use */
+.text-green-600 {
+    font-weight: 500;
+}
+
+/* Badge styling improvements */
+.rounded-full {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+/* Form field improvements */
+.fuse-mat-rounded {
+    .mat-mdc-form-field-outline {
+        border-radius: 8px;
+    }
+}
+
+/* Header improvements */
+.text-4xl.font-extrabold {
+    background: linear-gradient(135deg, var(--fuse-primary), var(--fuse-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Loading spinner improvements */
+.mat-mdc-progress-bar {
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* Table header sticky positioning */
+.mat-mdc-header-row {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--fuse-bg-card);
+}
+
+/* Mobile responsive table */
+@media (max-width: 640px) {
+    .overflow-x-auto {
+        margin: 0 16px;
+    }
+
+    .mat-mdc-table {
+        min-width: 800px;
+    }
+
+    .text-4xl {
+        font-size: 1.875rem;
+        line-height: 2.25rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .action-buttons,
+    .mat-mdc-paginator,
+    .mat-mdc-progress-bar {
+        display: none !important;
+    }
+
+    .mat-mdc-table {
+        border: 1px solid #000;
+    }
+
+    .mat-mdc-cell,
+    .mat-mdc-header-cell {
+        border: 1px solid #000;
+        padding: 8px;
+    }
+}

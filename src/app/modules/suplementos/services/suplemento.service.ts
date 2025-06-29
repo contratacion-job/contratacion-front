@@ -43,4 +43,14 @@ export class SuplementoService {
     }
     throw new Error('Suplemento not found');
   }
+
+  getSuplementosVencidos(page: number, size: number): Observable<{ data: Suplemento[]; total: number }> {
+    // For demo, filter expired suplementos and paginate
+    const expired = this.suplementos.filter(s => s.estado === 'Vencido');
+    const start = page * size;
+    const end = start + size;
+    const data = expired.slice(start, end);
+    const total = expired.length;
+    return of({ data, total });
+  }
 }

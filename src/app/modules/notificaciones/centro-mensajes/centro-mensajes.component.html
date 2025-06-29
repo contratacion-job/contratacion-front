@@ -1,1 +1,343 @@
-<p>centro-mensajes works!</p>
+<!-- email-composer.component.html -->
+<div class="email-composer">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="title">Envío de Correo Electrónico</h1>
+      </div>
+      <button class="settings-btn" (click)="toggleSettings()">
+        <i class="icon-settings"></i>
+        Configuración
+      </button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="content-grid">
+
+      <!-- Panel de Destinatarios -->
+      <div class="recipients-panel">
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="icon-users"></i>
+              <h2>Destinatarios</h2>
+            </div>
+            <span class="recipient-count">{{ recipients.length }}</span>
+          </div>
+
+          <div class="panel-body">
+            <!-- Agregar destinatario -->
+            <div class="add-recipient">
+              <input
+                type="email"
+                [(ngModel)]="newRecipient"
+                (keypress)="onKeyPress($event)"
+                placeholder="email@ejemplo.com"
+                class="recipient-input"
+              />
+              <button class="add-btn" (click)="addRecipient()">
+                <i class="icon-plus"></i>
+              </button>
+            </div>
+
+            <!-- Lista de destinatarios -->
+            <div class="recipients-list">
+              <div
+                *ngFor="let recipient of recipients"
+                class="recipient-item"
+              >
+                <div class="recipient-info">
+                  <p class="recipient-name">{{ recipient.name }}</p>
+                  <p class="recipient-email">{{ recipient.email }}</p>
+                </div>
+                <button
+                  class="remove-btn"
+                  (click)="removeRecipient(recipient.id)"
+                >
+                  <i class="icon-close"></i>
+                </button>
+              </div>
+            </div>
+
+            <button class="import-btn" (click)="importFromCsv()">
+              <i class="icon-upload"></i>
+              Importar desde CSV
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Principal de Composición -->
+      <div class="composer-panel">
+        <div class="panel-card">
+          <div class="panel-header">
+            <h2>Redactar Mensaje</h2>
+          </div>
+
+          <div class="panel-body">
+            <!-- Asunto -->
+            <div class="form-group">
+              <label class="form-label">Asunto</label>
+              <input
+                type="text"
+                [(ngModel)]="subject"
+                placeholder="Ingresa el asunto del correo"
+                class="form-input"
+              />
+            </div>
+
+            <!-- Editor de Mensaje -->
+            <div class="form-group">
+              <label class="form-label">Mensaje</label>
+
+              <!-- Barra de herramientas -->
+              <div class="toolbar">
+                <button class="toolbar-btn" title="Adjuntar archivo">
+                  <i class="icon-paperclip"></i>
+                </button>
+                <button class="toolbar-btn" title="Insertar imagen">
+                  <i class="icon-image"></i>
+                </button>
+                <button class="toolbar-btn" title="Insertar emoji">
+                  <i class="icon-smile"></i>
+                </button>
+                <div class="toolbar-spacer"></div>
+                <select class="toolbar-select">
+                  <option>Arial</option>
+                  <option>Helvetica</option>
+                  <option>Times New Roman</option>
+                </select>
+                <select class="toolbar-select">
+                  <option>12px</option>
+                  <option>14px</option>
+                  <option>16px</option>
+                </select>
+              </div>
+
+              <textarea
+                [(ngModel)]="message"
+                rows="12"
+                placeholder="Escribe tu mensaje aquí..."
+                class="message-textarea"
+              ></textarea>
+            </div>
+
+            <!-- Acciones -->
+            <div class="actions">
+              <div class="actions-left">
+                <button class="action-btn secondary" (click)="saveDraft()">
+                  Guardar Borrador
+                </button>
+                <button class="action-btn secondary" (click)="previewEmail()">
+                  Vista Previa
+                </button>
+              </div>
+
+              <button class="send-btn" (click)="sendEmails()">
+                <i class="icon-send"></i>
+                Enviar a {{ recipients.length }} destinatarios
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel de Vista Previa y Plantillas -->
+      <div class="preview-panel">
+        <!-- Estadísticas -->
+        <div class="panel-card stats-card">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="icon-stats"></i>
+              <h2>Estadísticas</h2>
+            </div>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-number">{{ emailStats.totalEmails }}</div>
+              <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number sent">{{ emailStats.sent }}</div>
+              <div class="stat-label">Enviados</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number pending">{{ emailStats.pending }}</div>
+              <div class="stat-label">Pendientes</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number failed">{{ emailStats.failed }}</div>
+              <div class="stat-label">Fallidos</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plantillas -->
+        <div class="templates-section">
+          <h3>Plantillas de Correo</h3>
+          <div class="templates-list">
+            <div
+              *ngFor="let template of templates"
+              class="template-item"
+              (click)="useTemplate(template)"
+            >
+              <div class="template-header">
+                <h4 class="template-name">{{ template.name }}</h4>
+                <button class="use-template-btn" type="button">
+                  <!-- Icono de Tailwind CSS -->
+                  <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  <span class="btn-text">Usar</span>
+                </button>
+              </div>
+              <div class="template-preview">
+                <p class="preview-text">{{ template.preview }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vista Previa del Email -->
+        <div class="panel-card preview-card" *ngIf="showPreview">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="icon-eye"></i>
+              <h2>Vista Previa</h2>
+            </div>
+            <button class="toggle-preview-btn" (click)="togglePreview()">
+              <i class="icon-close"></i>
+            </button>
+          </div>
+          <div class="panel-body">
+            <div class="email-preview">
+              <div class="preview-header">
+                <div class="preview-field">
+                  <strong>Para:</strong> {{ recipients.length }} destinatarios
+                </div>
+                <div class="preview-field">
+                  <strong>Asunto:</strong> {{ subject || 'Sin asunto' }}
+                </div>
+              </div>
+              <div class="preview-divider"></div>
+              <div class="preview-body">
+                <div [innerHTML]="message || 'Contenido del mensaje aparecerá aquí...'" class="preview-content"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progreso de Envío -->
+        <div class="panel-card progress-card">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="icon-clock"></i>
+              <h2>Progreso</h2>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="progress-info">
+              <div class="progress-text">
+                Listo para enviar
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="0"></div>
+              </div>
+              <div class="progress-details">
+                <span>0 de {{ recipients.length }} enviados</span>
+                <span>Tiempo estimado: --</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Configuración -->
+  <div class="modal-overlay" *ngIf="showSettings" (click)="showSettings = false">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Configuración de Envío</h3>
+        <button class="modal-close" (click)="showSettings = false">
+          <i class="icon-close"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Servidor SMTP</label>
+          <input
+            type="text"
+            [(ngModel)]="emailSettings.smtpServer"
+            placeholder="smtp.gmail.com"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Puerto</label>
+            <input
+              type="number"
+              [(ngModel)]="emailSettings.port"
+              placeholder="587"
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Retraso entre envíos (ms)</label>
+            <input
+              type="number"
+              [(ngModel)]="emailSettings.delay"
+              placeholder="1000"
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Usuario</label>
+          <input
+            type="email"
+            [(ngModel)]="emailSettings.username"
+            placeholder="tu-email@gmail.com"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input
+            type="password"
+            [(ngModel)]="emailSettings.password"
+            placeholder="Tu contraseña"
+            class="form-input"
+          />
+        </div>
+
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="emailSettings.useSsl"
+              class="checkbox-input"
+            />
+            <span class="checkbox-text">Usar autenticación SSL/TLS</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="action-btn secondary" (click)="showSettings = false">
+          Cancelar
+        </button>
+        <button class="action-btn primary" (click)="saveSettings()">
+          Guardar Configuración
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

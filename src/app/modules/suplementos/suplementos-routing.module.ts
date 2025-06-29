@@ -3,6 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { SuplementoDetailComponent } from './suplemento-detail/suplemento-detail.component';
 import { SuplementoListComponent } from './suplemento-list/suplemento-list.component';
 import { EjecucionSuplementoComponent } from './ejecucion-suplemento/ejecucion-suplemento.component';
+import { ExpiredComponent } from './ejecucion-suplemento/expired/expired.component';
+import { SuplementosExpiredComponent } from './suplementos-expired/suplementos-expired.component';
 
 const routes: Routes = [
 
@@ -16,12 +18,12 @@ const routes: Routes = [
     },
     {
       path: 'vencidas',
-      component: SuplementoDetailComponent
+      component: SuplementosExpiredComponent
     },
 
     {
       path: 'vencidos',
-      component: SuplementoDetailComponent
+      component: ExpiredComponent
     }
 ];
 

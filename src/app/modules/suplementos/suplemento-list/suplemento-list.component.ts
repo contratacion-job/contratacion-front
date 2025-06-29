@@ -27,6 +27,7 @@ import { Suplemento, Proveedor, TipoContrato, Vigencia, Departamento } from 'app
 import { mockProveedor, mockTipoContrato, mockVigenciaContrato, mockDepartamento } from 'app/mock-api/contrato-fake/fake';
 import { Subject } from 'rxjs';
 import { SuplementoDetailComponent } from '../suplemento-detail/suplemento-detail.component';
+import { SuplementoService } from '../services/suplemento.service';
 
 @Component({
   selector: 'app-suplemento-list',
@@ -94,10 +95,12 @@ export class SuplementoListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
+
   constructor(
     private cdr: ChangeDetectorRef,
     private fb: FormBuilder,
-    private _matDialog: MatDialog
+    private _matDialog: MatDialog,
+    private suplementoService :SuplementoService
   ) {
     this.dataSource = new MatTableDataSource<Suplemento>([]);
     this.initSelectedSuplementoForm();
@@ -114,9 +117,7 @@ export class SuplementoListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  /**
-   * Open the dialog to add a new suplemento
-   */
+
   openAddSuplementoDialog(): void {
     // Open the dialog
     const dialogRef = this._matDialog.open(SuplementoDetailComponent, {
@@ -129,7 +130,6 @@ export class SuplementoListComponent implements OnInit, AfterViewInit {
         suplemento: null
       }
     });
-
     // Handle dialog close
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
@@ -246,51 +246,21 @@ export class SuplementoListComponent implements OnInit, AfterViewInit {
   loadSuplementos(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    // TODO: Replace with actual service call
-    // For now, use mock data or empty array
-    this.data = [];
-    this.dataSource.data = this.data;
-    this.pagination.length = this.data.length;
-    this.isLoading = false;
-    this.cdr.detectChanges();
+    this.suplementoService.getSuplementos().subscribe({
+      next: (suplementos) => {
+        this.dataSource.data = suplementos;
+        this.pagination.length = suplementos.length;
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        this.errorMessage = 'Error al cargar suplementos. Por favor, inténtelo de nuevo.';
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
-  applyFilters(): void {
-    const filters = this.filterForm.value;
-    let filteredData = this.dataSource.data;
-
-    if (filters.proveedor_id) {
-      filteredData = filteredData.filter(item => item.proveedor.id === filters.proveedor_id);
-    }
-    if (filters.tipo_contrato_id) {
-      filteredData = filteredData.filter(item => item.tipo_contrato?.id === filters.tipo_contrato_id);
-    }
-    if (filters.departamento_id) {
-      filteredData = filteredData.filter(item => item.departamento?.id === filters.departamento_id);
-    }
-    if (filters.valor_cup_filter) {
-      filteredData = filteredData.filter(item => item.valor_cup >= filters.valor_cup_filter);
-    }
-    if (filters.valor_usd_filter) {
-      filteredData = filteredData.filter(item => item.valor_usd >= filters.valor_usd_filter);
-    }
-    if (filters.fecha_entrada_filter) {
-      filteredData = filteredData.filter(item => new Date(item.fecha_entrada) >= new Date(filters.fecha_entrada_filter));
-    }
-    if (filters.fecha_firmado_filter) {
-      filteredData = filteredData.filter(item => new Date(item.fecha_firmado) >= new Date(filters.fecha_firmado_filter));
-    }
-    if (filters.vigencia_id) {
-      filteredData = filteredData.filter(item => item.vigencia.id === filters.vigencia_id);
-    }
-
-    this.dataSource.filteredData = filteredData;
-  }
-
-  clearFilters(): void {
-    this.filterForm.reset();
-    this.dataSource.filteredData = this.dataSource.data;
-  }
 
   initSelectedSuplementoForm(): void {
     this.selectedSuplementoForm = this.fb.group({
@@ -328,90 +298,150 @@ export class SuplementoListComponent implements OnInit, AfterViewInit {
     return item.id;
   }
 
-  toggleDetails(rowId: number): void {
-    if (this.selectedSuplemento?.id === rowId) {
-      this.selectedSuplemento = null;
-    } else {
-      this.selectedSuplemento = this.data.find(row => row.id === rowId) || null;
-      if (this.selectedSuplemento) {
-        if (!this.selectedSuplementoForm) {
-          this.initSelectedSuplementoForm();
-        }
-        this.selectedSuplementoForm.patchValue({
-          no_contrato_contratacion: this.selectedSuplemento.no_contrato_contratacion || '',
-          proveedor: this.selectedSuplemento.proveedor || null,
-          tipo_contrato: this.selectedSuplemento.tipo_contrato || null,
-          valor_cup: this.selectedSuplemento.valor_cup || 0,
-          valor_usd: this.selectedSuplemento.valor_usd || 0,
-          fecha_firmado: this.selectedSuplemento.fecha_firmado || '',
-          vigencia: this.selectedSuplemento.vigencia || null,
-          observaciones: this.selectedSuplemento.observaciones || '',
-          fecha_vencido: this.selectedSuplemento.fecha_vencido || ''
-        });
+// 1. Corregir el método toggleDetails()
+toggleDetails(rowId: number): void {
+  if (this.selectedSuplemento?.id === rowId) {
+    this.selectedSuplemento = null;
+  } else {
+    // CAMBIO: Usar dataSource.data en lugar de this.data
+    this.selectedSuplemento = this.dataSource.data.find(row => row.id === rowId) || null;
+    if (this.selectedSuplemento) {
+      if (!this.selectedSuplementoForm) {
+        this.initSelectedSuplementoForm();
       }
+      this.selectedSuplementoForm.patchValue({
+        no_contrato_contratacion: this.selectedSuplemento.no_contrato_contratacion || '',
+        proveedor: this.selectedSuplemento.proveedor || null,
+        tipo_contrato: this.selectedSuplemento.tipo_contrato || null,
+        departamento: this.selectedSuplemento.departamento || null, // AGREGADO: faltaba departamento
+        fecha_entrada: this.selectedSuplemento.fecha_entrada || '', // AGREGADO: faltaba fecha_entrada
+        valor_cup: this.selectedSuplemento.valor_cup || 0,
+        valor_usd: this.selectedSuplemento.valor_usd || 0,
+        fecha_firmado: this.selectedSuplemento.fecha_firmado || '',
+        vigencia: this.selectedSuplemento.vigencia || null,
+        observaciones: this.selectedSuplemento.observaciones || '',
+        fecha_vencido: this.selectedSuplemento.fecha_vencido || ''
+      });
     }
-    this.cdr.detectChanges();
+  }
+  this.cdr.detectChanges();
+}
+
+// 2. Eliminar la propiedad data ya que no se usa
+// REMOVER esta línea de la clase:
+// data: Suplemento[] = [];
+
+// 3. Corregir el método applyFilters() para usar la funcionalidad correcta de MatTableDataSource
+applyFilters(): void {
+  const filters = this.filterForm.value;
+
+  // Crear un filtro personalizado
+  this.dataSource.filterPredicate = (data: Suplemento, filter: string) => {
+    // Aplicar filtros específicos
+    if (filters.proveedor_id && data.proveedor?.id !== filters.proveedor_id) {
+      return false;
+    }
+    if (filters.tipo_contrato_id && data.tipo_contrato?.id !== filters.tipo_contrato_id) {
+      return false;
+    }
+    if (filters.departamento_id && data.departamento?.id !== filters.departamento_id) {
+      return false;
+    }
+    if (filters.vigencia_id && data.vigencia?.id !== filters.vigencia_id) {
+      return false;
+    }
+    if (filters.valor_cup_filter && data.valor_cup < filters.valor_cup_filter) {
+      return false;
+    }
+    if (filters.valor_usd_filter && data.valor_usd < filters.valor_usd_filter) {
+      return false;
+    }
+    if (filters.fecha_entrada_filter && new Date(data.fecha_entrada) < new Date(filters.fecha_entrada_filter)) {
+      return false;
+    }
+    if (filters.fecha_firmado_filter && new Date(data.fecha_firmado) < new Date(filters.fecha_firmado_filter)) {
+      return false;
+    }
+
+    return true;
+  };
+
+  // Disparar el filtro
+  this.dataSource.filter = JSON.stringify(filters);
+  this.cdr.detectChanges();
+}
+
+// 4. Corregir el método clearFilters()
+clearFilters(): void {
+  this.filterForm.reset();
+  this.dataSource.filter = '';
+  this.cdr.detectChanges();
+}
+
+// 5. Corregir el método exportToCSV()
+exportToCSV(): void {
+  // Usar los datos filtrados del dataSource
+  const dataToExport = this.dataSource.filteredData || this.dataSource.data;
+
+  if (!dataToExport || dataToExport.length === 0) {
+    return;
   }
 
+  const csvRows = [];
+  // Headers
+  const headers = [
+    'No. Contrato',
+    'Proveedor',
+    'Tipo de Contrato',
+    'Departamento',
+    'Valor (CUP)',
+    'Valor (USD)',
+    'Fecha Entrada',
+    'Fecha Firmado',
+    'Vigencia',
+    'Fecha Vencido',
+    'Observaciones'
+  ];
+  csvRows.push(headers.join(','));
+
+  // Data
+  dataToExport.forEach(item => {
+    const row = [
+      item.no_contrato_contratacion,
+      item.proveedor?.nombre || '',
+      item.tipo_contrato?.nombre_tipo_contrato || '',
+      item.departamento?.nombre_departamento || '',
+      item.valor_cup,
+      item.valor_usd,
+      item.fecha_entrada,
+      item.fecha_firmado,
+      item.vigencia?.vigencia,
+      item.fecha_vencido,
+      item.observaciones || ''
+    ];
+    // Escape commas and quotes in values
+    const escapedRow = row.map(value => {
+      if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+        return `"${value.replace(/"/g, '""')}"`;
+      }
+      return value;
+    });
+    csvRows.push(escapedRow.join(','));
+  });
+
+  const csvString = csvRows.join('\n');
+  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+  const url = window.URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'suplementos_export.csv';
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
   closeDetails(): void {
     this.selectedSuplemento = null;
   }
 
-  exportToCSV(): void {
-    if (!this.dataSource.filteredData || this.dataSource.filteredData.length === 0) {
-      return;
-    }
 
-    const csvRows = [];
-    // Headers
-    const headers = [
-      'No. Contrato',
-      'Proveedor',
-      'Tipo de Contrato',
-      'Departamento',
-      'Valor (CUP)',
-      'Valor (USD)',
-      'Fecha Entrada',
-      'Fecha Firmado',
-      'Vigencia',
-      'Fecha Vencido',
-      'Observaciones'
-    ];
-    csvRows.push(headers.join(','));
-
-    // Data
-    this.dataSource.filteredData.forEach(item => {
-      const row = [
-        item.no_contrato_contratacion,
-        item.proveedor?.nombre || '',
-        item.tipo_contrato?.nombre_tipo_contrato || '',
-        item.departamento?.nombre_departamento || '',
-        item.valor_cup,
-        item.valor_usd,
-        item.fecha_entrada,
-        item.fecha_firmado,
-        item.vigencia?.vigencia,
-        item.fecha_vencido,
-        item.observaciones || ''
-      ];
-      // Escape commas and quotes in values
-      const escapedRow = row.map(value => {
-        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-          return `"${value.replace(/"/g, '""')}"`;
-        }
-        return value;
-      });
-      csvRows.push(escapedRow.join(','));
-    });
-
-    const csvString = csvRows.join('\n');
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'suplementos_export.csv';
-    a.click();
-    window.URL.revokeObjectURL(url);
-  }
 }

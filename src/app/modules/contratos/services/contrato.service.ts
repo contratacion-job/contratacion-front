@@ -100,4 +100,14 @@ export class ContratoService {
     this.tipoContrato.push(newContrato);
     return of(newContrato);
   }
+
+  getVencidoEjecucionContratos(page: number, size: number): Observable<{ data: Contrato[]; total: number }> {
+    // For demo, filter expired contracts and paginate
+    const expired = this.expired.filter(c => c.estado === 'Vencido');
+    const start = page * size;
+    const end = start + size;
+    const data = expired.slice(start, end);
+    const total = expired.length;
+    return of({ data, total });
+  }
 }

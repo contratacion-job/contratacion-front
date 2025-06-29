@@ -1,216 +1,215 @@
-import { Component, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { EjecucionSuplemento, Suplemento, Proveedor, Contrato, Municipio, Ministerio, Departamento, Vigencia, TipoContrato } from 'app/models/Type';
+import { 
+  EjecucionSuplemento, 
+  Proveedor, 
+  Contrato, 
+  Suplemento, 
+  Municipio, 
+  Ministerio, 
+  Departamento, 
+  Vigencia, 
+  TipoContrato,
+  Provincia
+} from 'app/models/Type';
 import { EjecucionSuplementoFormComponent } from './ejecucion-suplemento-form/ejecucion-suplemento-form.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MatDatepicker } from '@angular/material/datepicker';
 
-// Minimal mock data for testing
+// Helper type to make all properties optional and add missing ones
+type PartialWithId<T> = Partial<T> & { id: number };
+
+// Extended EjecucionSuplemento for mock data
+interface EjecucionSuplementoMock extends Omit<EjecucionSuplemento, 'proveedor' | 'contrato' | 'suplemento' | 'fecha_creacion' | 'fecha_actualizacion' | 'usuario_creacion' | 'usuario_actualizacion' | 'estado'> {
+  proveedor: Proveedor;
+  contrato: Contrato;
+  suplemento: Suplemento;
+  fecha_creacion: Date | string;
+  fecha_actualizacion: Date | string;
+  usuario_creacion: string;
+  usuario_actualizacion: string;
+  estado: string;
+}
+
+// Mock data for testing
+const mockProvincia: Provincia = {
+  id: 1,
+  nombre_provincia: 'La Habana'
+};
+
 const mockMunicipio: Municipio = { 
   id: 1, 
-  nombre: 'Municipio 1',
+  nombre_municipio: 'La Habana Vieja',
   provincia_id: 1,
-  codigo: 'MUN-001',
-  activo: true,
-  creado_por: 1,
-  actualizado_por: 1,
-  creado_en: new Date(),
-  actualizado_en: new Date()
-} as unknown as Municipio;
+  provincia: mockProvincia
+};
 
 const mockMinisterio: Ministerio = { 
   id: 1, 
-  nombre: 'Ministerio 1',
-  codigo: 'MIN-001',
-  activo: true,
-  creado_por: 1,
-  actualizado_por: 1,
-  creado_en: new Date(),
-  actualizado_en: new Date()
-} as unknown as Ministerio;
+  nombre_ministerio: 'MINSAP',
+  descripcion: 'Ministerio de Salud Pública'
+};
 
 const mockDepartamento: Departamento = { 
   id: 1, 
-  nombre: 'Departamento 1',
+  nombre_departamento: 'Contratación',
   codigo: 'DEP-001',
-  activo: true,
-  creado_por: 1,
-  actualizado_por: 1,
-  creado_en: new Date(),
-  actualizado_en: new Date()
-} as unknown as Departamento;
+  descripcion: 'Departamento de Contratación'
+};
 
 const mockVigencia: Vigencia = { 
   id: 1, 
-  nombre: '2023',
-  fecha_inicio: new Date('2023-01-01'),
-  fecha_fin: new Date('2023-12-31'),
-  activa: true,
-  creado_por: 1,
-  actualizado_por: 1,
-  creado_en: new Date(),
-  actualizado_en: new Date()
-} as unknown as Vigencia;
+  vigencia: 2024,
+  alerta_vigencia: 1,
+  tipo_vigencia: 'Anual',
+  tipo_alerta_vigencia: 'ninguna'
+};
 
 const mockTipoContrato: TipoContrato = { 
   id: 1, 
-  nombre: 'Servicios',
-  codigo: 'SERV',
-  activo: true,
-  creado_por: 1,
-  actualizado_por: 1,
-  creado_en: new Date(),
-  actualizado_en: new Date()
-} as unknown as TipoContrato;
+  nombre_tipo_contrato: 'Servicios',
+  descripcion: 'Contrato de servicios'
+};
 
 const mockProveedor: Proveedor = {
   id: 1,
-  nombre: 'Proveedor 1',
-  codigo: 'PROV1',
   municipio_id: 1,
-  municipio: mockMunicipio,
   ministerio_id: 1,
+  nombre: 'Empresa de Prueba',
+  codigo: 'PRUEBA001',
+  telefonos: '555-1234',
+  domicilio: 'Calle 123',
+  municipio: mockMunicipio,
   ministerio: mockMinisterio,
-  domicilio: 'Dirección 1',
-  telefonos: '12345678',
-  direccion: 'Dirección 1',
-  email: 'proveedor@example.com',
-  nit: '12345',
-  representante: 'Representante',
-  cargo_representante: 'Cargo',
-  telefono_representante: '12345678',
-  email_representante: 'representante@example.com',
-  activo: true,
-  fechaCreacion: new Date().toISOString(),
-  fechaActualizacion: new Date().toISOString()
-} as Proveedor;
+  fechaCreacion: '2024-01-01',
+  representantes: []
+};
 
 const mockContrato: Contrato = {
   id: 1,
-  no_contrato_contratacion: 'CON-001',
-  objeto: 'Contrato de prueba 1',
   vigencia_id: 1,
-  vigencia: mockVigencia,
   proveedor_id: 1,
-  proveedor: mockProveedor,
   tipo_contrato_id: 1,
-  tipo_contrato: mockTipoContrato,
-  no_contrato: 'CON-001',
-  fecha_firma: new Date(),
-  fecha_vigencia: new Date(),
-  monto_total: 10000,
-  moneda: 'CUP',
-  estado: 'Activo',
-  descripcion: 'Descripción',
-  observaciones: 'Sin observaciones',
-  creado_por: 1,
-  creado_en: new Date(),
-  actualizado_por: 1,
-  actualizado_en: new Date(),
-  departamento_id: 1,
-  departamento: mockDepartamento,
-  fecha_entrada: new Date(),
-  fecha_firmado: new Date(),
-  fecha_vencido: new Date(),
-  monto_cup: 10000,
-  monto_usd: 0,
-  monto_cl: 0,
-  monto_vencimiento_cup: 0,
-  monto_vencimiento_usd: 0,
-  monto_vencimiento_cl: 0,
+  no_contrato: 123,
+  fecha_entrada: new Date('2024-01-01'),
+  fecha_firmado: new Date('2024-01-01'),
   valor_cup: 10000,
-  valor_usd: 0,
-  valor_cl: 0,
-  fecha_comite_contratacion: new Date(),
-  no_comite_contratacion: 'CC-001',
-  no_acuerdo_comite_contratacion: 'ACC-001',
-  fecha_comite_administracion: new Date(),
-  no_comite_administracion: 'CA-001',
-  no_acuerdo_comite_administracion: 'ACA-001',
-  valor_monto_restante: 0
-} as unknown as Contrato;
+  monto_vencimiento_cup: 10000,
+  monto_vencimiento_cl: 100,
+  valor_usd: 100,
+  monto_vencimiento_usd: 100,
+  observaciones: 'Contrato de prueba',
+  no_contrato_contratacion: 123,
+  fecha_comite_contratacion: new Date('2024-01-01'),
+  no_comite_contratacion: 1,
+  no_acuerdo_comite_contratacion: 1,
+  fecha_comite_administracion: new Date('2024-01-01'),
+  no_comite_administracion: 1,
+  no_acuerdo_comite_administracion: 1,
+  departamento_id: 1,
+  fecha_vencido: new Date('2024-12-31'),
+  valor_monto_restante: 10000,
+  entidad: ['Entidad 1'],
+  vigencia: mockVigencia,
+  proveedor: mockProveedor,
+  tipo_contrato: mockTipoContrato,
+  departamento: mockDepartamento,
+  estado: 'activo',
+  fecha_creacion: new Date('2024-01-01'),
+  fecha_actualizacion: new Date('2024-01-01'),
+  usuario_creacion: 'system',
+  usuario_actualizacion: 'system'
+} as Contrato;
 
 const mockSuplemento: Suplemento = {
   id: 1,
-  no_contrato_contratacion: 'SUP-001',
   vigencia_id: 1,
-  vigencia: mockVigencia,
   proveedor_id: 1,
-  proveedor: mockProveedor,
   tipo_contrato_id: 1,
-  tipo_contrato: mockTipoContrato,
   no_contrato_id: 1,
-  contrato: mockContrato,
-  fecha_entrada: new Date(),
-  fecha_firmado: new Date(),
-  fecha_vencido: new Date(),
-  monto_cup: 1000,
-  monto_usd: 0,
-  monto_cl: 0,
-  monto_vencimiento_cup: 0,
-  monto_vencimiento_usd: 0,
-  monto_vencimiento_cl: 0,
-  estado: 'Activo',
-  observaciones: 'Sin observaciones',
-  creado_por: 1,
-  creado_en: new Date(),
-  actualizado_por: 1,
-  actualizado_en: new Date(),
   departamento_id: 1,
+  fecha_entrada: new Date('2024-01-01'),
+  fecha_firmado: new Date('2024-01-01'),
+  valor_cup: 5000,
+  monto_vencimiento_cup: 5000,
+  monto_vencimiento_cl: 50,
+  valor_usd: 50,
+  monto_vencimiento_usd: 50,
+  observaciones: 'Suplemento de prueba',
+  no_contrato_contratacion: 123,
+  fecha_comite_contratacion: new Date('2024-01-01'),
+  no_comite_contratacion: 1,
+  no_acuerdo_comite_contratacion: 1,
+  fecha_comite_administracion: new Date('2024-01-01'),
+  no_comite_administracion: 1,
+  no_acuerdo_comite_administracion: 1,
+  fecha_vencido: new Date('2024-12-31'),
+  valor_monto_restante: 5000,
+  vigencia: mockVigencia,
+  proveedor: mockProveedor,
+  tipo_contrato: mockTipoContrato,
   departamento: mockDepartamento,
-  valor_cup: 1000,
-  valor_usd: 0,
-  valor_cl: 0,
-  fecha_comite_contratacion: new Date(),
-  no_comite_contratacion: 'COM-001',
-  no_acuerdo_comite_contratacion: 'ACC-001',
-  fecha_comite_administracion: new Date(),
-  no_comite_administracion: 'CA-001',
-  no_acuerdo_comite_administracion: 'ACA-001',
-  valor_monto_restante: 0,
-  fecha_aprobacion: new Date(),
-  no_aprobacion: 'APR-001',
-  fecha_notificacion: new Date(),
-  no_notificacion: 'NOT-001',
-  fecha_entrega: new Date(),
-  no_entrega: 'ENT-001',
-  fecha_recepcion: new Date(),
-  no_recepcion: 'REC-001'
-} as unknown as Suplemento;
+  fecha_creacion: new Date('2024-01-01'),
+  fecha_actualizacion: new Date('2024-01-01'),
+  usuario_creacion: 'system',
+  usuario_actualizacion: 'system',
+  estado: 'activo',
+  no_suplemento: 1,
+  no_contrato: 123
+} as Suplemento;
 
-// Mock data - replace with actual service calls
-const mockEjecucionSuplemento: EjecucionSuplemento[] = [
+const mockEjecucionSuplemento: EjecucionSuplementoMock[] = [
   {
     id: 1,
-    proveedor_id: 1,
-    no_contrato_id: 1,
     no_suplemento_id: 1,
+    no_contrato_id: 1,
+    proveedor_id: 1,
+    trabajo_ejecutado: 'Trabajo de prueba',
     costo_cup: 1000,
-    costo_cl: 500,
-    trabajo_ejecutado: 'Trabajo de prueba 1',
-    fecha_ejecucion: new Date('2023-01-15'),
+    costo_cl: 10,
+    fecha_ejecucion: new Date('2024-01-01'),
     proveedor: mockProveedor,
     contrato: mockContrato,
-    suplemento: {
-      ...mockSuplemento,
-      contrato: mockContrato
-    }
-  } as EjecucionSuplemento
+    suplemento: mockSuplemento,
+    fecha_creacion: new Date('2024-01-01'),
+    fecha_actualizacion: new Date('2024-01-01'),
+    usuario_creacion: 'system',
+    usuario_actualizacion: 'system',
+    estado: 'activo'
+  },
+  {
+    id: 2,
+    no_suplemento_id: 1,
+    no_contrato_id: 1,
+    proveedor_id: 1,
+    trabajo_ejecutado: 'Trabajo de prueba 2',
+    costo_cup: 2000,
+    costo_cl: 20,
+    fecha_ejecucion: new Date('2024-02-01'),
+    proveedor: mockProveedor,
+    contrato: mockContrato,
+    suplemento: mockSuplemento,
+    fecha_creacion: new Date('2024-01-01'),
+    fecha_actualizacion: new Date('2024-01-01'),
+    usuario_creacion: 'system',
+    usuario_actualizacion: 'system',
+    estado: 'activo'
+  }
 ];
 
 @Component({
@@ -230,9 +229,17 @@ const mockEjecucionSuplemento: EjecucionSuplemento[] = [
     ReactiveFormsModule,
     MatSelectModule,
     MatInputModule,
-    MatFormFieldModule
-
+    MatFormFieldModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    FormsModule
   ],
+  providers: [
+    MatDatepicker,
+    DatePipe,
+    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' }
+  ],
+  encapsulation: ViewEncapsulation.None,
   templateUrl: './ejecucion-suplemento.component.html',
   styleUrls: ['./ejecucion-suplemento.component.scss']
 })
@@ -249,24 +256,79 @@ export class EjecucionSuplementoComponent implements AfterViewInit, OnDestroy {
   ejecuciones: Partial<EjecucionSuplemento>[] = [];
   displayedColumns: string[] = ['no_suplemento', 'proveedor', 'contrato', 'trabajo_ejecutado', 'costo_cup', 'costo_cl', 'fecha_ejecucion', 'acciones'];
   dataSource: MatTableDataSource<Partial<EjecucionSuplemento>>;
-
-  resultsLength = 0;
+  selectedEjecucion: Partial<EjecucionSuplemento> | null = null;
+  selectedEjecucionForm: FormGroup = this._formBuilder.group({
+    id: [''],
+    no_suplemento_id: ['', Validators.required],
+    proveedor_id: ['', Validators.required],
+    no_contrato_id: ['', Validators.required],
+    trabajo_ejecutado: ['', Validators.required],
+    costo_cup: ['', [Validators.required, Validators.min(0)]],
+    costo_cl: ['', [Validators.required, Validators.min(0)]],
+    fecha_ejecucion: ['', Validators.required],
+    proveedor: [null],
+    contrato: [null],
+    suplemento: [null]
+  });
   isLoadingResults = true;
   isRateLimitReached = false;
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
   searchInputControl = new FormControl('');
+  filterForm: FormGroup;
 
-  
   constructor(
     private _matDialog: MatDialog,
-    private _snackBar: MatSnackBar
-  ) { }
+    private _snackBar: MatSnackBar,
+    private _formBuilder: FormBuilder
+  ) {
+    // Initialize dataSource with empty array first
+    this.dataSource = new MatTableDataSource<Partial<EjecucionSuplemento>>([]);
+    this.initFilterForm();
+    
+    // Load mock data (replace with actual API call in production)
+    this.loadEjecuciones();
+  }
+  
+  private loadEjecuciones(): void {
+    // Simulate API call
+    this.isLoadingResults = true;
+    setTimeout(() => {
+      this.dataSource = new MatTableDataSource<Partial<EjecucionSuplemento>>(mockEjecucionSuplemento);
+      this.dataSource.paginator = this._paginator;
+      this.dataSource.sort = this._sort;
+      this.resultsLength = mockEjecucionSuplemento.length;
+      this.isLoadingResults = false;
+    }, 500);
+  }
+
+  private initFilterForm(): void {
+    this.filterForm = this._formBuilder.group({
+      no_suplemento_id_filter: [''],
+      proveedor_filter: [''],
+      contrato_filter: [''],
+      trabajo_ejecutado_filter: [''],
+      costo_cup_filter: [''],
+      costo_cl_filter: [''],
+      fecha_ejecucion_filter: [''],
+      no_contrato_filter: [''],
+      valor_cup_filter: [''],
+      valor_usd_filter: [''],
+      fecha_entrada_filter: [''],
+      fecha_firmado_filter: ['']
+    });
+  }
+
+  private initSelectedEjecucionForm(): void {
+    // Form is now initialized in the property declaration
+  }
 
   ngAfterViewInit() {
-    // If you need to set up pagination or sorting, you can do it here
-    // this.dataSource.paginator = this.paginator;
-    // this.dataSource.sort = this.sort;
+    // Set up pagination and sorting
+    if (this.dataSource) {
+      this.dataSource.paginator = this._paginator;
+      this.dataSource.sort = this._sort;
+    }
   }
 
 
@@ -335,5 +397,73 @@ export class EjecucionSuplementoComponent implements AfterViewInit, OnDestroy {
   exportToCSV(): void {
     // Implementar la lógica de exportación aquí
     this.showMessage('Exportar a CSV no implementado');
+  }
+
+  onPageChange(event: any): void {
+    // Handle page change event
+    // If you need to fetch new data when page changes, you can do it here
+    // For example:
+    // this.pageIndex = event.pageIndex;
+    // this.pageSize = event.pageSize;
+    // this.loadEjecuciones();
+  }
+
+  toggleDetails(id: number): void {
+    if (this.selectedEjecucion?.id === id) {
+      this.selectedEjecucion = null;
+    } else {
+      const ejecucion = this.dataSource.data.find(e => e.id === id);
+      this.selectedEjecucion = ejecucion || null;
+      if (ejecucion) {
+        this.selectedEjecucionForm.patchValue({
+          id: ejecucion.id,
+          no_suplemento_id: ejecucion.no_suplemento_id,
+          proveedor_id: ejecucion.proveedor_id,
+          no_contrato_id: ejecucion.no_contrato_id,
+          trabajo_ejecutado: ejecucion.trabajo_ejecutado,
+          costo_cup: ejecucion.costo_cup,
+          costo_cl: ejecucion.costo_cl,
+          fecha_ejecucion: ejecucion.fecha_ejecucion ? new Date(ejecucion.fecha_ejecucion).toISOString().substring(0, 10) : null,
+          proveedor: ejecucion.proveedor,
+          contrato: ejecucion.contrato,
+          suplemento: ejecucion.suplemento
+        });
+      }
+    }
+  }
+
+  onSaveEjecucion(): void {
+    if (this.selectedEjecucionForm.invalid) {
+      this.showMessage('Por favor complete todos los campos requeridos');
+      return;
+    }
+
+    const formValue = this.selectedEjecucionForm.getRawValue();
+    const updatedEjecucion: Partial<EjecucionSuplemento> = {
+      ...this.selectedEjecucion,
+      ...formValue,
+      // Ensure dates are properly formatted
+      fecha_ejecucion: formValue.fecha_ejecucion ? new Date(formValue.fecha_ejecucion) : null,
+      // Preserve related objects
+      proveedor: this.selectedEjecucion?.proveedor,
+      contrato: this.selectedEjecucion?.contrato,
+      suplemento: this.selectedEjecucion?.suplemento
+    };
+
+    // Here you would typically call a service to update the ejecucion
+    console.log('Updating ejecucion:', updatedEjecucion);
+    
+    // For now, we'll just update the local data
+    const index = this.dataSource.data.findIndex(e => e.id === updatedEjecucion.id);
+    if (index > -1) {
+      this.dataSource.data[index] = updatedEjecucion;
+      this.dataSource._updateChangeSubscription();
+      this.showMessage('Ejecución actualizada correctamente');
+      this.selectedEjecucion = null; // Close the form after saving
+    }
+  }
+
+  onCancelEdit(): void {
+    this.selectedEjecucion = null;
   }
 }

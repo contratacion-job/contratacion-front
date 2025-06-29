@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectionStrategy, V
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { CommonModule } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSortModule } from '@angular/material/sort';
@@ -12,13 +12,13 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
-import { ContratoService } from '../services/contrato.service';
+import { ContratoService } from '../../services/contrato.service';
 import { Contrato } from 'app/models/Type';
 
 @Component({
-  selector: 'app-expired-contracts',
+  selector: 'app-vencido-ejecucion-contrato',
   standalone: true,
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,14 +35,15 @@ import { Contrato } from 'app/models/Type';
     MatInputModule,
     MatSelectModule,
     CurrencyPipe,
-    DatePipe
+    DatePipe,
+    MatCardModule
   ],
-  templateUrl: './expired-contracts.component.html',
-  styleUrls: ['./expired-contracts.component.scss']
+  templateUrl: './vencido-ejecucion-contrato.component.html',
+  styleUrls: ['./vencido-ejecucion-contrato.component.scss']
 })
-export class ExpiredContractsComponent implements OnInit, AfterViewInit {
+export class VencidoEjecucionContratoComponent implements OnInit, AfterViewInit {
   dataSource: MatTableDataSource<Contrato>;
-  displayedColumns: string[] = ['no_contrato', 'proveedor', 'tipo_contrato', 'valor_cup', 'fecha_firmado', 'fecha_vencido', 'acciones'];
+  displayedColumns: string[] = ['no_contrato', 'proveedor', 'tipo_contrato', 'valor_cup', 'fecha_inicio', 'fecha_vencido', 'acciones'];
   isLoading = false;
   errorMessage = '';
   pagination = { length: 0, page: 0, size: 10 };
@@ -59,7 +60,7 @@ export class ExpiredContractsComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.loadExpiredContracts();
+    this.loadVencidoEjecucionContratos();
 
     this.searchInputControl.valueChanges.subscribe(value => {
       this.applyFilter(value);
@@ -72,18 +73,18 @@ export class ExpiredContractsComponent implements OnInit, AfterViewInit {
     this.cdr.markForCheck();
   }
 
-  loadExpiredContracts(): void {
+  loadVencidoEjecucionContratos(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    this.contratoService.getExpiredContratos().subscribe({
-      next: (contratos) => {
-        this.dataSource.data = contratos.filter(c => c.proveedor && c.proveedor.nombre);
-        this.pagination.length = this.dataSource.data.length;
+    this.contratoService.getVencidoEjecucionContratos(this.pagination.page, this.pagination.size).subscribe({
+      next: (response) => {
+        this.dataSource.data = response.data;
+        this.pagination.length = response.total;
         this.isLoading = false;
         this.cdr.markForCheck();
       },
       error: (error) => {
-        this.errorMessage = 'Failed to load expired contracts. Please try again.';
+        this.errorMessage = 'Error al cargar contratos vencidos.';
         this.isLoading = false;
         this.cdr.markForCheck();
       }
@@ -102,7 +103,7 @@ export class ExpiredContractsComponent implements OnInit, AfterViewInit {
   restoreContrato(id: number): void {
     this.contratoService.restoreContrato(id).subscribe({
       next: () => {
-        this.loadExpiredContracts();
+        this.loadVencidoEjecucionContratos();
         this.cdr.markForCheck();
       },
       error: (error) => {
@@ -115,7 +116,7 @@ export class ExpiredContractsComponent implements OnInit, AfterViewInit {
   deleteContrato(id: number): void {
     this.contratoService.deleteContrato(id).subscribe({
       next: () => {
-        this.loadExpiredContracts();
+        this.loadVencidoEjecucionContratos();
         this.cdr.markForCheck();
       },
       error: (error) => {

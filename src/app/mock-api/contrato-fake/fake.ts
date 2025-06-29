@@ -421,7 +421,7 @@ export const mockRepresentantes = [
     },
     contrato_id: 7
   }
-  
+
 ];
 
 

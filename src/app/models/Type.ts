@@ -92,6 +92,7 @@ export interface Proveedor {
 // Table: suplemento
 export interface Suplemento {
   id: number;
+  estado?: string; // Added optional estado property to support filtering expired suplementos
   vigencia_id: number;
   proveedor_id: number;
   tipo_contrato_id: number;
@@ -179,6 +180,7 @@ export interface EjecucionSuplemento {
   proveedor: Proveedor;
   contrato: Contrato;
   suplemento: Suplemento;
+  estado?: string; // Added optional estado property to support filtering expired ejecuciones
 }
 
 // Table: log

@@ -195,7 +195,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 title: 'Configuración de Correo',
                 type: 'basic',
                 icon: 'heroicons_outline:envelope',
-                link: '/organizacion/configuracion-correo',
+                link: '/notificaciones/correo',
             },
                {
                 id: 'logs',

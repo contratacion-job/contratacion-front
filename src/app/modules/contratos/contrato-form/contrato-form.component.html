@@ -46,7 +46,7 @@
                     <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:plus'"></mat-icon>
                 </button>
             </div>
-
+            <div class="flex items-center gap-2">
             <mat-form-field appearance="outline">
                 <mat-label>Tipo de Contrato</mat-label>
                 <mat-select formControlName="tipo_contrato" required>
@@ -61,10 +61,11 @@
                  <button type="button" 
                         mat-icon-button 
                         color="primary"
-                        class="!w-5 !h-10 !min-w-5-mt-3"
+                        class="!w-10 !h-10 !min-w-5 -mt-3"
                         (click)="openNewTipoContratoDialog()">
                     <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:plus'"></mat-icon>
                 </button>
+               </div>
         </div>
 
         <!-- Fechas del contrato -->

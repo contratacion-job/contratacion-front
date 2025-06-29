@@ -1,0 +1,41 @@
+.currency-amount {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 500;
+}
+
+.order-row {
+    cursor: pointer;
+    transition: background-color 150ms cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    &:hover {
+        @apply bg-gray-50 dark:bg-hover;
+    }
+}
+
+// Estilos para los badges de estado
+.status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+
+    &.en-ejecucion {
+        @apply bg-orange-100 text-orange-800;
+
+        .dark & {
+            @apply bg-orange-900 text-orange-300;
+        }
+    }
+
+    &.vencido {
+        @apply bg-red-100 text-red-800;
+
+        .dark & {
+            @apply bg-red-900 text-red-300;
+        }
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .currency-amount {
+        font-size: 0.875rem;
+    }
+}

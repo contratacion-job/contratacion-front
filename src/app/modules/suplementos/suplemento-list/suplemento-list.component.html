@@ -10,18 +10,8 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <h2 class="text-2xl font-semibold">Lista de Suplementos</h2>
       <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-        <button mat-raised-button color="primary" (click)="openAddSuplementoDialog()" class="w-full sm:w-auto">
-          <mat-icon>add</mat-icon>
-          <span>Agregar Suplemento</span>
-        </button>
-        <button mat-stroked-button (click)="applyFilters()" class="w-full sm:w-auto">
-          <mat-icon>filter_alt</mat-icon>
-          <span>Aplicar Filtros</span>
-        </button>
-        <button mat-button (click)="clearFilters()" class="w-full sm:w-auto">
-          <mat-icon>clear_all</mat-icon>
-          <span>Limpiar</span>
-        </button>
+
+
       </div>
     </div>
 
@@ -105,9 +95,13 @@
           [autocomplete]="'off'"
           [placeholder]="'Buscar suplementos'" />
       </mat-form-field>
-
       <!-- Action buttons -->
       <div class="flex items-center gap-4 mt-4 sm:mt-0">
+
+        <button mat-raised-button color="primary" (click)="openAddSuplementoDialog()" class="w-full sm:w-auto">
+          <mat-icon>add</mat-icon>
+          <span>Agregar Suplemento</span>
+        </button>
         <!-- Export button -->
         <button
           mat-icon-button
@@ -212,19 +206,19 @@
                 </mat-form-field>
               </div>
               <div class="flex gap-1 sticky-end">
-                <button 
-                  mat-icon-button 
-                  color="primary" 
-                  (click)="applyFilters()" 
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="applyFilters()"
                   type="button"
                   matTooltip="Aplicar filtros"
                   class="!w-8 !h-8 !min-w-8">
                   <mat-icon class="!text-sm">search</mat-icon>
                 </button>
-                <button 
-                  mat-icon-button 
-                  color="warn" 
-                  (click)="clearFilters()" 
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="clearFilters()"
                   type="button"
                   matTooltip="Limpiar filtros"
                   class="!w-8 !h-8 !min-w-8">
@@ -269,20 +263,7 @@
                   {{ suplemento.observaciones }}
                 </div>
                 <div class="flex items-center justify-end gap-2 sticky-end">
-                  <button 
-                    mat-icon-button 
-                    color="primary" 
-                    (click)="$event.stopPropagation(); openEditSuplementoDialog(suplemento)" 
-                    matTooltip="Editar">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button 
-                    mat-icon-button 
-                    color="warn" 
-                    (click)="$event.stopPropagation(); deleteSuplemento(suplemento)" 
-                    matTooltip="Eliminar">
-                    <mat-icon>delete</mat-icon>
-                  </button>
+
                   <button
                     class="min-w-10 min-h-7 h-7 px-2 leading-6 whitespace-nowrap"
                     mat-stroked-button
