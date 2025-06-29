@@ -123,7 +123,7 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
     this.initSelectedContratoForm();
     this.initNewContratoForm();
 
-    this.filterForm = this.fb.group({
+this.filterForm = this.fb.group({
       vigencia_id: [''],
       proveedor_id: [''],
       tipo_contrato_id: [''],
@@ -132,7 +132,12 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
       fecha_desde: [''],
       fecha_hasta: [''],
       valor_minimo: [''],
-      valor_maximo: ['']
+      valor_maximo: [''],
+      no_contrato_filter: [''],
+      valor_cup_filter: [''],
+      valor_usd_filter: [''],
+      fecha_entrada_filter: [''],
+      fecha_firmado_filter: ['']
     });
   }
 // Agregar esta propiedad a tu componente

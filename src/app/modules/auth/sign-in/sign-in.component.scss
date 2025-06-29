@@ -1,0 +1,77 @@
+/* Estilos personalizados para el tema dinámico */
+.custom-text-primary {
+    color: var(--custom-primary, #2196F3) !important;
+}
+
+.custom-button-primary {
+    background-color: var(--custom-primary, #2196F3) !important;
+    border-color: var(--custom-primary, #2196F3) !important;
+
+    &:hover {
+        background-color: var(--custom-primary-600, #1976D2) !important;
+        border-color: var(--custom-primary-600, #1976D2) !important;
+    }
+
+    &:disabled {
+        background-color: var(--custom-primary-300, #64B5F6) !important;
+        border-color: var(--custom-primary-300, #64B5F6) !important;
+    }
+}
+
+.custom-button-outline {
+    border-color: var(--custom-primary, #2196F3) !important;
+    color: var(--custom-primary, #2196F3) !important;
+
+    &:hover {
+        background-color: var(--custom-primary-50, #E3F2FD) !important;
+        border-color: var(--custom-primary-600, #1976D2) !important;
+        color: var(--custom-primary-600, #1976D2) !important;
+    }
+}
+
+.custom-checkbox {
+    ::ng-deep .mat-checkbox-checked .mat-checkbox-background {
+        background-color: var(--custom-primary, #2196F3) !important;
+    }
+
+    ::ng-deep .mat-checkbox-indeterminate .mat-checkbox-background {
+        background-color: var(--custom-primary, #2196F3) !important;
+    }
+}
+
+.custom-bg-primary {
+    background: linear-gradient(135deg,
+        var(--custom-primary-800, #1565C0) 0%,
+        var(--custom-primary-600, #1976D2) 100%) !important;
+}
+
+/* Estilos para los form fields */
+::ng-deep .mat-form-field.mat-focused .mat-form-field-label {
+    color: var(--custom-primary, #2196F3) !important;
+}
+
+::ng-deep .mat-form-field.mat-focused .mat-form-field-underline .mat-form-field-ripple {
+    background-color: var(--custom-primary, #2196F3) !important;
+}
+
+::ng-deep .mat-form-field.mat-focused .mat-form-field-outline-thick {
+    color: var(--custom-primary, #2196F3) !important;
+}
+
+/* Selector de colores personalizado */
+.color-selector {
+    .color-option {
+        transition: all 0.2s ease;
+
+        &:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        &.selected {
+            border-width: 3px !important;
+            border-color: #333 !important;
+            transform: scale(1.1);
+        }
+    }
+}

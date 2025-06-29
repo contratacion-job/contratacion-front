@@ -1,5 +1,5 @@
 import { NgIf } from '@angular/common';
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule, NgForm, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -11,6 +11,8 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
 import { AuthService } from 'app/core/auth/auth.service';
+import { Subject } from 'rxjs';
+import { AppLogoComponent } from '../../../shared/components/app-logo/app-logo.component';
 
 @Component({
     selector     : 'auth-sign-in',
@@ -18,9 +20,9 @@ import { AuthService } from 'app/core/auth/auth.service';
     encapsulation: ViewEncapsulation.None,
     animations   : fuseAnimations,
     standalone   : true,
-    imports      : [RouterLink, FuseAlertComponent, NgIf, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatCheckboxModule, MatProgressSpinnerModule],
+    imports      : [RouterLink, FuseAlertComponent, NgIf, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatCheckboxModule, MatProgressSpinnerModule, AppLogoComponent],
 })
-export class AuthSignInComponent implements OnInit
+export class AuthSignInComponent implements OnInit, OnDestroy
 {
     @ViewChild('signInNgForm') signInNgForm: NgForm;
 
@@ -30,6 +32,8 @@ export class AuthSignInComponent implements OnInit
     };
     signInForm: UntypedFormGroup;
     showAlert: boolean = false;
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
      * Constructor
@@ -54,10 +58,20 @@ export class AuthSignInComponent implements OnInit
     {
         // Create the form
         this.signInForm = this._formBuilder.group({
-            username  : ['admin', Validators.required],
-            password  : ['admin', Validators.required],
+            username     : ['', [Validators.required]],
+            password  : ['', Validators.required],
             rememberMe: [''],
         });
+    }
+
+    /**
+     * On destroy
+     */
+    ngOnDestroy(): void
+    {
+        // Unsubscribe from all subscriptions
+        this._unsubscribeAll.next(null);
+        this._unsubscribeAll.complete();
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -84,8 +98,7 @@ export class AuthSignInComponent implements OnInit
         // Sign in
         this._authService.signIn(this.signInForm.value)
             .subscribe(
-                () =>
-                {
+                () => {
                     // Set the redirect url.
                     // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
                     // to the correct page after a successful sign in. This way, that url can be set via
@@ -94,10 +107,8 @@ export class AuthSignInComponent implements OnInit
 
                     // Navigate to the redirect url
                     this._router.navigateByUrl(redirectURL);
-
                 },
-                (response) =>
-                {
+                (response) => {
                     // Re-enable the form
                     this.signInForm.enable();
 
@@ -107,7 +118,7 @@ export class AuthSignInComponent implements OnInit
                     // Set the alert
                     this.alert = {
                         type   : 'error',
-                        message: 'Wrong username or password',
+                        message: 'Wrong email or password',
                     };
 
                     // Show the alert

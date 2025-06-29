@@ -1,0 +1,373 @@
+/* Settings Component Styles */
+.settings-cog {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    z-index: 999;
+    width: 52px;
+    height: 52px;
+    border-radius: 26px 0 0 26px;
+    background: rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.2);
+        transform: translateX(-2px);
+    }
+
+    mat-icon {
+        transition: transform 0.3s ease;
+    }
+
+    &:hover mat-icon {
+        transform: rotate(90deg);
+    }
+}
+
+/* Aplicar colores personalizados globalmente */
+:root {
+    --custom-primary: #2196F3;
+    --custom-primary-50: #E3F2FD;
+    --custom-primary-100: #BBDEFB;
+    --custom-primary-200: #90CAF9;
+    --custom-primary-300: #64B5F6;
+    --custom-primary-400: #42A5F5;
+    --custom-primary-500: #2196F3;
+    --custom-primary-600: #1E88E5;
+    --custom-primary-700: #1976D2;
+    --custom-primary-800: #1565C0;
+    --custom-primary-900: #0D47A1;
+
+    --sidebar-bg: var(--custom-primary);
+    --sidebar-bg-hover: var(--custom-primary-600);
+    --sidebar-text: #ffffff;
+    --sidebar-text-secondary: rgba(255, 255, 255, 0.7);
+}
+
+/* Custom scrollbar for drawer */
+fuse-drawer .mat-drawer-inner-container {
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 3px;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.5);
+        }
+    }
+}
+
+/* Color selection styles */
+.color-option {
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &.selected {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* Logo selection styles */
+.logo-option {
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    &.selected {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* Custom file input styles */
+input[type="file"] {
+    &::file-selector-button {
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        background: var(--custom-primary);
+        color: white;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background: var(--custom-primary-600);
+            transform: translateY(-1px);
+        }
+    }
+}
+
+/* Custom color picker styles */
+input[type="color"] {
+    border: 2px solid #e5e7eb;
+    transition: all 0.2s ease;
+
+    &:hover {
+        border-color: var(--custom-primary);
+        transform: scale(1.05);
+    }
+
+    &:focus {
+        outline: none;
+        border-color: var(--custom-primary);
+        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    }
+}
+
+/* Animation for settings drawer */
+.settings-drawer-content {
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .settings-cog {
+        width: 44px;
+        height: 44px;
+        border-radius: 22px 0 0 22px;
+
+        mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+        }
+    }
+}
+
+/* Theme-specific overrides */
+.dark {
+    .settings-cog {
+        background: rgba(255, 255, 255, 0.12);
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    }
+
+    input[type="color"] {
+        border-color: #374151;
+
+        &:hover {
+            border-color: var(--custom-primary);
+        }
+    }
+}
+
+/* Aplicar colores personalizados al sidebar y componentes Material */
+::ng-deep {
+    /* Sidebar personalizado */
+    fuse-vertical-navigation {
+        .fuse-vertical-navigation-wrapper {
+            background-color: var(--sidebar-bg) !important;
+
+            .fuse-vertical-navigation-content {
+                .fuse-vertical-navigation-item {
+                    .fuse-vertical-navigation-item-wrapper {
+                        .fuse-vertical-navigation-item-content {
+                            color: var(--sidebar-text) !important;
+
+                            .fuse-vertical-navigation-item-icon {
+                                color: var(--sidebar-text-secondary) !important;
+                            }
+
+                            .fuse-vertical-navigation-item-title {
+                                color: var(--sidebar-text) !important;
+                            }
+                        }
+
+                        &:hover {
+                            background-color: var(--sidebar-bg-hover) !important;
+                        }
+
+                        &.fuse-vertical-navigation-item-active {
+                            background-color: var(--sidebar-bg-hover) !important;
+                        }
+                    }
+                }
+
+                .fuse-vertical-navigation-group {
+                    .fuse-vertical-navigation-group-title {
+                        color: var(--sidebar-text-secondary) !important;
+                    }
+                }
+            }
+        }
+    }
+
+    /* Botones Material con color personalizado */
+    .mat-primary {
+        background-color: var(--custom-primary) !important;
+    }
+
+    .mat-button.mat-primary,
+    .mat-raised-button.mat-primary,
+    .mat-flat-button.mat-primary {
+        background-color: var(--custom-primary) !important;
+
+        &:hover {
+            background-color: var(--custom-primary-600) !important;
+        }
+
+        &:disabled {
+            background-color: var(--custom-primary-200) !important;
+        }
+    }
+
+    .mat-stroked-button.mat-primary {
+        border-color: var(--custom-primary) !important;
+        color: var(--custom-primary) !important;
+
+        &:hover {
+            background-color: var(--custom-primary-50) !important;
+        }
+    }
+
+    .mat-icon-button.mat-primary {
+        color: var(--custom-primary) !important;
+
+        &:hover {
+            background-color: var(--custom-primary-50) !important;
+        }
+    }
+
+    /* Form fields */
+    .mat-form-field.mat-primary {
+        .mat-form-field-label {
+            color: var(--custom-primary) !important;
+        }
+
+        .mat-form-field-underline {
+            background-color: var(--custom-primary) !important;
+        }
+
+        .mat-form-field-ripple {
+            background-color: var(--custom-primary) !important;
+        }
+    }
+
+    /* Checkboxes */
+    .mat-checkbox.mat-primary {
+        .mat-checkbox-checkmark-path {
+            stroke: var(--custom-primary) !important;
+        }
+
+        .mat-checkbox-frame {
+            border-color: var(--custom-primary) !important;
+        }
+
+        .mat-checkbox-background {
+            background-color: var(--custom-primary) !important;
+        }
+    }
+
+    /* Progress spinners */
+    .mat-progress-spinner.mat-primary circle,
+    .mat-spinner.mat-primary circle {
+        stroke: var(--custom-primary) !important;
+    }
+
+    /* Tabs */
+    .mat-tab-group.mat-primary {
+        .mat-tab-label-active {
+            color: var(--custom-primary) !important;
+        }
+
+        .mat-ink-bar {
+            background-color: var(--custom-primary) !important;
+        }
+    }
+
+    /* Sliders */
+    .mat-slider.mat-primary {
+        .mat-slider-track-fill,
+        .mat-slider-thumb {
+            background-color: var(--custom-primary) !important;
+        }
+    }
+
+    /* Menu items */
+    .mat-menu-item:hover {
+        background-color: var(--custom-primary-50) !important;
+    }
+
+    /* Ripple effects */
+    .mat-ripple-element {
+        background-color: var(--custom-primary-200) !important;
+    }
+}
+
+/* Aplicar colores a elementos específicos de Fuse */
+::ng-deep {
+    .fuse-mat-button-large {
+        background-color: var(--custom-primary) !important;
+
+        &:hover {
+            background-color: var(--custom-primary-600) !important;
+        }
+    }
+
+    .text-primary-500 {
+        color: var(--custom-primary) !important;
+    }
+
+    .bg-primary {
+        background-color: var(--custom-primary) !important;
+    }
+
+    .border-primary {
+        border-color: var(--custom-primary) !important;
+    }
+
+    .ring-primary {
+        --tw-ring-color: var(--custom-primary) !important;
+    }
+}
+
+settings {
+    .settings-drawer {
+        width: 400px !important;
+        min-width: 400px !important;
+        max-width: 400px !important;
+
+        @media (max-width: 599px) {
+            width: 100% !important;
+            min-width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .mat-drawer-inner-container {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+    }
+}
