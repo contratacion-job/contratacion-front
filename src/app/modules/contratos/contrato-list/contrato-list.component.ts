@@ -27,6 +27,9 @@ import { mockProveedor, mockTipoContrato, mockVigenciaContrato, mockDepartamento
 import { Subject } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
 @Component({
   selector: 'app-contrato-list',
   standalone: true,

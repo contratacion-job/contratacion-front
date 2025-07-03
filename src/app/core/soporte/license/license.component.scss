@@ -1,3 +1,4 @@
+
 /* software-license.component.css */
 
 /* Container principal */
@@ -88,6 +89,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
+  margin-top: 68px;
 }
 
 .btn-renovar:hover {
@@ -269,6 +271,7 @@
   margin: 0 0 8px 0;
 }
 
+
 .observaciones-text {
   color: #1e3a8a;
   margin: 0;
@@ -448,7 +451,7 @@
 /* Icons (puedes usar Font Awesome o crear iconos CSS) */
 .icon-calendar::before { content: "📅"; }
 .icon-clock::before { content: "⏰"; }
-.icon-shield::before { content: "🛡️"; }
+.icon-shield::before { content: "🛡"; }
 .icon-check-circle::before { content: "✅"; }
 .icon-alert-circle::before { content: "⚠️"; }
 .icon-user::before { content: "👤"; }

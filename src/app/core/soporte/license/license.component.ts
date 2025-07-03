@@ -1,4 +1,3 @@
-
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -8,7 +7,6 @@ import { LicenseService } from './license.service';
 import { Licencia ,Entidad} from 'app/models/Type';
 
 // Interfaces
-
 export interface HistorialActivacion {
   serie: string;
   fecha: string;
@@ -23,7 +21,6 @@ export interface HistorialActivacion {
   encapsulation: ViewEncapsulation.None
 })
 export class LicenseComponent implements OnInit {
-  
   activeTab: string = 'estado';
   licenseData: Licencia;
   historialActivaciones: HistorialActivacion[];

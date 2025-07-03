@@ -1,0 +1,65 @@
+<div class="flex flex-col w-full p-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between mb-8">
+    <div>
+      <h2 class="text-3xl font-bold tracking-tight">Configuración</h2>
+      <p class="text-secondary mt-2">Personaliza la aplicación según tus preferencias</p>
+    </div>
+    <div class="flex gap-2 mt-4 sm:mt-0">
+      <button
+        mat-stroked-button
+        color="warn"
+        (click)="resetToDefault()">
+        <mat-icon>refresh</mat-icon>
+        <span class="ml-2">Restablecer</span>
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="saveSettings()">
+        <mat-icon>save</mat-icon>
+        <span class="ml-2">Guardar</span>
+      </button>
+    </div>
+  </div>
+
+  <form [formGroup]="settingsForm" class="space-y-6">
+
+    <!-- Personalización de Colores -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon class="mr-2">palette</mat-icon>
+          Personalización de Colores
+        </mat-card-title>
+        <mat-card-subtitle>
+          Personaliza los colores de la interfaz
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="pt-4">
+        <!-- Selector de Color del Sidebar -->
+        <div class="mb-6">
+          <h4 class="text-lg font-semibold mb-4">Color del Sidebar</h4>
+
+          <!-- Selector dropdown -->
+          <mat-form-field appearance="outline" class="w-full max-w-xs mb-4">
+            <mat-label>Seleccionar Color</mat-label>
+            <mat-select formControlName="sidebarColor">
+              <mat-option *ngFor="let colorOption of sidebarColorOptions" [value]="colorOption.value">
+                <div class="flex items-center">
+                  <div
+                    class="w-6 h-6 rounded mr-3 border"
+                    [style.background-color]="colorOption.value">
+                  </div>
+                  {{ colorOption.name }}
+                </div>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Grid de colores -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
+            <div
+              *ngFor="let colorOption of sidebarColorOptions"
+              class="flex flex-col items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:

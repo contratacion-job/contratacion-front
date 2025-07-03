@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FuseDrawerComponent } from '@fuse/components/drawer';
 import { FuseConfig, FuseConfigService } from '@fuse/services/config';
+import { ThemeCustomizationService } from 'app/services/theme-customization.service';
 
 // Interfaces
 interface ThemeCustomization {
@@ -38,6 +40,7 @@ interface ThemeOption {
     templateUrl: './settings.component.html',
     styleUrls: ['./settings.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
     imports: [
         CommonModule,
@@ -104,7 +107,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
+    selectedSidebarColor: string = '#1e3a8a';
+
     constructor(
+        private themeService:ThemeCustomizationService,
         private _fuseConfigService: FuseConfigService
     ) {}
 
@@ -118,6 +124,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
         // Load user customization from localStorage
         this.loadCustomization();
+        const savedColor = localStorage.getItem('sidebarColor');
+    if (savedColor) {
+        this.applySidebarColor(savedColor);
+    }
     }
 
     ngOnDestroy(): void {
@@ -273,6 +283,136 @@ export class SettingsComponent implements OnInit, OnDestroy {
             }, 2000);
         }
     }
+testColorChange(): void {
+
+
+
+
+
+
+    console.log('Botón de prueba presionado');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    testColorBlue(): void {
+        this.applySidebarColor('#1e3a8a'); // Azul marino
+    }
+
+    testColorGreen(): void {
+        this.applySidebarColor('#059669'); // Verde esmeralda
+    }
+
+    testColorPurple(): void {
+        this.applySidebarColor('#9370db'); // Púrpura medio (original)
+    }
+
+    testColorOrange(): void {
+        this.applySidebarColor('#ea580c'); // Naranja
+    }
+
+    // Método helper para aplicar cualquier color
+    private applySidebarColor(color: string): void {
+        console.log('Aplicando color:', color);
+
+        const existing = document.getElementById('dynamic-sidebar-style');
+        if (existing) {
+            existing.remove();
+        }
+
+        const hoverColor = this.darkenColor(color, 15);
+        const activeColor = this.darkenColor(color, 25);
+
+        const styleElement = document.createElement('style');
+        styleElement.id = 'dynamic-sidebar-style';
+        styleElement.textContent = `
+            .fuse-vertical-navigation-wrapper .fuse-vertical-navigation-content {
+                background-color: ${color} !important;
+            }
+            fuse-vertical-navigation .fuse-vertical-navigation-content {
+                background-color: ${color} !important;
+            }
+            .fuse-vertical-navigation .fuse-vertical-navigation-content {
+                background-color: ${color} !important;
+            }
+            .fuse-vertical-navigation-wrapper .fuse-vertical-navigation-content .fuse-vertical-navigation-item:hover {
+                background-color: ${hoverColor} !important;
+            }
+            .fuse-vertical-navigation-wrapper .fuse-vertical-navigation-content .fuse-vertical-navigation-item.fuse-vertical-navigation-item-active {
+                background-color: ${activeColor} !important;
+            }
+        `;
+
+        document.head.appendChild(styleElement);
+        localStorage.setItem('sidebarColor', color);
+    }
+
+    // Método para oscurecer colores
+    private darkenColor(color: string, percent: number): string {
+        const hex = color.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+
+        const factor = (100 - percent) / 100;
+        const newR = Math.round(r * factor);
+        const newG = Math.round(g * factor);
+        const newB = Math.round(b * factor);
+
+        return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+    }
+
+    isColorSelected(color: string): boolean {
+        return this.selectedSidebarColor === color;
+    }
+
+    selectSidebarColor(color: ColorOption): void {
+        this.selectedSidebarColor = color.color;
+
+        // Aplicar el color directamente
+        const existing = document.getElementById('sidebar-color-style');
+        if (existing) {
+            existing.remove();
+        }
+
+        const style = document.createElement('style');
+        style.id = 'sidebar-color-style';
+        style.textContent = `
+            .fuse-vertical-navigation .fuse-vertical-navigation-content {
+                background-color: ${color.color} !important;
+            }
+        `;
+
+        document.head.appendChild(style);
+    }
+
+    getColorPreviewStyle(color: string): any {
+        return {
+            'background-color': color,
+            'width': '40px',
+            'height': '40px',
+            'border-radius': '8px',
+            'border': this.isColorSelected(color) ? '3px solid #1976d2' : '2px solid #e0e0e0',
+            'cursor': 'pointer'
+        };
+    }
 
     // Métodos auxiliares
     getThemeColor(theme: string): string | null {
@@ -293,8 +433,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
         const theme = this.availableThemes.find(t => t.id === themeId);
         return theme ? theme.name : 'Desconocido';
     }
-
-
 
     private loadCustomization(): void {
         // Cargar configuración completa
@@ -414,3 +552,4 @@ export class SettingsComponent implements OnInit, OnDestroy {
         return this.customization.primaryColor;
     }
 }
+

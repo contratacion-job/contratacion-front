@@ -1,0 +1,13 @@
+/* Agregar al final del archivo */
+.dynamic-sidebar-color {
+  background-color: var(--sidebar-color, #9370db) !important;
+}
+
+/* Forzar el color del sidebar */
+.fuse-vertical-navigation-wrapper .fuse-vertical-navigation-content,
+fuse-vertical-navigation .fuse-vertical-navigation-content,
+.fuse-vertical-navigation .fuse-vertical-navigation-content {
+  background-color: var(--sidebar-color, #9370db) !important;
+}
+
+// Método de prueba temporal

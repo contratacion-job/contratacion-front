@@ -1,3 +1,5 @@
+
+
 <div
     class="settings-cog flex items-center justify-center cursor-pointer print:hidden"
     (click)="settingsDrawer.toggle()">
@@ -104,7 +106,26 @@
                 </div>
             </div>
 
-            <hr class="my-8">
+            <div class="mb-6 p-4 border rounded-lg">
+                <h3 class="text-lg font-semibold mb-4">🎨 Personalización del Sidebar</h3>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    <button mat-raised-button color="primary" (click)="testColorChange()" class="bg-red-500">
+                        🔴 Rojo
+                    </button>
+                    <button mat-raised-button (click)="testColorBlue()" class="bg-blue-900 text-white">
+                        🔵 Azul
+                    </button>
+                    <button mat-raised-button (click)="testColorGreen()" class="bg-green-600 text-white">
+                        🟢 Verde
+                    </button>
+                    <button mat-raised-button (click)="testColorPurple()" class="bg-purple-500 text-white">
+                        🟣 Púrpura
+                    </button>
+                    <button mat-raised-button (click)="testColorOrange()" class="bg-orange-600 text-white">
+                        🟠 Naranja
+                    </button>
+                </div>
+            </div>
 
             <!-- Scheme -->
             <div class="text-md font-semibold text-secondary">TEMA</div>
