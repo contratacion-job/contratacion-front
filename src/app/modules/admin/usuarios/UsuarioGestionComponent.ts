@@ -1,4 +1,3 @@
-
 import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
@@ -7,7 +6,9 @@ import { FormBuilder, FormControl, FormGroup, UntypedFormControl, UntypedFormGro
 import { debounceTime, distinctUntilChanged, map, switchMap, takeUntil } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { UsuarioFormComponent } from './usuario-form.component';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSortModule } from '@angular/material/sort';
@@ -18,7 +19,6 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { } from '@angular/common';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { Subject } from 'rxjs';
@@ -26,9 +26,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { UserService } from 'app/core/user/user.service';
 import { Usuario } from 'app/models/Type';
-
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 @Component({
     selector: 'app-usuario-gestion',
@@ -55,6 +53,7 @@ import 'jspdf-autotable';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UsuarioGestionComponent implements OnInit, AfterViewInit {
+
     displayedColumns: string[] = ['id', 'username', 'roles', 'nombre', 'apellidos', 'cargo', 'correo', 'movil', 'extension', 'actions'];
     dataSource: MatTableDataSource<Usuario> = new MatTableDataSource<Usuario>();
 
@@ -228,6 +227,138 @@ this.cdr.detectChanges();
     deleteUser(user: Usuario): void {
         this.dataSource.data = this.dataSource.data.filter(u => u.id !== user.id);
     }
+    exportToPDF(includeDetails: boolean = false): void {
+        if (!this.dataSource.filteredData || this.dataSource.filteredData.length === 0) {
+          return;
+        }
+      
+        const doc = new jsPDF('l', 'mm', 'a4');
+        
+        // Document setup
+        this.setupPDFDocument(doc);
+        
+        if (includeDetails) {
+          this.generateDetailedPDF(doc);
+        } else {
+          this.generateSummaryPDF(doc);
+        }
+      
+        // Save with timestamp
+        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+        doc.save(`usuarios_${includeDetails ? 'detallado' : 'resumen'}_${timestamp}.pdf`);
+      }
+      
+      private setupPDFDocument(doc: jsPDF): void {
+        doc.setProperties({
+          title: 'Lista de Usuarios',
+          subject: 'Reporte de Usuarios del Sistema',
+          author: 'Sistema de Gestión',
+          creator: 'Sistema de Gestión'
+        });
+      }
+      
+      private generateSummaryPDF(doc: jsPDF): void {
+        // Add header
+        this.addPDFHeader(doc, 'Lista de Usuarios - Resumen');
+        
+        // Add statistics
+        this.addPDFStatistics(doc);
+        
+        // Add main table
+        const tableColumns = ['ID', 'Username', 'Nombre Completo', 'Cargo', 'Correo'];
+        const tableRows = this.dataSource.filteredData.map(user => [
+          user.id?.toString() || '',
+          user.username || '',
+          `${user.name || ''} ${user.apellidos || ''}`.trim(),
+          user.cargo || '',
+          user.correo || '',
+    
+        ]);
+      
+        autoTable(doc, {
+          head: [tableColumns],
+          body: tableRows,
+          startY: 55,
+          styles: { fontSize: 9, cellPadding: 3 },
+          headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [245, 245, 245] }
+        });
+      
+        this.addPDFFooter(doc);
+      }
+      
+      private generateDetailedPDF(doc: jsPDF): void {
+        this.addPDFHeader(doc, 'Lista de Usuarios - Detallado');
+        this.addPDFStatistics(doc);
+      
+        let yPosition = 60;
+        
+        this.dataSource.filteredData.forEach((user, index) => {
+          if (yPosition > 180) { // Check if we need a new page
+            doc.addPage();
+            yPosition = 20;
+          }
+      
+          // User card
+          doc.setFillColor(250, 250, 250);
+          doc.rect(14, yPosition, 267, 35, 'F');
+          
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.text(`${user.name} ${user.apellidos}`, 16, yPosition + 8);
+          
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'normal');
+          doc.text(`ID: ${user.id} | Username: ${user.username}`, 16, yPosition + 15);
+          doc.text(`Cargo: ${user.cargo} `, 16, yPosition + 22);
+          doc.text(`Correo: ${user.correo} | Móvil: ${user.movil}`, 16, yPosition + 29);
+          
+          yPosition += 40;
+        });
+      
+        this.addPDFFooter(doc);
+      }
+      
+      private addPDFHeader(doc: jsPDF, title: string): void {
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text(title, 14, 20);
+      
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        const currentDate = new Date().toLocaleDateString('es-ES', {
+          year: 'numeric', month: 'long', day: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+        doc.text(`Generado el: ${currentDate}`, 14, 28);
+      }
+      
+      private addPDFStatistics(doc: jsPDF): void {
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Estadísticas:', 14, 38);
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Total: ${this.totalUsuarios}`, 14, 45);
+        doc.text(`Activos: ${this.usuariosActivos}`, 80, 45);
+        doc.text(`Inactivos: ${this.usuariosInactivos}`, 150, 45);
+        doc.text(`Administradores: ${this.totalAdministradores}`, 220, 45);
+      }
+      
+      private addPDFFooter(doc: jsPDF): void {
+        const pageCount = doc.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+          doc.setPage(i);
+          doc.setFontSize(8);
+          doc.text(
+            `Página ${i} de ${pageCount}`,
+            doc.internal.pageSize.width - 30,
+            doc.internal.pageSize.height - 10
+          );
+        }
+      }
+      
     exportToCSV(): void {
         if (!this.dataSource.filteredData || this.dataSource.filteredData.length === 0) {
           return;

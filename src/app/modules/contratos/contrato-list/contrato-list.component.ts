@@ -29,7 +29,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-
+import autoTable from 'jspdf-autotable';
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: (options: any) => jsPDF;
+  }
+}
 @Component({
   selector: 'app-contrato-list',
   standalone: true,
@@ -523,6 +528,226 @@ this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
     const fecha = new Date(fechaFirmado);
     fecha.setDate(fecha.getDate() + vigenciaDias);
     return fecha.toISOString().split('T')[0];
+  }
+ 
+  exportToPDF(): void {
+    try {
+      if (!this.dataSource.filteredData || this.dataSource.filteredData.length === 0) {
+        console.warn('No hay datos para exportar');
+        alert('No hay datos para exportar');
+        return;
+      }
+
+      console.log('Iniciando exportación PDF...');
+
+      // Crear nuevo documento PDF
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      // Título del documento
+      doc.setFontSize(16);
+      doc.setTextColor(40, 40, 40);
+      doc.text('Reporte de Contratos', 14, 20);
+
+      // Información adicional
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-ES')}`, 14, 30);
+      doc.text(`Total de contratos: ${this.dataSource.filteredData.length}`, 14, 35);
+
+      // Preparar datos para la tabla
+      const tableHeaders = [
+        'No. Contrato',
+        'Proveedor',
+        'Tipo',
+        'Departamento',
+        'Valor CUP',
+        'Valor USD',
+        'F. Entrada',
+        'Estado'
+      ];
+
+      const tableData = this.dataSource.filteredData.map(contract => [
+        contract.no_contrato || '',
+        this.truncateText(contract.proveedor?.nombre || '', 20),
+        this.truncateText(contract.tipo_contrato?.nombre_tipo_contrato || '', 15),
+        this.truncateText(contract.departamento?.nombre_departamento || '', 15),
+        this.formatNumber(contract.valor_cup || 0),
+        this.formatNumber(contract.valor_usd || 0),
+        this.formatDateForPDF(contract.fecha_entrada),
+        contract.estado || ''
+      ]);
+
+      console.log('Datos preparados para la tabla:', tableData.length, 'filas');
+
+      // Generar tabla usando autoTable
+      autoTable(doc, {
+        head: [tableHeaders],
+        body: tableData,
+        startY: 45,
+        theme: 'striped',
+        styles: {
+          fontSize: 8,
+          cellPadding: 3,
+          overflow: 'linebreak',
+          halign: 'left'
+        },
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 9
+        },
+        columnStyles: {
+          0: { cellWidth: 25 }, // No. Contrato
+          1: { cellWidth: 40 }, // Proveedor
+          2: { cellWidth: 30 }, // Tipo
+          3: { cellWidth: 30 }, // Departamento
+          4: { cellWidth: 25, halign: 'right' }, // Valor CUP
+          5: { cellWidth: 25, halign: 'right' }, // Valor USD
+          6: { cellWidth: 25, halign: 'center' }, // F. Entrada
+          7: { cellWidth: 20, halign: 'center' } // Estado
+        },
+        alternateRowStyles: {
+          fillColor: [245, 245, 245]
+        },
+        margin: { top: 45, left: 14, right: 14, bottom: 20 },
+        didDrawPage: (data) => {
+          // Pie de página
+          const pageCount = doc.getNumberOfPages();
+          const pageSize = doc.internal.pageSize;
+          const pageHeight = pageSize.height || pageSize.getHeight();
+          
+          doc.setFontSize(8);
+          doc.setTextColor(100, 100, 100);
+          
+          // Número de página
+          doc.text(
+            `Página ${data.pageNumber} de ${pageCount}`,
+            14,
+            pageHeight - 10
+          );
+          
+          // Nombre del sistema
+          const systemText = 'Sistema de Gestión de Contratos';
+          const textWidth = doc.getTextWidth(systemText);
+          const pageWidth = pageSize.width || pageSize.getWidth();
+          doc.text(
+            systemText,
+            pageWidth - 14 - textWidth,
+            pageHeight - 10
+          );
+        }
+      });
+
+      console.log('Tabla generada, guardando PDF...');
+
+      // Guardar el PDF
+      const fileName = `contratos_export_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+
+      console.log('PDF guardado exitosamente');
+
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+      alert('Error al generar el PDF. Por favor, intente nuevamente.');
+    }
+  }
+
+
+  /**
+   * Formatea números para mostrar en el PDF
+   */
+  private formatNumber(value: number): string {
+    if (!value || value === 0) return '0';
+    return new Intl.NumberFormat('es-ES', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value);
+  }
+
+  /**
+   * Formatea moneda para mostrar en el PDF
+   */
+  private formatCurrencyForPDF(value: number, currency: string): string {
+    if (!value || value === 0) return `${currency} 0`;
+    const formattedValue = new Intl.NumberFormat('es-ES', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value);
+    return `${currency} ${formattedValue}`;
+  }
+
+  /**
+   * Formatea fechas para mostrar en el PDF
+   */
+  private formatDateForPDF(date: Date | string | null | undefined): string {
+    if (!date) return '';
+    
+    try {
+      let dateObj: Date;
+      
+      if (date instanceof Date) {
+        dateObj = date;
+      } else if (typeof date === 'string') {
+        dateObj = new Date(date);
+      } else {
+        return '';
+      }
+      
+      // Verificar si la fecha es válida
+      if (isNaN(dateObj.getTime())) {
+        return '';
+      }
+      
+      return dateObj.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+      });
+    } catch {
+      return '';
+    }
+  }
+
+  /**
+   * Formatea fechas para CSV
+   */
+  private formatDateForCSV(date: Date | string | null | undefined): string {
+    if (!date) return '';
+    
+    try {
+      let dateObj: Date;
+      
+      if (date instanceof Date) {
+        dateObj = date;
+      } else if (typeof date === 'string') {
+        dateObj = new Date(date);
+      } else {
+        return '';
+      }
+      
+      // Verificar si la fecha es válida
+      if (isNaN(dateObj.getTime())) {
+        return '';
+      }
+      
+      return dateObj.toLocaleDateString('es-ES');
+    } catch {
+      return '';
+    }
+  }
+
+  /**
+   * Trunca texto para que quepa en las celdas del PDF
+   */
+  private truncateText(text: string, maxLength: number): string {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength - 3) + '...';
   }
 
   exportToCSV(): void {

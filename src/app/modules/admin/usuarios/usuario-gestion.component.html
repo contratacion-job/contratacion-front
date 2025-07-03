@@ -79,20 +79,28 @@
             <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
             <span class="ml-2 mr-1">Agregar</span>
           </button>
-          <button
-            class="ml-4 mt-4 sm:mt-0"
-            mat-icon-button
-            [color]="'primary'"
-            (click)="exportToCSV()"
-            matTooltip="Exportar tabla a CSV"
-            aria-label="Exportar tabla a CSV">
+          <button mat-icon-button
+                  class="ml-4 mt-4 sm:mt-0"
+                  [matMenuTriggerFor]="exportMenu"
+                  [color]="'primary'"
+                  matTooltip="Exportar datos"
+                  aria-label="Exportar datos">
             <mat-icon [svgIcon]="'heroicons_outline:arrow-up-tray'"></mat-icon>
           </button>
+          <mat-menu #exportMenu="matMenu" xPosition="before">
+            <button mat-menu-item (click)="exportToCSV()">
+              <mat-icon>grid_on</mat-icon>
+              <span>Exportar a Excel</span>
+            </button>
+            <button mat-menu-item (click)="exportToPDF()">
+              <mat-icon>picture_as_pdf</mat-icon>
+              <span>Exportar a PDF</span>
+            </button>
+          </mat-menu>
         </div>
       </div>
 
-
-<!-- Main -->
+      <!-- Main -->
       <div class="flex flex-auto overflow-hidden ">
         <!-- Usuarios list -->
         <div class="flex flex-col flex-auto sm:mb-18 overflow-x-auto">

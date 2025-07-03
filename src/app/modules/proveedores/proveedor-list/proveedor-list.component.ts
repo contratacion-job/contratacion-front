@@ -29,6 +29,8 @@ import {
 } from 'app/mock-api/contrato-fake/fake'; 
 import { Proveedor, Representante } from 'app/models/Type';
 import { Subject, of, combineLatest } from 'rxjs';
+import autoTable from 'jspdf-autotable';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-proveedor-list',
@@ -303,5 +305,134 @@ ngAfterViewInit(): void {
     a.download = 'proveedores_export.csv';
     a.click();
     window.URL.revokeObjectURL(url);
+  }
+  exportToPDF(): void {
+    try {
+      if (!this.dataSource.filteredData || this.dataSource.filteredData.length === 0) {
+        console.warn('No hay datos para exportar');
+        alert('No hay datos para exportar');
+        return;
+      }
+
+      console.log('Iniciando exportación PDF...');
+
+      // Crear nuevo documento PDF
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      // Título del documento
+      doc.setFontSize(16);
+      doc.setTextColor(40, 40, 40);
+      doc.text('Reporte de Proveedores', 14, 20);
+
+      // Información adicional
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-ES')}`, 14, 30);
+      doc.text(`Total de proveedores: ${this.dataSource.filteredData.length}`, 14, 35);
+
+      // Preparar datos para la tabla
+      const tableHeaders = [
+        'Nombre',
+        'Código',
+        'Teléfonos',
+        'Domicilio',
+        'Municipio',
+        'Ministerio'
+      ];
+
+      const tableData = this.dataSource.filteredData.map(proveedor => [
+        this.truncateText(proveedor.nombre || '', 25),
+        proveedor.codigo || '',
+        this.truncateText(proveedor.telefonos || '', 20),
+        this.truncateText(proveedor.domicilio || '', 30),
+        this.truncateText(proveedor.municipio?.nombre_municipio || '', 20),
+        this.truncateText(proveedor.ministerio?.nombre_ministerio || '', 25)
+      ]);
+
+      console.log('Datos preparados para la tabla:', tableData.length, 'filas');
+
+      // Generar tabla usando autoTable
+      autoTable(doc, {
+        head: [tableHeaders],
+        body: tableData,
+        startY: 45,
+        theme: 'striped',
+        styles: {
+          fontSize: 8,
+          cellPadding: 3,
+          overflow: 'linebreak',
+          halign: 'left'
+        },
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 9
+        },
+        columnStyles: {
+          0: { cellWidth: 50 }, // Nombre
+          1: { cellWidth: 25 }, // Código
+          2: { cellWidth: 35 }, // Teléfonos
+          3: { cellWidth: 60 }, // Domicilio
+          4: { cellWidth: 35 }, // Municipio
+          5: { cellWidth: 50 }  // Ministerio
+        },
+        alternateRowStyles: {
+          fillColor: [245, 245, 245]
+        },
+        margin: { top: 45, left: 14, right: 14, bottom: 20 },
+        didDrawPage: (data) => {
+          // Pie de página
+          const pageCount = doc.getNumberOfPages();
+          const pageSize = doc.internal.pageSize;
+          const pageHeight = pageSize.height || pageSize.getHeight();
+          
+          doc.setFontSize(8);
+          doc.setTextColor(100, 100, 100);
+          
+          // Número de página
+          doc.text(
+            `Página ${data.pageNumber} de ${pageCount}`,
+            14,
+            pageHeight - 10
+          );
+          
+          // Nombre del sistema
+          const systemText = 'Sistema de Gestión de Proveedores';
+          const textWidth = doc.getTextWidth(systemText);
+          const pageWidth = pageSize.width || pageSize.getWidth();
+          doc.text(
+            systemText,
+            pageWidth - 14 - textWidth,
+            pageHeight - 10
+          );
+        }
+      });
+
+      console.log('Tabla generada, guardando PDF...');
+
+      // Guardar el PDF
+      const fileName = `proveedores_export_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+
+      console.log('PDF guardado exitosamente');
+
+    } catch (error) {
+      console.error('Error al exportar PDF:', error);
+      alert('Error al generar el PDF. Por favor, intente nuevamente.');
+    }
+  }
+
+  /**
+   * Trunca texto para que quepa en las celdas del PDF
+   */
+  private truncateText(text: string, maxLength: number): string {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength - 3) + '...';
   }
 }
