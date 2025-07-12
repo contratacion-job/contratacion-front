@@ -1,56 +1,60 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Suplemento } from 'app/models/Type';
-import { mockSuplemento } from 'app/mock-api/suplemento-fake/fake';
+import { API_ENDPOINTS } from 'app/core/constants/api-endpoints';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SuplementoService {
-  private suplementos: Suplemento[] = [];
 
-  constructor() {
-    this.suplementos = mockSuplemento || [];
-  }
+  private baseUrl = API_ENDPOINTS.SUPLEMENTOS;
+  private ejecucionSuplementosUrl = API_ENDPOINTS.EJECUCION_SUPLEMENTOS;
+
+  constructor(private http: HttpClient) {}
 
   getSuplementos(): Observable<Suplemento[]> {
-    return of([...this.suplementos]);
-  }
-
-  createSuplemento(suplemento: Suplemento): Observable<Suplemento> {
-    const newSuplemento: Suplemento = {
-      ...suplemento,
-      id: this.suplementos.length + 1
-    };
-    this.suplementos.push(newSuplemento);
-    return of(newSuplemento);
-  }
-
-  updateSuplemento(id: number, suplemento: Suplemento): Observable<Suplemento> {
-    const index = this.suplementos.findIndex(s => s.id === id);
-    if (index !== -1) {
-      this.suplementos[index] = { ...suplemento, id };
-      return of(this.suplementos[index]);
-    }
-    throw new Error('Suplemento not found');
-  }
-
-  deleteSuplemento(id: number): Observable<void> {
-    const index = this.suplementos.findIndex(s => s.id === id);
-    if (index !== -1) {
-      this.suplementos.splice(index, 1);
-      return of(void 0);
-    }
-    throw new Error('Suplemento not found');
+    console.log('Fetching suplementos list from backend');
+    const observable = this.http.get<Suplemento[]>(this.baseUrl);
+    observable.subscribe(response => console.log('Response from getSuplementos:', response));
+    return observable;
   }
 
   getSuplementosVencidos(page: number, size: number): Observable<{ data: Suplemento[]; total: number }> {
-    // For demo, filter expired suplementos and paginate
-    const expired = this.suplementos.filter(s => s.estado === 'Vencido');
-    const start = page * size;
-    const end = start + size;
-    const data = expired.slice(start, end);
-    const total = expired.length;
-    return of({ data, total });
+    console.log(`Fetching expired suplementos page ${page} size ${size}`);
+    const params = {
+      page: page.toString(),
+      size: size.toString()
+    };
+    return this.http.get<{ data: Suplemento[]; total: number }>(this.ejecucionSuplementosUrl, { params });
+  }
+
+  getSuplementoById(id: number): Observable<Suplemento> {
+    console.log(`Fetching suplemento with id ${id} from backend`);
+    const observable = this.http.get<Suplemento>(`${this.baseUrl}/${id}`);
+    observable.subscribe(response => console.log(`Response from getSuplementoById(${id}):`, response));
+    return observable;
+  }
+
+  createSuplemento(suplemento: Suplemento): Observable<Suplemento> {
+    console.log('Creating suplemento:', suplemento);
+    const observable = this.http.post<Suplemento>(this.baseUrl, suplemento);
+    observable.subscribe(response => console.log('Response from createSuplemento:', response));
+    return observable;
+  }
+
+  updateSuplemento(id: number, suplemento: Suplemento): Observable<Suplemento> {
+    console.log(`Updating suplemento with id ${id}:`, suplemento);
+    const observable = this.http.put<Suplemento>(`${this.baseUrl}/${id}`, suplemento);
+    observable.subscribe(response => console.log(`Response from updateSuplemento(${id}):`, response));
+    return observable;
+  }
+
+  deleteSuplemento(id: number): Observable<void> {
+    console.log(`Deleting suplemento with id ${id}`);
+    const observable = this.http.delete<void>(`${this.baseUrl}/${id}`);
+    observable.subscribe(() => console.log(`Response from deleteSuplemento(${id}): success`));
+    return observable;
   }
 }

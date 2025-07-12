@@ -1,48 +1,40 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Representante } from 'app/models/Type';
-import { mockRepresentantes } from 'app/mock-api/contrato-fake/fake';
+import { API_ENDPOINTS } from 'app/core/constants/api-endpoints';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RepresentanteService {
-  private representantes: Representante[] = [...mockRepresentantes];
 
-  constructor() {}
+  private baseUrl = API_ENDPOINTS.REPRESENTANTES;
+
+  constructor(private http: HttpClient) {}
 
   getRepresentantes(): Observable<Representante[]> {
-    return of(this.representantes);
+    console.log('Fetching representantes list from backend');
+    return this.http.get<Representante[]>(this.baseUrl);
   }
 
-  getRepresentante(id: number): Observable<Representante | undefined> {
-    const representante = this.representantes.find(r => r.id === id);
-    return of(representante);
+  getRepresentanteById(id: number): Observable<Representante> {
+    console.log(`Fetching representante with id ${id} from backend`);
+    return this.http.get<Representante>(`${this.baseUrl}/${id}`);
   }
 
   createRepresentante(representante: Representante): Observable<Representante> {
-    const newRepresentante = {
-      ...representante,
-      id: Math.max(...this.representantes.map(r => r.id)) + 1
-    };
-    this.representantes.push(newRepresentante);
-    return of(newRepresentante);
+    console.log('Creating representante:', representante);
+    return this.http.post<Representante>(this.baseUrl, representante);
   }
 
-  updateRepresentante(id: number, representante: Representante): Observable<Representante | undefined> {
-    const index = this.representantes.findIndex(r => r.id === id);
-    if (index !== -1) {
-      this.representantes[index] = { ...representante, id };
-      return of(this.representantes[index]);
-    }
-    return of(undefined);
+  updateRepresentante(id: number, representante: Representante): Observable<Representante> {
+    console.log(`Updating representante with id ${id}:`, representante);
+    return this.http.put<Representante>(`${this.baseUrl}/${id}`, representante);
   }
 
   deleteRepresentante(id: number): Observable<void> {
-    const index = this.representantes.findIndex(r => r.id === id);
-    if (index !== -1) {
-      this.representantes.splice(index, 1);
-    }
-    return of(void 0);
+    console.log(`Deleting representante with id ${id}`);
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

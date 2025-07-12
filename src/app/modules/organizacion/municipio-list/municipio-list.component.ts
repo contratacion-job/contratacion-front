@@ -32,7 +32,23 @@ import { MatInputModule } from '@angular/material/input';
   styleUrls: ['./municipio-list.component.scss']
 })
 export class DepartamentoComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['nombre_departamento', 'codigo', 'descripcion', 'actions'];
+  displayedColumns: string[] = ['nombre_departamento', 'codigo', 'descripcion', 'director', 'estado', 'fecha_creacion', 'ministerio', 'presupuesto_anual', 'telefono', 'detalles'];
+
+  // Add a property to track which columns are displayed
+  allColumns: string[] = ['nombre_departamento', 'codigo', 'descripcion', 'director', 'estado', 'fecha_creacion', 'ministerio', 'presupuesto_anual', 'telefono', 'detalles'];
+
+  // Columns that are currently visible
+  visibleColumns: string[] = [...this.allColumns];
+
+  toggleColumn(column: string): void {
+    const index = this.visibleColumns.indexOf(column);
+    if (index >= 0) {
+      this.visibleColumns.splice(index, 1);
+    } else {
+      this.visibleColumns.push(column);
+    }
+    this.visibleColumns = [...this.visibleColumns]; // trigger change detection
+  }
   dataSource = new MatTableDataSource<Departamento>([]);
   searchInputControl: FormControl = new FormControl();
   selectedRow: Departamento | null = null;
@@ -56,7 +72,7 @@ export class DepartamentoComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.isLoading = true;
     this.departamentoService.getDepartamentos().subscribe((data) => {
-      this.dataSource.data = data;
+        this.dataSource.data = data.data;
       this.isLoading = false;
       this.cdr.detectChanges();
     });
@@ -118,4 +134,5 @@ export class DepartamentoComponent implements OnInit, AfterViewInit {
       // Implement delete logic here
     }
   }
+
 }

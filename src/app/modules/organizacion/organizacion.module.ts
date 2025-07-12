@@ -1,14 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
-import { OrganizacionRoutingModule } from './organizacion-routing.module';
-
+const routes = [
+  {
+    path: 'trabajadores',
+    loadComponent: () => import('./trabajadores/trabajadores.component').then(c => c.TrabajadoresComponent)
+  },
+  {
+    path: 'entidades',
+    loadComponent: () => import('./entidad-list/entidad-list.component').then(c => c.EntidadListComponent)
+  }
+];
 
 @NgModule({
-  declarations: [],
   imports: [
     CommonModule,
-    OrganizacionRoutingModule
+    RouterModule.forChild(routes)
   ]
 })
 export class OrganizacionModule { }

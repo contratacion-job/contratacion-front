@@ -1,3 +1,4 @@
+import { TipoContratoService } from './../../services/tipo-contrato.service';
 import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
@@ -44,6 +45,7 @@ export class TipoContratoFormComponent implements OnInit, AfterViewInit {
 
   constructor(
     private departamentoService: ContratoService,
+    private TipoContratoService: TipoContratoService,
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog
   ) {
@@ -56,7 +58,7 @@ export class TipoContratoFormComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.isLoading = true;
-    this.departamentoService.getTipoContratos().subscribe((data) => {
+    this.TipoContratoService.getTiposContrato().subscribe((data) => {
       this.dataSource.data = data;
       this.isLoading = false;
       this.cdr.detectChanges();
@@ -118,7 +120,7 @@ export class TipoContratoFormComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.isLoading = true;
-        this.departamentoService.getTipoContratos().subscribe((data) => {
+        this.TipoContratoService.getTiposContrato().subscribe((data) => {
           this.dataSource.data = data;
           this.isLoading = false;
           this.cdr.detectChanges();

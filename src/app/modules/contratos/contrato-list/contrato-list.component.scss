@@ -116,3 +116,18 @@
   overflow-y: auto !important;
 }
 
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .flex.flex-col.flex-auto.sm\:mb-18.overflow-x-auto,
+  .flex.flex-col.flex-auto.sm\:mb-18.overflow-x-auto * {
+    visibility: visible;
+  }
+  .flex.flex-col.flex-auto.sm\:mb-18.overflow-x-auto {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

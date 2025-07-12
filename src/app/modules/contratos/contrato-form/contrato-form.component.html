@@ -51,7 +51,7 @@
                 <mat-label>Tipo de Contrato</mat-label>
                 <mat-select formControlName="tipo_contrato" required>
                     <mat-option *ngFor="let tipo of tiposContrato" [value]="tipo">
-                        {{tipo.tipo_contrato}}
+                        {{tipo.nombre_tipo_contrato}}
                     </mat-option>
                 </mat-select>
                 <mat-error *ngIf="contratoForm.get('tipo_contrato')?.hasError('required')">
@@ -144,7 +144,7 @@
                     <mat-label>Departamento</mat-label>
                     <mat-select formControlName="departamento" required>
                         <mat-option *ngFor="let depto of departamentos" [value]="depto">
-                            {{depto.nombre_dpto}}
+                            {{depto.nombre}}
                         </mat-option>
                     </mat-select>
                     <mat-error *ngIf="contratoForm.get('departamento')?.hasError('required')">

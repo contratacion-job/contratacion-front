@@ -1,11 +1,11 @@
 <div class="flex flex-col min-h-screen p-6 w-full">
 
-
   <div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
     <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
       <div class="absolute inset-x-0 bottom-0" *ngIf="isLoading">
         <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
       </div>
+
       <div class="text-4xl font-extrabold tracking-tight">Departamentos</div>
       <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
         <mat-form-field class="fuse-mat-dense fuse-mat-rounded min-w-64" [subscriptSizing]="'dynamic'">
@@ -30,34 +30,30 @@
             <div class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
               matSort
               matSortDisableClear
-              style="grid-template-columns: 40px repeat(3, minmax(100px, 1fr)) 100px;">
+              style="grid-template-columns: 40px repeat(auto-fit, minmax(100px, 1fr)) 100px;">
               <div></div>
-              <div [mat-sort-header]="'nombre_departamento'">Nombre</div>
-              <div [mat-sort-header]="'codigo'">Código</div>
-              <div [mat-sort-header]="'descripcion'">Descripción</div>
+              <div *ngFor="let column of visibleColumns" [mat-sort-header]="column">{{ column | titlecase }}</div>
               <div class="sticky-end">Detalles</div>
             </div>
 
             <ng-container *ngFor="let departamento of dataSource.filteredData; let i = index">
               <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b items-center text-m"
-                style="grid-template-columns: 40px repeat(3, minmax(100px, 1fr)) 100px;">
+                style="grid-template-columns: 40px repeat(auto-fit, minmax(100px, 1fr)) 100px;">
                 <div>{{ i + 1 }}</div>
-                <div class="truncate">{{ departamento.nombre_departamento }}</div>
-                <div class="truncate">{{ departamento.codigo }}</div>
-                <div class="truncate">{{ departamento.descripcion }}</div>
+                <div *ngFor="let column of visibleColumns" class="truncate">{{ departamento[column] }}</div>
                 <div class="flex items-center justify-center sticky-end">
                   <button
                     class="min-w-10 min-h-7 h-7 px-2 leading-6 whitespace-nowrap"
                     mat-stroked-button
-                    (click)="toggleDetails(departamento.nombre_departamento)">
+                    (click)="toggleDetails(departamento.nombre)">
                     <mat-icon
                       class="icon-size-5"
-                      [svgIcon]="selectedRow?.nombre_departamento === departamento.nombre_departamento ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                      [svgIcon]="selectedRow?.nombre === departamento.nombre ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
                   </button>
                 </div>
               </div>
 
-              <div class="grid" *ngIf="selectedRow?.nombre_departamento === departamento.nombre_departamento">
+              <div class="grid" *ngIf="selectedRow?.nombre === departamento.nombre">
                 <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: { $implicit: departamento }"></ng-container>
               </div>
             </ng-container>
@@ -76,9 +72,19 @@
           <div class="p-8 sm:p-16 border-b text-4xl font-semibold tracking-tight text-center">
             ¡No hay departamentos!
           </div>
+          <p class="text-gray-500 mb-6 text-center">
+            Comienza agregando tu primer departamento al sistema
+          </p>
         </ng-template>
       </div>
     </div>
+  </div>
+
+  <div class="flex flex-row flex-wrap gap-2 p-4">
+    <span class="font-semibold mr-2">Mostrar columnas:</span>
+    <button *ngFor="let column of allColumns" mat-stroked-button color="primary" (click)="toggleColumn(column)" [disabled]="visibleColumns.length === 1 && visibleColumns.includes(column)">
+      {{ column | titlecase }}
+    </button>
   </div>
 
   <ng-template #rowDetailsTemplate let-departamento>
@@ -90,7 +96,7 @@
               <div class="flex flex-col w-full lg:w-2/4 sm:pl-8">
                 <mat-form-field class="w-full">
                   <mat-label>Nombre del Departamento</mat-label>
-                  <input matInput formControlName="nombre_departamento" />
+                  <input matInput formControlName="nombre" />
                 </mat-form-field>
                 <mat-form-field class="w-full">
                   <mat-label>Código</mat-label>

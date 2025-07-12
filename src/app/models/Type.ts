@@ -302,16 +302,21 @@ export interface Alerta {
 
 // Table: trabajador
 export interface Trabajador {
-  id: number;
+  id?: number;
   nombre: string;
-  apellido: string;
+  apellido: string; // Cambiado de 'apellidos' a 'apellido' para coincidir con backend
+  usuario: string;
+  contrasena?: string;
   cargo: string;
-  departamentoId: number;
-  departamento: Departamento;
+  departamento_id: number; // Mantenemos este nombre para coincidir con backend
+  departamentoId?: number; // Alias para compatibilidad
   email: string;
-  createdAt: Date;
-  updatedAt: Date;
-  timeZone: string;
+  telefono?: string;
+  telefono_movil?: string;
+  rol: 'admin' | 'user' | 'supervisor' | 'empleado';
+  fecha_creacion?: Date;
+  fecha_actualizacion?: Date;
+  activo?: boolean;
 }
 
 // ===== TIPOS AUXILIARES AGREGADOS =====
@@ -340,4 +345,31 @@ export interface EstadisticaProveedor {
   proveedores_con_contratos: number;
   valor_total_contratado: number;
   promedio_contratos_por_proveedor: number;
+}
+
+// Add these interfaces if they don't exist
+export interface CreateTrabajadorRequest {
+  nombre: string;
+  apellidos: string;
+  email: string;
+  telefono?: string;
+  departamentoId: number;
+  cargo?: string;
+  contrasena: string;
+}
+
+export interface UpdateTrabajadorRequest {
+  id?: number;
+  nombre?: string;
+  apellidos?: string;
+  email?: string;
+  telefono?: string;
+  departamentoId?: number;
+  cargo?: string;
+  contrasena?: string;
+}
+
+export interface TrabajadorDialogData {
+  trabajador?: Trabajador;
+  isEdit: boolean;
 }

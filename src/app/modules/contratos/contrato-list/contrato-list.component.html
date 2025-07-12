@@ -87,7 +87,7 @@
           [autocomplete]="'off'"
           [placeholder]="'Buscar contratos'" />
       </mat-form-field>
-      
+
       <!-- Action buttons -->
       <div class="flex items-center gap-4 mt-4 sm:mt-0">
         <!-- Add contract button -->
@@ -99,9 +99,9 @@
           <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
           <span class="ml-2 mr-1">Agregar</span>
         </button>
-        
 
-    
+
+
         <!-- Export button with menu -->
         <button
           mat-icon-button
@@ -112,7 +112,7 @@
           class="ml-4 mt-4 sm:mt-0">
           <mat-icon [svgIcon]="'heroicons_outline:arrow-up-tray'"></mat-icon>
         </button>
-        
+
         <!-- Export menu -->
         <mat-menu #exportMenu="matMenu">
           <button mat-menu-item (click)="exportToCSV()">
@@ -124,14 +124,14 @@
             <span>Exportar a PDF</span>
           </button>
         </mat-menu>
-        
+
       </div>
     </div>
 
     <!-- Main -->
     <div class="flex flex-auto overflow-hidden">
       <!-- Contratos list -->
-      <div class="flex flex-col flex-auto sm:mb-18 overflow-x-auto">
+      <div class="flex flex-col flex-auto sm:mb-18 overflow-x-auto" (contextmenu)="onRightClick($event)" style="cursor: context-menu;">
         <ng-container *ngIf="dataSource.data.length > 0; else noContracts">
           <div class="flex flex-col h-full overflow-y-auto">
             <!-- Header -->
@@ -159,14 +159,14 @@
                  [formGroup]="filterForm">
               <!-- Estado Filter -->
               <div></div>
-              
+
               <!-- No. Contrato Filter -->
               <div>
                 <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
                   <input matInput placeholder="No. Contrato" formControlName="no_contrato_filter">
                 </mat-form-field>
               </div>
-              
+
               <!-- Proveedor Filter -->
               <div>
                 <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
@@ -176,7 +176,7 @@
                   </mat-select>
                 </mat-form-field>
               </div>
-              
+
               <!-- Tipo de Contrato Filter -->
               <div>
                 <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
@@ -186,7 +186,7 @@
                   </mat-select>
                 </mat-form-field>
               </div>
-              
+
               <!-- Departamento Filter -->
               <div>
                 <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
@@ -196,35 +196,35 @@
                   </mat-select>
                 </mat-form-field>
               </div>
-              
+
               <!-- Valor CUP Filter -->
               <div>
                 <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
                   <input matInput type="number" placeholder="Valor CUP" formControlName="valor_cup_filter">
                 </mat-form-field>
               </div>
-              
+
               <!-- Valor USD Filter -->
               <div>
                 <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
                   <input matInput type="number" placeholder="Valor USD" formControlName="valor_usd_filter">
                 </mat-form-field>
               </div>
-              
+
               <!-- Fecha Entrada Filter -->
               <div>
                 <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
                   <input matInput type="date" formControlName="fecha_entrada_filter">
                 </mat-form-field>
               </div>
-              
+
               <!-- Fecha Firmado Filter -->
               <div>
                 <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
                   <input matInput type="date" formControlName="fecha_firmado_filter">
                 </mat-form-field>
               </div>
-              
+
               <!-- Vigencia Filter -->
               <div>
                 <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
@@ -234,7 +234,7 @@
                   </mat-select>
                 </mat-form-field>
               </div>
-              
+
               <!-- Estado Filter -->
               <div>
                 <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
@@ -246,22 +246,22 @@
                   </mat-select>
                 </mat-form-field>
               </div>
-              
+
               <!-- Action Buttons -->
               <div class="flex gap-1 sticky-end">
-                <button 
-                  mat-icon-button 
-                  color="primary" 
-                  (click)="applyFilters()" 
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="applyFilters()"
                   type="button"
                   matTooltip="Aplicar filtros"
                   class="!w-8 !h-8 !min-w-8">
                   <mat-icon class="!text-sm">search</mat-icon>
                 </button>
-                <button 
-                  mat-icon-button 
-                  color="warn" 
-                  (click)="clearFilters()" 
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="clearFilters()"
                   type="button"
                   matTooltip="Limpiar filtros"
                   class="!w-8 !h-8 !min-w-8">
@@ -279,24 +279,24 @@
                   <span
                     class="w-3 h-3 rounded-full inline-block"
                     [ngClass]="{
-                      'bg-green-500': contract.estado === 'Activo',
-                      'bg-orange-500': contract.estado === 'Casi a vencer',
-                      'bg-red-500': contract.estado === 'Vencido'
+                      'bg-green-500': contract.estado === 'vigente',
+                      'bg-orange-500': contract.estado === 'casi al vencer',
+                      'bg-red-500': contract.estado === 'vencido'
                     }"></span>
                 </div>
                 <!-- No. Contrato -->
                 <div class="truncate">{{ contract.no_contrato }}</div>
                 <!-- Provider -->
-                <div class="truncate" [matTooltip]="contract.proveedor.nombre" matTooltipPosition="above">
-                  {{ contract.proveedor.nombre }}
+                <div class="truncate" [matTooltip]="contract.proveedor?.nombre" matTooltipPosition="above">
+                  {{ contract.proveedor?.nombre || 'N/A' }}
                 </div>
                 <!-- Contract Type -->
                 <div class="truncate" [matTooltip]="contract.tipo_contrato?.nombre_tipo_contrato" matTooltipPosition="above">
-                  {{ contract.tipo_contrato?.nombre_tipo_contrato }}
+                  {{ contract.tipo_contrato?.nombre_tipo_contrato || 'N/A' }}
                 </div>
                 <!-- Departamento -->
                 <div class="truncate" [matTooltip]="contract.departamento?.nombre_departamento" matTooltipPosition="above">
-                  {{ contract.departamento?.nombre_departamento }}
+                  {{ contract.departamento?.nombre_departamento || 'N/A' }}
                 </div>
                 <!-- Value (CUP) -->
                 <div class="truncate">
@@ -308,11 +308,11 @@
                 </div>
                 <!-- Fecha Entrada -->
                 <div class="truncate">
-                  {{ contract.fecha_entrada | date : "d/M/yy" }}
+                  {{ contract.fecha_inicio | date : "d/M/yy" }}
                 </div>
                 <!-- Signed Date -->
                 <div class="truncate">
-                  {{ contract.fecha_firmado | date : "d/M/yy" }}
+                  {{ contract.fecha_fin | date : "d/M/yy" }}
                 </div>
                 <!-- Vigencia -->
                 <div class="truncate">
@@ -373,26 +373,26 @@
           <mat-form-field class="w-full">
             <mat-label>Proveedor</mat-label>
             <mat-select formControlName="proveedor">
-              <mat-option *ngFor="let provider of proveedores" [value]="provider">
+              <mat-option *ngFor="let provider of proveedores; trackBy: trackByProveedor" [value]="provider">
                 {{ provider.nombre }}
               </mat-option>
             </mat-select>
           </mat-form-field>
-          <!-- Contract Type -->
+          
           <mat-form-field class="w-full">
             <mat-label>Tipo de Contrato</mat-label>
             <mat-select formControlName="tipo_contrato">
-              <mat-option *ngFor="let type of tiposContrato" [value]="type">
-                {{ type.tipo_contrato }}
+              <mat-option *ngFor="let type of tiposContrato; trackBy: trackByTipoContrato" [value]="type">
+                {{ type.nombre_tipo_contrato }}
               </mat-option>
             </mat-select>
           </mat-form-field>
-          <!-- Departamento -->
+          
           <mat-form-field class="w-full">
             <mat-label>Departamento</mat-label>
             <mat-select formControlName="departamento">
-              <mat-option *ngFor="let dept of mockDepartamento" [value]="dept">
-                {{ dept.nombre_departamento }}
+              <mat-option *ngFor="let dept of departamentos; trackBy: trackByDepartamento" [value]="dept">
+                {{ dept.nombre }}
               </mat-option>
             </mat-select>
           </mat-form-field>
@@ -407,7 +407,7 @@
             <input matInput type="date" formControlName="fecha_acuerdo_comite_contratacion" />
           </mat-form-field>
           </div>
-                  
+
                   <!-- Values and Dates -->
                   <div class="flex flex-col w-full lg:w-1/3 sm:pl-8">
                       <!-- Value CUP -->
@@ -441,7 +441,7 @@
                         <input matInput type="date" formControlName="fecha_comite_administracion" />
                       </mat-form-field>
                   </div>
-                  
+
                   <!-- Vigencia and Observations -->
                   <div class="flex flex-col w-full lg:w-1/3 sm:pl-8">
                     <!-- Vigencia -->
@@ -504,6 +504,9 @@
           <div class="p-8 sm:p-16 border-b text-4xl font-semibold tracking-tight text-center">
             ¡No hay contratos!
           </div>
+          <p class="text-gray-500 mb-6 text-center">
+            Comienza agregando tu primer contrato al sistema
+          </p>
         </ng-template>
       </div>
     </div>

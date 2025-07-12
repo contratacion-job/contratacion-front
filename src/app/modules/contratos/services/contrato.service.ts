@@ -1,69 +1,180 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { Contrato, TipoContrato } from 'app/models/Type';
-import { mockContrato, expiredContracts,mockDepartamento ,mockTipoContrato} from 'app/mock-api/contrato-fake/fake';
-
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, catchError, of } from 'rxjs';
+import { Contrato } from 'app/models/Type';
+import { mockContrato, expiredContracts, mockDepartamento } from 'app/mock-api/contrato-fake/fake';
+import { API_ENDPOINTS } from 'app/core/constants/api-endpoints';
+import { tap } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
 export class ContratoService {
   private contratos: Contrato[] = [];
-    private tipoContrato: TipoContrato[] = [];
   private expired: Contrato[] = [];
 
-  constructor() {
- this.contratos = mockContrato as Contrato[] || [];
-  this.tipoContrato = mockTipoContrato as TipoContrato[] || [];
-  this.expired = expiredContracts as Contrato[] || [];
-   // console.log('Contratos inicializados:', this.contratos);
+  constructor(private http: HttpClient) {
+    this.contratos = mockContrato as Contrato[] || [];
+    this.expired = expiredContracts as Contrato[] || [];
   }
 
-  getContratos(): Observable<Contrato[]> {
-    return of([...this.contratos]);
+  /**
+   * Listar contratos
+   */
+
+
+getContratos(): Observable<Contrato[]> {
+  return this.http.get<Contrato[]>(API_ENDPOINTS.CONTRATOS)
+    .pipe(
+      tap(data => console.log('Contratos fetched:', data)),
+      catchError(error => {
+        console.error('Error fetching contratos:', error);
+        return of([...this.contratos]);
+      })
+    );
+}
+
+  /**
+   * Obtener contrato por ID
+   */
+  getContratoById(id: number): Observable<Contrato> {
+    return this.http.get<Contrato>(`${API_ENDPOINTS.CONTRATOS}/${id}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error fetching contrato by id:', error);
+          const contrato = this.contratos.find(c => c.id === id) || this.expired.find(c => c.id === id);
+          if (contrato) {
+            return of(contrato);
+          }
+          throw error;
+        })
+      );
   }
+
+  /**
+   * Crear contrato
+   */
+  createContrato(contrato: Contrato): Observable<Contrato> {
+    return this.http.post<Contrato>(API_ENDPOINTS.CONTRATOS, contrato)
+      .pipe(
+        catchError(error => {
+          console.error('Error creating contrato:', error);
+          const newContrato: Contrato = {
+            ...contrato,
+            id: this.contratos.length + this.expired.length + 1,
+            departamento: contrato.departamento || mockDepartamento[0],
+            estado: contrato.estado || 'Activo'
+          };
+          this.contratos.push(newContrato);
+          return of(newContrato);
+        })
+      );
+  }
+
+  /**
+   * Actualizar contrato
+   */
+  updateContrato(id: number, contrato: Contrato): Observable<Contrato> {
+    return this.http.put<Contrato>(`${API_ENDPOINTS.CONTRATOS}/${id}`, contrato)
+      .pipe(
+        catchError(error => {
+          console.error('Error updating contrato:', error);
+          const index = this.contratos.findIndex(c => c.id === id);
+          if (index !== -1) {
+            this.contratos[index] = { ...contrato, id };
+            return of(this.contratos[index]);
+          }
+          const expiredIndex = this.expired.findIndex(c => c.id === id);
+          if (expiredIndex !== -1) {
+            this.expired[expiredIndex] = { ...contrato, id };
+            return of(this.expired[expiredIndex]);
+          }
+          throw new Error('Contrato not found');
+        })
+      );
+  }
+
+  /**
+   * Eliminar contrato
+   */
+  deleteContrato(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_ENDPOINTS.CONTRATOS}/${id}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error deleting contrato:', error);
+          const index = this.contratos.findIndex(c => c.id === id);
+          if (index !== -1) {
+            this.contratos.splice(index, 1);
+            return of(void 0);
+          }
+          const expiredIndex = this.expired.findIndex(c => c.id === id);
+          if (expiredIndex !== -1) {
+            this.expired.splice(expiredIndex, 1);
+            return of(void 0);
+          }
+          throw new Error('Contrato not found');
+        })
+      );
+  }
+
+  /**
+   * Obtener contratos vencidos con paginación
+   */
+  getVencidoEjecucionContratos(page: number, size: number): Observable<{ data: Contrato[]; total: number }> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('estado', 'Vencido');
+
+    return this.http.get<{ data: Contrato[]; total: number }>(API_ENDPOINTS.CONTRATOS_VENCIDOS, { params })
+      .pipe(
+        catchError(error => {
+          console.error('Error fetching vencidos contratos:', error);
+          const expired = this.expired.filter(c => c.estado === 'Vencido');
+          const start = page * size;
+          const end = start + size;
+          const data = expired.slice(start, end);
+          const total = expired.length;
+          return of({ data, total });
+        })
+      );
+  }
+
+  /**
+   * Obtener contratos por proveedor
+   */
+  getContratosByProveedor(proveedorId: number): Observable<Contrato[]> {
+    const params = new HttpParams().set('proveedor_id', proveedorId.toString());
+
+    return this.http.get<Contrato[]>(API_ENDPOINTS.CONTRATOS, { params })
+      .pipe(
+        catchError(error => {
+          console.error('Error fetching contratos by proveedor:', error);
+          const contratos = this.contratos.filter(c => c.proveedor?.id === proveedorId);
+          return of(contratos);
+        })
+      );
+  }
+
+  /**
+   * Obtener contratos por departamento
+   */
+  getContratosByDepartamento(departamentoId: number): Observable<Contrato[]> {
+    const params = new HttpParams().set('departamento_id', departamentoId.toString());
+
+    return this.http.get<Contrato[]>(API_ENDPOINTS.CONTRATOS, { params })
+      .pipe(
+        catchError(error => {
+          console.error('Error fetching contratos by departamento:', error);
+          const contratos = this.contratos.filter(c => c.departamento?.id === departamentoId);
+          return of(contratos);
+        })
+      );
+  }
+
+  // ===== MÉTODOS LEGACY (para compatibilidad) =====
 
   getExpiredContratos(): Observable<Contrato[]> {
     return of([...this.expired]);
-  }
-
-  createContrato(contrato: Contrato): Observable<Contrato> {
-    const newContrato: Contrato = {
-      ...contrato,
-      id: this.contratos.length + this.expired.length + 1,
-      departamento: contrato.departamento || mockDepartamento[0],
-      estado: contrato.estado || 'Activo'
-    };
-    this.contratos.push(newContrato);
-    return of(newContrato);
-  }
-
-  updateContrato(id: number, contrato: Contrato): Observable<Contrato> {
-    const index = this.contratos.findIndex(c => c.id === id);
-    if (index !== -1) {
-      this.contratos[index] = { ...contrato, id };
-      return of(this.contratos[index]);
-    }
-    const expiredIndex = this.expired.findIndex(c => c.id === id);
-    if (expiredIndex !== -1) {
-      this.expired[expiredIndex] = { ...contrato, id };
-      return of(this.expired[expiredIndex]);
-    }
-    throw new Error('Contrato not found');
-  }
-
-  deleteContrato(id: number): Observable<void> {
-    const index = this.contratos.findIndex(c => c.id === id);
-    if (index !== -1) {
-      this.contratos.splice(index, 1);
-      return of(void 0);
-    }
-    const expiredIndex = this.expired.findIndex(c => c.id === id);
-    if (expiredIndex !== -1) {
-      this.expired.splice(expiredIndex, 1);
-      return of(void 0);
-    }
-    throw new Error('Contrato not found');
   }
 
   transferExpiredContratos(): Observable<Contrato[]> {
@@ -86,28 +197,16 @@ export class ContratoService {
     throw new Error('Expired contrato not found');
   }
 
- getTipoContratos(): Observable<TipoContrato[]> {
-    return of([...this.tipoContrato]);
+
+  getDashboard(): Observable<Contrato[]> {
+    return this.http.get<Contrato[]>(API_ENDPOINTS.ESTADISTICAS.DASHBOARD)
+      .pipe(
+        tap(data => console.log('Contratos fetched:', data)),
+        catchError(error => {
+          console.error('Error fetching contratos:', error);
+          return of([...this.contratos]);
+        })
+      );
   }
 
-  createTipoContrato(contrato: TipoContrato): Observable<TipoContrato> {
-    const newContrato: TipoContrato = {
-      ...contrato,
-      id: this.tipoContrato.length + this.expired.length + 1,
-
-
-    };
-    this.tipoContrato.push(newContrato);
-    return of(newContrato);
-  }
-
-  getVencidoEjecucionContratos(page: number, size: number): Observable<{ data: Contrato[]; total: number }> {
-    // For demo, filter expired contracts and paginate
-    const expired = this.expired.filter(c => c.estado === 'Vencido');
-    const start = page * size;
-    const end = start + size;
-    const data = expired.slice(start, end);
-    const total = expired.length;
-    return of({ data, total });
-  }
 }

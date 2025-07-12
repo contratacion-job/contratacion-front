@@ -30,6 +30,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
+import { TipoContratoService } from '../services/tipo-contrato.service';
+import { DepartamentoService } from 'app/modules/organizacion/services/departamento.service';
+import { ProveedorService } from 'app/modules/proveedores/services/proveedor.service';
 declare module 'jspdf' {
   interface jsPDF {
     autoTable: (options: any) => jsPDF;
@@ -66,7 +69,12 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
   proveedores: Proveedor[] = [];
   tiposContrato: TipoContrato[] = [];
   vigencias: VigenciaContrato[] = [];
-  departamentos = mockDepartamento;
+  departamentos: any[] = [];
+
+  // Add a flag to check if departamentos is loaded as array
+  isDepartamentosArray(): boolean {
+    return Array.isArray(this.departamentos);
+  }
   estados = [
     { label: 'Activo', color: 'green' },
     { label: 'Casi a vencer', color: 'orange' },
@@ -122,6 +130,9 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
 
   constructor(
     private contratoService: ContratoService,
+    private tipocontratoervice: TipoContratoService,
+    private departamentoService: DepartamentoService,
+    private proveedorService:ProveedorService,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
     private fb: FormBuilder
@@ -137,8 +148,8 @@ this.filterForm = this.fb.group({
       tipo_contrato_id: [''],
       departamento_id: [''],
       estado: [''],
-      fecha_desde: [''],
-      fecha_hasta: [''],
+      fecha_entrada: [''],
+      fecha_firmado: [''],
       valor_minimo: [''],
       valor_maximo: [''],
       no_contrato_filter: [''],
@@ -155,11 +166,84 @@ showAdvancedFilters = false;
 toggleAdvancedFilters(): void {
   this.showAdvancedFilters = !this.showAdvancedFilters;
 }
+// Todas las columnas posibles
+
+private convertToArray(data: any): any[] {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  if (typeof data === 'object') {
+    // Check for common pagination/response wrapper properties
+    if (data.data && Array.isArray(data.data)) return data.data;
+    if (data.items && Array.isArray(data.items)) return data.items;
+    if (data.results && Array.isArray(data.results)) return data.results;
+    if (data.list && Array.isArray(data.list)) return data.list;
+    if (data.content && Array.isArray(data.content)) return data.content;
+    
+    // If it's a plain object, convert values to array
+    return Object.values(data);
+  }
+  return [];
+}
+
+
   ngOnInit(): void {
-    this.proveedores = mockProveedor;
-    this.tiposContrato = mockTipoContrato;
-    this.vigencias = mockVigenciaContrato;
+    this.tiposContrato = [];
+    this.vigencias = [];
+    this.departamentos = [];
+    this.proveedores = [];
+  
     this.loadContratos();
+  
+    // Load tipos contrato
+    this.tipocontratoervice.getTiposContrato().subscribe({
+      next: (data) => {
+        console.log('Tipos de contrato raw:', data);
+        this.tiposContrato = this.convertToArray(data);
+        console.log('Tipos de contrato converted:', this.tiposContrato);
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading tipos contrato:', error);
+        this.tiposContrato = [];
+      }
+    });
+  
+    // Load departamentos
+    this.departamentoService.getDepartamentos().subscribe({
+      next: (data) => {
+        console.log('Departamentos raw:', data);
+        this.departamentos = this.convertToArray(data);
+        console.log('Departamentos converted:', this.departamentos);
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading departamentos:', error);
+        this.departamentos = [];
+      }
+    });
+  
+    // Load proveedores
+    this.proveedorService.getProveedores().subscribe({
+      next: (data) => {
+        console.log('Proveedores raw:', data);
+        const proveedoresArray = this.convertToArray(data);
+        this.proveedores = proveedoresArray.map((prov: any) => ({
+          ...prov,
+          municipio_id: prov.municipio_id || null,
+          ministerio_id: prov.ministerio_id || null,
+          fechaCreacion: prov.fechaCreacion ? new Date(prov.fechaCreacion) : null
+        }));
+        console.log('Proveedores converted:', this.proveedores);
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading proveedores:', error);
+        this.proveedores = [];
+      }
+    });
+    this.contratoService.getDashboard().subscribe((data) => {
+      console.log(data);
+    });
 
     this.dataSource.sortingDataAccessor = (item: Contrato, property: string) => {
       switch(property) {
@@ -175,7 +259,7 @@ toggleAdvancedFilters(): void {
       }
     };
 
-this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
+    this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
       if (!filter) return true;
 
       const searchTerm = filter.toLowerCase().trim();
@@ -222,11 +306,81 @@ this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
     this.isLoading = true;
     this.errorMessage = '';
     this.contratoService.getContratos().subscribe({
-      next: (contratos) => {
-        const contratosFiltrados = contratos.filter(c => c.estado !== 'Vencido');
-        contratosFiltrados.forEach(contrato => {
-          (contrato as any).tiempoRestante = this.calcularTiempoRestante(contrato);
-        });
+      next: (response: any) => {
+        // The API might be returning an object with data property containing the array
+        const contratosArray = Array.isArray(response) ? response : response.data || [];
+        console.log(contratosArray);
+        // Defensive check: ensure contratosArray is an array before filtering
+        if (!Array.isArray(contratosArray)) {
+          this.errorMessage = 'Error: contratos data is not an array.';
+          this.isLoading = false;
+          this.cdr.detectChanges();
+          return;
+        }
+        // Map contratos to ensure nested objects are properly assigned and typed
+        const mappedContratos: Contrato[] = contratosArray.map(c => ({
+          ...c,
+          proveedor: c.Proveedor ? {
+            id: c.Proveedor.id,
+            nombre: c.Proveedor.nombre,
+            codigo: c.Proveedor.codigo,
+            estado: c.Proveedor.estado,
+            ministerio: c.Proveedor.ministerio,
+            municipio: c.Proveedor.municipio,
+            municipio_id: c.Proveedor.municipio_id || null,
+            ministerio_id: c.Proveedor.ministerio_id || null,
+            domicilio: c.Proveedor.domicilio || null,
+            fechaCreacion: c.Proveedor.fechaCreacion ? new Date(c.Proveedor.fechaCreacion) : null,
+            prefijo_provincia: c.Proveedor.prefijo_provincia,
+            provincia: c.Proveedor.provincia,
+            telefonos: c.Proveedor.telefonos,
+            tipo_empresa: c.Proveedor.tipo_empresa,
+            representante_legal_id: c.Proveedor.representante_legal_id,
+            updatedAt: c.Proveedor.updatedAt ? new Date(c.Proveedor.updatedAt) : null,
+            createdAt: c.Proveedor.createdAt ? new Date(c.Proveedor.createdAt) : null
+          } : null,
+          departamento: c.Departamento ? {
+            id: c.Departamento.id,
+            nombre_departamento: c.Departamento.nombre,
+            codigo: c.Departamento.codigo,
+            descripcion: c.Departamento.descripcion,
+            director: c.Departamento.director,
+            email: c.Departamento.email,
+            entidad_id: c.Departamento.entidad_id,
+            estado: c.Departamento.estado,
+            fecha_creacion: c.Departamento.fecha_creacion ? new Date(c.Departamento.fecha_creacion) : null,
+            ministerio: c.Departamento.ministerio,
+            presupuesto_anual: c.Departamento.presupuesto_anual,
+            telefono: c.Departamento.telefono,
+            updatedAt: c.Departamento.updatedAt ? new Date(c.Departamento.updatedAt) : null,
+            createdAt: c.Departamento.createdAt ? new Date(c.Departamento.createdAt) : null
+          } : null,
+          tipo_contrato: c.TipoContrato ? {
+            id: c.TipoContrato.id,
+            codigo: c.TipoContrato.codigo,
+            descripcion: c.TipoContrato.descripcion,
+            documentos_requeridos: c.TipoContrato.documentos_requeridos,
+            duracion_maxima: c.TipoContrato.duracion_maxima,
+            estado: c.TipoContrato.estado,
+            nivel_aprobacion: c.TipoContrato.nivel_aprobacion,
+            nombre_tipo_contrato: c.TipoContrato.nombre,
+            observaciones: c.TipoContrato.observaciones,
+            requiere_aprobacion: c.TipoContrato.requiere_aprobacion,
+            updatedAt: c.TipoContrato.updatedAt ? new Date(c.TipoContrato.updatedAt) : null,
+            createdAt: c.TipoContrato.createdAt ? new Date(c.TipoContrato.createdAt) : null
+          } : null,
+          vigencia: c.vigencia ? { vigencia: c.vigencia } : (c.TipoContrato && c.TipoContrato.nombre ? { vigencia: c.TipoContrato.nombre } : null),
+          tiempoRestante: this.calcularTiempoRestante(c),
+          estado: c.estado,
+          no_contrato: c.no_contrato,
+          valor_cup: c.valor ? parseFloat(c.valor) : 0,
+          valor_usd: c.valor_usd || 0,
+          fecha_entrada: c.fecha_inicio ? new Date(c.fecha_inicio) : null,
+          fecha_firmado: c.fecha_firmado ? new Date(c.fecha_firmado) : null,
+          observaciones: c.observaciones || '',
+          id: c.id
+        }));
+        const contratosFiltrados = mappedContratos.filter(c => c.estado !== 'Vencido');
         this.data = contratosFiltrados;
         this.dataSource.data = contratosFiltrados;
         this.pagination.length = contratosFiltrados.length;
@@ -240,70 +394,75 @@ this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
       }
     });
   }
+onRightClick(event: MouseEvent) {
+  event.preventDefault();  // Evita que aparezca el menú contextual estándar
+  window.print();          // Abre el diálogo de impresión
+}
+
   applyFilters(): void {
     const filters = this.filterForm.value;
-    
+
     // Aplicar filtros usando los nuevos nombres de campos
     let filteredData = this.dataSource.data;
-  
-    
+
+
     if (filters.proveedor_id) {
-      filteredData = filteredData.filter(contract => 
+      filteredData = filteredData.filter(contract =>
         contract.proveedor.id === filters.proveedor_id
       );
     }
-    
+
     if (filters.tipo_contrato_id) {
-      filteredData = filteredData.filter(contract => 
+      filteredData = filteredData.filter(contract =>
         contract.tipo_contrato?.id === filters.tipo_contrato_id
       );
     }
-    
+
     if (filters.departamento_id) {
-      filteredData = filteredData.filter(contract => 
+      filteredData = filteredData.filter(contract =>
         contract.departamento?.id === filters.departamento_id
       );
     }
-    
+
     if (filters.valor_cup_filter) {
-      filteredData = filteredData.filter(contract => 
+      filteredData = filteredData.filter(contract =>
         contract.valor_cup >= filters.valor_cup_filter
       );
     }
-    
+
     if (filters.valor_usd_filter) {
-      filteredData = filteredData.filter(contract => 
+      filteredData = filteredData.filter(contract =>
         contract.valor_usd >= filters.valor_usd_filter
       );
     }
-    
+
     if (filters.fecha_entrada_filter) {
-      filteredData = filteredData.filter(contract => 
+      filteredData = filteredData.filter(contract =>
         new Date(contract.fecha_entrada) >= new Date(filters.fecha_entrada_filter)
       );
     }
-    
+
     if (filters.fecha_firmado_filter) {
-      filteredData = filteredData.filter(contract => 
+      filteredData = filteredData.filter(contract =>
         new Date(contract.fecha_firmado) >= new Date(filters.fecha_firmado_filter)
       );
     }
-    
+
     if (filters.vigencia_id) {
-      filteredData = filteredData.filter(contract => 
+      filteredData = filteredData.filter(contract =>
         contract.vigencia.id === filters.vigencia_id
       );
     }
-    
+
     if (filters.estado) {
-      filteredData = filteredData.filter(contract => 
+      filteredData = filteredData.filter(contract =>
         contract.estado === filters.estado
       );
     }
-    
+
     this.dataSource.filteredData = filteredData;
   }
-  
+
   clearFilters(): void {
     this.filterForm.reset();
     this.dataSource.filteredData = this.dataSource.data;
@@ -349,59 +508,139 @@ this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
 
   calcularTiempoRestante(contrato: Contrato): string {
     const hoy = new Date();
-    let fechaVencimiento: Date | null = null;
+    // Use any available date fields for calculation
+    let fechaInicio: Date | null = (contrato as any).fecha_inicio ? new Date((contrato as any).fecha_inicio) : null;
+    let fechaFin: Date | null = (contrato as any).fecha_fin ? new Date((contrato as any).fecha_fin) : null;
 
-    if (contrato.fecha_vencido) {
-      fechaVencimiento = new Date(contrato.fecha_vencido);
+    if (fechaInicio && fechaFin) {
+      const diffMs = fechaFin.getTime() - hoy.getTime();
+      if (diffMs < 0) {
+        return 'Vencido';
+      }
+
+      let remainingMs = diffMs;
+
+      const msInYear = 1000 * 60 * 60 * 24 * 365;
+      const msInMonth = 1000 * 60 * 60 * 24 * 30;
+      const msInWeek = 1000 * 60 * 60 * 24 * 7;
+      const msInDay = 1000 * 60 * 60 * 24;
+
+      const years = Math.floor(remainingMs / msInYear);
+      remainingMs -= years * msInYear;
+
+      const months = Math.floor(remainingMs / msInMonth);
+      remainingMs -= months * msInMonth;
+
+      const weeks = Math.floor(remainingMs / msInWeek);
+      remainingMs -= weeks * msInWeek;
+
+      const days = Math.floor(remainingMs / msInDay);
+
+      let resultado = '';
+      if (years > 0) {
+        resultado += years + (years === 1 ? ' año' : ' años');
+      }
+      if (months > 0) {
+        if (resultado.length > 0) resultado += ', ';
+        resultado += months + (months === 1 ? ' mes' : ' meses');
+      }
+      if (weeks > 0) {
+        if (resultado.length > 0) resultado += ', ';
+        resultado += weeks + (weeks === 1 ? ' semana' : ' semanas');
+      }
+      if (days > 0) {
+        if (resultado.length > 0) resultado += ' y ';
+        resultado += days + (days === 1 ? ' día' : ' días');
+      }
+      return resultado || 'Menos de un día';
+    } else if (contrato.fecha_vencido) {
+      const fechaVencimiento = new Date(contrato.fecha_vencido);
+      const diffMs = fechaVencimiento.getTime() - hoy.getTime();
+      if (diffMs < 0) {
+        return 'Vencido';
+      }
+      // Similar calculation as above
+      let remainingMs = diffMs;
+
+      const msInYear = 1000 * 60 * 60 * 24 * 365;
+      const msInMonth = 1000 * 60 * 60 * 24 * 30;
+      const msInWeek = 1000 * 60 * 60 * 24 * 7;
+      const msInDay = 1000 * 60 * 60 * 24;
+
+      const years = Math.floor(remainingMs / msInYear);
+      remainingMs -= years * msInYear;
+
+      const months = Math.floor(remainingMs / msInMonth);
+      remainingMs -= months * msInMonth;
+
+      const weeks = Math.floor(remainingMs / msInWeek);
+      remainingMs -= weeks * msInWeek;
+
+      const days = Math.floor(remainingMs / msInDay);
+
+      let resultado = '';
+      if (years > 0) {
+        resultado += years + (years === 1 ? ' año' : ' años');
+      }
+      if (months > 0) {
+        if (resultado.length > 0) resultado += ', ';
+        resultado += months + (months === 1 ? ' mes' : ' meses');
+      }
+      if (weeks > 0) {
+        if (resultado.length > 0) resultado += ', ';
+        resultado += weeks + (weeks === 1 ? ' semana' : ' semanas');
+      }
+      if (days > 0) {
+        if (resultado.length > 0) resultado += ' y ';
+        resultado += days + (days === 1 ? ' día' : ' días');
+      }
+      return resultado || 'Menos de un día';
     } else if (contrato.fecha_firmado && contrato.vigencia && contrato.vigencia.vigencia) {
-      fechaVencimiento = new Date(contrato.fecha_firmado);
+      const fechaVencimiento = new Date(contrato.fecha_firmado);
       fechaVencimiento.setDate(fechaVencimiento.getDate() + contrato.vigencia.vigencia);
-    }
+      const diffMs = fechaVencimiento.getTime() - hoy.getTime();
+      if (diffMs < 0) {
+        return 'Vencido';
+      }
+      // Similar calculation as above
+      let remainingMs = diffMs;
 
-    if (!fechaVencimiento) {
+      const msInYear = 1000 * 60 * 60 * 24 * 365;
+      const msInMonth = 1000 * 60 * 60 * 24 * 30;
+      const msInWeek = 1000 * 60 * 60 * 24 * 7;
+      const msInDay = 1000 * 60 * 60 * 24;
+
+      const years = Math.floor(remainingMs / msInYear);
+      remainingMs -= years * msInYear;
+
+      const months = Math.floor(remainingMs / msInMonth);
+      remainingMs -= months * msInMonth;
+
+      const weeks = Math.floor(remainingMs / msInWeek);
+      remainingMs -= weeks * msInWeek;
+
+      const days = Math.floor(remainingMs / msInDay);
+
+      let resultado = '';
+      if (years > 0) {
+        resultado += years + (years === 1 ? ' año' : ' años');
+      }
+      if (months > 0) {
+        if (resultado.length > 0) resultado += ', ';
+        resultado += months + (months === 1 ? ' mes' : ' meses');
+      }
+      if (weeks > 0) {
+        if (resultado.length > 0) resultado += ', ';
+        resultado += weeks + (weeks === 1 ? ' semana' : ' semanas');
+      }
+      if (days > 0) {
+        if (resultado.length > 0) resultado += ' y ';
+        resultado += days + (days === 1 ? ' día' : ' días');
+      }
+      return resultado || 'Menos de un día';
+    } else {
       return 'N/A';
     }
-
-    const diffMs = fechaVencimiento.getTime() - hoy.getTime();
-    if (diffMs < 0) {
-      return 'Vencido';
-    }
-
-    let remainingMs = diffMs;
-
-    const msInYear = 1000 * 60 * 60 * 24 * 365;
-    const msInMonth = 1000 * 60 * 60 * 24 * 30;
-    const msInWeek = 1000 * 60 * 60 * 24 * 7;
-    const msInDay = 1000 * 60 * 60 * 24;
-
-    const years = Math.floor(remainingMs / msInYear);
-    remainingMs -= years * msInYear;
-
-    const months = Math.floor(remainingMs / msInMonth);
-    remainingMs -= months * msInMonth;
-
-    const weeks = Math.floor(remainingMs / msInWeek);
-    remainingMs -= weeks * msInWeek;
-
-    const days = Math.floor(remainingMs / msInDay);
-
-    let resultado = '';
-    if (years > 0) {
-      resultado += years + (years === 1 ? ' año' : ' años');
-    }
-    if (months > 0) {
-      if (resultado.length > 0) resultado += ', ';
-      resultado += months + (months === 1 ? ' mes' : ' meses');
-    }
-    if (weeks > 0) {
-      if (resultado.length > 0) resultado += ', ';
-      resultado += weeks + (weeks === 1 ? ' semana' : ' semanas');
-    }
-    if (days > 0) {
-      if (resultado.length > 0) resultado += ' y ';
-      resultado += days + (days === 1 ? ' día' : ' días');
-    }
-    return resultado || 'Menos de un día';
   }
 
   trackByFn(index: number, item: Contrato): number {
@@ -422,12 +661,13 @@ this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
       this.selectedContrato = this.data.find(row => row.id === rowId) || null;
       if (this.selectedContrato) {
         if (!this.selectedContratoForm) {
-          this.initNewContratoForm();
+          this.initSelectedContratoForm();
         }
         this.selectedContratoForm.patchValue({
           no_contrato: this.selectedContrato.no_contrato || '',
           proveedor: this.selectedContrato.proveedor || null,
           tipo_contrato: this.selectedContrato.tipo_contrato || null,
+          departamento: this.selectedContrato.departamento || null,
           valor_cup: this.selectedContrato.valor_cup || 0,
           valor_usd: this.selectedContrato.valor_usd || 0,
           fecha_firmado: this.selectedContrato.fecha_firmado || '',
@@ -529,7 +769,7 @@ this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
     fecha.setDate(fecha.getDate() + vigenciaDias);
     return fecha.toISOString().split('T')[0];
   }
- 
+
   exportToPDF(): void {
     try {
       if (!this.dataSource.filteredData || this.dataSource.filteredData.length === 0) {
@@ -620,17 +860,17 @@ this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
           const pageCount = doc.getNumberOfPages();
           const pageSize = doc.internal.pageSize;
           const pageHeight = pageSize.height || pageSize.getHeight();
-          
+
           doc.setFontSize(8);
           doc.setTextColor(100, 100, 100);
-          
+
           // Número de página
           doc.text(
             `Página ${data.pageNumber} de ${pageCount}`,
             14,
             pageHeight - 10
           );
-          
+
           // Nombre del sistema
           const systemText = 'Sistema de Gestión de Contratos';
           const textWidth = doc.getTextWidth(systemText);
@@ -686,10 +926,10 @@ this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
    */
   private formatDateForPDF(date: Date | string | null | undefined): string {
     if (!date) return '';
-    
+
     try {
       let dateObj: Date;
-      
+
       if (date instanceof Date) {
         dateObj = date;
       } else if (typeof date === 'string') {
@@ -697,12 +937,12 @@ this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
       } else {
         return '';
       }
-      
+
       // Verificar si la fecha es válida
       if (isNaN(dateObj.getTime())) {
         return '';
       }
-      
+
       return dateObj.toLocaleDateString('es-ES', {
         day: '2-digit',
         month: '2-digit',
@@ -718,10 +958,10 @@ this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
    */
   private formatDateForCSV(date: Date | string | null | undefined): string {
     if (!date) return '';
-    
+
     try {
       let dateObj: Date;
-      
+
       if (date instanceof Date) {
         dateObj = date;
       } else if (typeof date === 'string') {
@@ -729,12 +969,12 @@ this.dataSource.filterPredicate = (data: Contrato, filter: string) => {
       } else {
         return '';
       }
-      
+
       // Verificar si la fecha es válida
       if (isNaN(dateObj.getTime())) {
         return '';
       }
-      
+
       return dateObj.toLocaleDateString('es-ES');
     } catch {
       return '';

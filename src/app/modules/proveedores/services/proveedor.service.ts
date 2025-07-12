@@ -25,6 +25,7 @@ export class ProveedorService {
   constructor(private http: HttpClient) {}
 
   getProveedores(): Observable<Proveedor[]> {
+    console.log('Fetching proveedores list');
     if (this.useMockData) {
       return of(this.proveedores);
     }
@@ -32,6 +33,7 @@ export class ProveedorService {
   }
 
   getProveedor(id: number): Observable<Proveedor> {
+    console.log(`Fetching proveedor with id ${id}`);
     if (this.useMockData) {
       const proveedor = this.proveedores.find(p => p.id === id);
       return of(proveedor);
@@ -40,6 +42,7 @@ export class ProveedorService {
   }
 
   createProveedor(proveedor: Proveedor): Observable<Proveedor> {
+    console.log('Creating proveedor:', proveedor);
     if (this.useMockData) {
       const newProveedor = {
         ...proveedor,
@@ -52,6 +55,7 @@ export class ProveedorService {
   }
 
   updateProveedor(id: number, proveedor: Proveedor): Observable<Proveedor> {
+    console.log(`Updating proveedor with id ${id}:`, proveedor);
     if (this.useMockData) {
       const index = this.proveedores.findIndex(p => p.id === id);
       if (index !== -1) {
@@ -63,6 +67,7 @@ export class ProveedorService {
   }
 
   deleteProveedor(id: number): Observable<void> {
+    console.log(`Deleting proveedor with id ${id}`);
     if (this.useMockData) {
       const index = this.proveedores.findIndex(p => p.id === id);
       if (index !== -1) {

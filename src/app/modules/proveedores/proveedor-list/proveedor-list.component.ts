@@ -1,3 +1,4 @@
+import { CatalogService } from './../../../services/catalog.service';
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
@@ -88,6 +89,8 @@ export class ProveedorListComponent implements OnInit {
   constructor(
     private dialog: MatDialog,
     private proveedorService: ProveedorService,
+
+    private CatalogService: CatalogService,
     private representanteService: RepresentanteService,
     private cdr: ChangeDetectorRef
   ) {
@@ -107,6 +110,10 @@ ngAfterViewInit(): void {
   ngOnInit(): void {
     this.displayedColumns = this.columns.map(col => col.key).concat('details');
     this.loadProveedores();
+  this.CatalogService.getMinisterios().subscribe((ministerios) => {
+    this.columns.find(col => col.key === 'ministerio')!.selectOptions = ministerios;
+  });
+    this.CatalogService.getMunicipios();
 
     this.searchInputControl.valueChanges
     .pipe(

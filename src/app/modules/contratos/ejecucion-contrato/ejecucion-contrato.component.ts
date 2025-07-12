@@ -26,6 +26,8 @@ import {
 import { EjecucionService } from 'app/modules/dashboard/services/ejecucion.service';
 import { SuplementoFormComponent } from 'app/modules/suplementos/suplemento-form/suplemento-form.component';
 import { Subject } from 'rxjs';
+import { ContratoService } from '../services/contrato.service';
+import { ProveedorService } from 'app/modules/proveedores/services/proveedor.service';
 
 
 @Component({
@@ -87,7 +89,13 @@ export class EjecucionContratoComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
  
 
-  constructor(private ejecucionService: EjecucionService, public dialog: MatDialog, private cdr: ChangeDetectorRef) {
+  constructor(
+    private ejecucionService: EjecucionService, 
+    public dialog: MatDialog, 
+    private cdr: ChangeDetectorRef,
+    private contratoService: ContratoService,
+    private proveedorService: ProveedorService
+  ) {
     this.dataSource = new MatTableDataSource([]);
     this.selectedRowForm = new FormGroup({});
     
@@ -96,7 +104,12 @@ export class EjecucionContratoComponent implements OnInit {
   ngOnInit(): void {
     this.displayedColumns = this.columns.map(col => col.key).concat('details');
     this.loadEjecuciones();
-
+    this.contratoService.getContratos().subscribe((data) => {
+      console.log(data);
+    });
+    this.proveedorService.getProveedores().subscribe((data) => {
+      console.log(data);
+    });
     this.searchInputControl.valueChanges
     .pipe(
         debounceTime(300),
