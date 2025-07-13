@@ -92,6 +92,7 @@
       this.isLoading = true;
       this.trabajadoresService.getTrabajadores().subscribe({
         next: (trabajadores) => {
+          console.log(trabajadores)
           this.dataSource.data = trabajadores;
           this.isLoading = false;
           this.cdr.detectChanges();

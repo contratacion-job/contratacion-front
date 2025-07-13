@@ -16,6 +16,7 @@ interface ThemeCustomization {
     logo: string;
     companyName: string;
     userId?: string;
+    sidebarColor?: string;
 }
 
 interface ColorOption {
@@ -57,6 +58,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
     customization: ThemeCustomization = {
         primaryColor: '#2196F3',
+        sidebarColor: localStorage.getItem('sidebarColor') || '#1e3a8a',
         logo: 'assets/logo.jpg',
         companyName: 'Sistema de Contratación'
     };
@@ -283,34 +285,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
             }, 2000);
         }
     }
-testColorChange(): void {
-
-
-
-
-
-
-    console.log('Botón de prueba presionado');
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     testColorBlue(): void {
         this.applySidebarColor('#1e3a8a'); // Azul marino
@@ -327,19 +301,25 @@ testColorChange(): void {
     testColorOrange(): void {
         this.applySidebarColor('#ea580c'); // Naranja
     }
+    testColorBlack(): void {
+        this.applySidebarColor('#1e293b'); // Naranja
+    }
 
-    // Método helper para aplicar cualquier color
-    private applySidebarColor(color: string): void {
+
+
+    
+    applySidebarColor(color: string): void {
+        this.customization.sidebarColor = color; // ← actualiza el modelo
         console.log('Aplicando color:', color);
-
+    
         const existing = document.getElementById('dynamic-sidebar-style');
         if (existing) {
             existing.remove();
         }
-
+    
         const hoverColor = this.darkenColor(color, 15);
         const activeColor = this.darkenColor(color, 25);
-
+    
         const styleElement = document.createElement('style');
         styleElement.id = 'dynamic-sidebar-style';
         styleElement.textContent = `
@@ -359,12 +339,12 @@ testColorChange(): void {
                 background-color: ${activeColor} !important;
             }
         `;
-
+    
         document.head.appendChild(styleElement);
-        localStorage.setItem('sidebarColor', color);
+        localStorage.setItem('sidebarColor', color); // guarda en localStorage también
     }
-
-    // Método para oscurecer colores
+    
+ // Método para oscurecer colores
     private darkenColor(color: string, percent: number): string {
         const hex = color.replace('#', '');
         const r = parseInt(hex.substr(0, 2), 16);
@@ -551,5 +531,7 @@ testColorChange(): void {
     getCurrentThemeColor(): string {
         return this.customization.primaryColor;
     }
+ 
+    
 }
 

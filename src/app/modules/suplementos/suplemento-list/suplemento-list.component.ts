@@ -24,10 +24,12 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { SuplementoFormComponent } from '../suplemento-form/suplemento-form.component';
 
 import { Suplemento, Proveedor, TipoContrato, Vigencia, Departamento } from 'app/models/Type';
-import { mockProveedor, mockTipoContrato, mockVigenciaContrato, mockDepartamento } from 'app/mock-api/contrato-fake/fake';
 import { Subject } from 'rxjs';
 import { SuplementoDetailComponent } from '../suplemento-detail/suplemento-detail.component';
 import { SuplementoService } from '../services/suplemento.service';
+import { TipoContratoService } from 'app/modules/contratos/services/tipo-contrato.service';
+import { DepartamentoService } from 'app/modules/organizacion/departamento.service';
+import { ProveedorService } from 'app/modules/proveedores/services/proveedor.service';
 
 @Component({
   selector: 'app-suplemento-list',
@@ -98,6 +100,9 @@ export class SuplementoListComponent implements OnInit, AfterViewInit {
 
   constructor(
     private cdr: ChangeDetectorRef,
+      private tipocontratoervice: TipoContratoService,
+      private departamentoService: DepartamentoService,
+        private proveedorService:ProveedorService,
     private fb: FormBuilder,
     private _matDialog: MatDialog,
     private suplementoService :SuplementoService
@@ -106,21 +111,22 @@ export class SuplementoListComponent implements OnInit, AfterViewInit {
     this.initSelectedSuplementoForm();
 
     this.filterForm = this.fb.group({
-      vigencia_id: [''],
-      proveedor_id: [''],
-      tipo_contrato_id: [''],
-      departamento_id: [''],
-      fecha_entrada_filter: [''],
-      fecha_firmado_filter: [''],
-      valor_cup_filter: [''],
-      valor_usd_filter: ['']
+      contrato_id_filter: [''],
+      monto_filter: [''],
+      fecha_suplemento_filter: [''],
+      estado_filter: [''],
+      descripcion_filter: [''],
+      observaciones_filter: [''],
+      createdAt_filter: [''],
+      updatedAt_filter: [''],
+      documentos_filter: ['']
     });
   }
 
 
   openAddSuplementoDialog(): void {
     // Open the dialog
-    const dialogRef = this._matDialog.open(SuplementoDetailComponent, {
+    const dialogRef = this._matDialog.open(SuplementoFormComponent, {
       width: '800px',
       maxWidth: '90vw',
       maxHeight: '90vh',
@@ -182,10 +188,6 @@ export class SuplementoListComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.proveedores = mockProveedor;
-    this.tiposContrato = mockTipoContrato;
-    this.vigencias = mockVigenciaContrato;
-    this.departamentos = mockDepartamento;
     this.loadSuplementos();
 
     this.dataSource.sortingDataAccessor = (item: Suplemento, property: string) => {
@@ -243,13 +245,128 @@ export class SuplementoListComponent implements OnInit, AfterViewInit {
       });
   }
 
+  private convertToArray(data: any): any[] {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (typeof data === 'object') {
+      // Check for common pagination/response wrapper properties
+      if (data.data && Array.isArray(data.data)) return data.data;
+      if (data.items && Array.isArray(data.items)) return data.items;
+      if (data.results && Array.isArray(data.results)) return data.results;
+      if (data.list && Array.isArray(data.list)) return data.list;
+      if (data.content && Array.isArray(data.content)) return data.content;
+      
+      // If it's a plain object, convert values to array
+      return Object.values(data);
+    }
+    return [];
+  }
+  
+  
   loadSuplementos(): void {
     this.isLoading = true;
     this.errorMessage = '';
+
+    // Load tipos contrato
+    this.tipocontratoervice.getTiposContrato().subscribe({
+      next: (data) => {
+        console.log('Tipos de contrato raw:', data);
+        this.tiposContrato = this.convertToArray(data);
+        console.log('Tipos de contrato converted:', this.tiposContrato);
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading tipos contrato:', error);
+        this.tiposContrato = [];
+      }
+    });
+  
+    // Load departamentos
+    this.departamentoService.getDepartamentos().subscribe({
+      next: (data) => {
+        console.log('Departamentos raw:', data);
+        this.departamentos = this.convertToArray(data);
+        console.log('Departamentos converted:', this.departamentos);
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading departamentos:', error);
+        this.departamentos = [];
+      }
+    });
+  
+    // Load proveedores
+    this.proveedorService.getProveedores().subscribe({
+      next: (data) => {
+        console.log('Proveedores raw:', data);
+        const proveedoresArray = this.convertToArray(data);
+        this.proveedores = proveedoresArray.map((prov: any) => ({
+          ...prov,
+          municipio_id: prov.municipio_id || null,
+          ministerio_id: prov.ministerio_id || null,
+          fechaCreacion: prov.fechaCreacion ? new Date(prov.fechaCreacion) : null
+        }));
+        console.log('Proveedores converted:', this.proveedores);
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading proveedores:', error);
+        this.proveedores = [];
+      }
+    });
     this.suplementoService.getSuplementos().subscribe({
-      next: (suplementos) => {
-        this.dataSource.data = suplementos;
-        this.pagination.length = suplementos.length;
+      next: (response) => {
+        // The backend returns an array directly, not wrapped in data property
+        const suplementosArray = this.convertToArray(response);
+        // Map backend properties to expected properties
+        const mappedSuplementos = suplementosArray.map((item: any) => ({
+          id: item.id,
+          no_contrato_contratacion: item.contrato_id ? item.contrato_id.toString() : 'N/A',
+          proveedor: item.proveedor || null,
+          tipo_contrato: item.tipo_contrato || null,
+          departamento: item.departamento || null,
+          valor_cup: item.monto ? parseFloat(item.monto) : 0,
+          valor_usd: 0, // No data provided for USD value
+          fecha_entrada: item.contrato_fecha_inicio || '',
+          fecha_firmado: item.fecha_suplemento || '',
+          vigencia: item.vigencia || null,
+          fecha_vencido: item.fecha_vencido || '',
+          observaciones: item.observaciones || '',
+          // Add missing properties with default or null values to satisfy Suplemento type
+          vigencia_id: item.vigencia_id || null,
+          proveedor_id: item.proveedor_id || null,
+          tipo_contrato_id: item.tipo_contrato_id || null,
+          no_contrato_id: item.no_contrato_id || null,
+          departamento_id: item.departamento_id || null,
+          contrato_id: item.contrato_id || null,
+          contrato_fecha_inicio: item.contrato_fecha_inicio || null,
+          monto: item.monto || null,
+          fecha_suplemento: item.fecha_suplemento || null,
+          estado: item.estado || null,
+          createdAt: item.createdAt || null,
+          updatedAt: item.updatedAt || null,
+          descripcion: item.descripcion || null,
+          documentos: item.documentos || [],
+          monto_vencimiento_cup: item.monto_vencimiento_cup || null,
+          monto_vencimiento_cl: item.monto_vencimiento_cl || null,
+          monto_vencimiento_usd: item.monto_vencimiento_usd || null,
+          fecha_comite_contratacion: item.fecha_comite_contratacion || null,
+          fecha_comite_evaluacion: item.fecha_comite_evaluacion || null,
+          fecha_comite_juridico: item.fecha_comite_juridico || null,
+          fecha_comite_tecnico: item.fecha_comite_tecnico || null,
+          fecha_comite_finanzas: item.fecha_comite_finanzas || null,
+          fecha_comite_aprobacion: item.fecha_comite_aprobacion || null,
+          no_comite_contratacion: item.no_comite_contratacion || null,
+          no_acuerdo_comite_contratacion: item.no_acuerdo_comite_contratacion || null,
+          fecha_comite_administracion: item.fecha_comite_administracion || null,
+          no_comite_administracion: item.no_comite_administracion || null,
+          fecha_comite_finanzas_administracion: item.fecha_comite_finanzas_administracion || null,
+          no_comite_finanzas_administracion: item.no_comite_finanzas_administracion || null,
+          no_acuerdo_comite_administracion: item.no_acuerdo_comite_administracion || null,
+          valor_monto_restante: item.valor_monto_restante || null
+        }));
+        this.dataSource.data = mappedSuplementos;
+        this.pagination.length = mappedSuplementos.length;
         this.isLoading = false;
         this.cdr.markForCheck();
       },
@@ -264,17 +381,15 @@ export class SuplementoListComponent implements OnInit, AfterViewInit {
 
   initSelectedSuplementoForm(): void {
     this.selectedSuplementoForm = this.fb.group({
-      no_contrato_contratacion: ['', Validators.required],
-      proveedor: [null, Validators.required],
-      tipo_contrato: [null, Validators.required],
-      departamento: [null, Validators.required],
-      fecha_entrada: ['', Validators.required],
-      fecha_firmado: ['', Validators.required],
-      valor_cup: [0, [Validators.required, Validators.min(0)]],
-      valor_usd: [0, [Validators.min(0)]],
-      vigencia: [null, Validators.required],
+      contrato_id: ['', Validators.required],
+      monto: ['', Validators.required],
+      fecha_suplemento: ['', Validators.required],
+      estado: ['', Validators.required],
+      descripcion: [''],
       observaciones: [''],
-      fecha_vencido: ['']
+      createdAt: [''],
+      updatedAt: [''],
+      documentos: [[]]
     });
   }
 

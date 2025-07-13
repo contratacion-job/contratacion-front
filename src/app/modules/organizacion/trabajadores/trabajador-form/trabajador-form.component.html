@@ -1,0 +1,117 @@
+<div class="trabajador-form-dialog">
+  <h2 mat-dialog-title class="flex items-center">
+    <mat-icon>{{ isEdit ? 'edit' : 'person_add' }}</mat-icon>
+    {{ isEdit ? 'Editar Trabajador' : 'Nuevo Trabajador' }}
+  </h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="trabajadorForm" class="flex flex-col gap-4">
+      
+      <!-- Nombre -->
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombre" placeholder="Ingrese el nombre">
+        <mat-error *ngIf="nombre?.invalid && nombre?.touched">
+          <span *ngIf="nombre?.errors?.['required']">El nombre es requerido</span>
+          <span *ngIf="nombre?.errors?.['minlength']">El nombre debe tener al menos 2 caracteres</span>
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Apellido (corregido) -->
+      <mat-form-field appearance="outline">
+        <mat-label>Apellido</mat-label>
+        <input matInput formControlName="apellido" placeholder="Ingrese el apellido">
+        <mat-error *ngIf="apellido?.invalid && apellido?.touched">
+          <span *ngIf="apellido?.errors?.['required']">El apellido es requerido</span>
+          <span *ngIf="apellido?.errors?.['minlength']">El apellido debe tener al menos 2 caracteres</span>
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Usuario -->
+      <mat-form-field appearance="outline">
+        <mat-label>Usuario</mat-label>
+        <input matInput formControlName="usuario" placeholder="Ingrese el nombre de usuario">
+        <mat-error *ngIf="usuario?.invalid && usuario?.touched">
+          <span *ngIf="usuario?.errors?.['required']">El usuario es requerido</span>
+          <span *ngIf="usuario?.errors?.['minlength']">El usuario debe tener al menos 3 caracteres</span>
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Email -->
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="ejemplo@correo.com">
+        <mat-error *ngIf="email?.invalid && email?.touched">
+          <span *ngIf="email?.errors?.['required']">El email es requerido</span>
+          <span *ngIf="email?.errors?.['email']">Ingrese un email válido</span>
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Teléfono -->
+      <mat-form-field appearance="outline">
+        <mat-label>Teléfono</mat-label>
+        <input matInput formControlName="telefono" placeholder="Ingrese el teléfono">
+      </mat-form-field>
+
+      <!-- Teléfono Móvil -->
+      <mat-form-field appearance="outline">
+        <mat-label>Teléfono Móvil</mat-label>
+        <input matInput formControlName="telefono_movil" placeholder="Ingrese el teléfono móvil">
+      </mat-form-field>
+
+      <!-- Cargo -->
+      <mat-form-field appearance="outline">
+        <mat-label>Cargo</mat-label>
+        <input matInput formControlName="cargo" placeholder="Ingrese el cargo">
+        <mat-error *ngIf="cargo?.invalid && cargo?.touched">
+          <span *ngIf="cargo?.errors?.['required']">El cargo es requerido</span>
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Departamento -->
+      <mat-form-field appearance="outline">
+        <mat-label>Departamento</mat-label>
+        <mat-select formControlName="departamento_id">
+          <mat-option *ngFor="let dept of departamentos$ | async" [value]="dept.id">
+            {{ dept.nombre }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="departamento_id?.invalid && departamento_id?.touched">
+          <span *ngIf="departamento_id?.errors?.['required']">El departamento es requerido</span>
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Rol -->
+      <mat-form-field appearance="outline">
+        <mat-label>Rol</mat-label>
+        <mat-select formControlName="rol">
+          <mat-option *ngFor="let rol of roles" [value]="rol.value">
+            {{ rol.label }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="rol?.invalid && rol?.touched">
+          <span *ngIf="rol?.errors?.['required']">El rol es requerido</span>
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Contraseña (solo para nuevos usuarios) -->
+      <mat-form-field appearance="outline" *ngIf="!isEdit">
+        <mat-label>Contraseña</mat-label>
+        <input matInput type="password" formControlName="contrasena" placeholder="Contraseña temporal">
+        <mat-hint>Se asignará una contraseña temporal que el usuario deberá cambiar</mat-hint>
+      </mat-form-field>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Cancelar</button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onSubmit()"
+      [disabled]="trabajadorForm.invalid">
+      {{ isEdit ? 'Actualizar' : 'Crear' }}
+    </button>
+  </mat-dialog-actions>
+</div>

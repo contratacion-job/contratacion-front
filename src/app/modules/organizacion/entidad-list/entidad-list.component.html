@@ -1,314 +1,354 @@
-<!-- File: src/app/modules/organizacion/entidad-list/entidad-list.component.html -->
-<div class="flex flex-col min-h-screen p-6 w-full">
-  <div class="relative flex flex-col flex-auto p-6 pr-3 pb-3 bg-card rounded-2xl shadow overflow-hidden mb-6 w-full">
-    <div class="absolute bottom-0 right-0 w-24 h-24 -m-6">
-      <mat-icon
-        class="icon-size-24 opacity-25 text-blue-500 dark:text-blue-400"
-        [svgIcon]="'heroicons_outline:building-office'"></mat-icon>
-    </div>
+<!-- Vista de una sola entidad - Perfil -->
+<ng-container *ngIf="dataSource.data.length === 1; else multipleEntities">
+  <div class="flex flex-col w-full">
 
-
-
-  <div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
-    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
-      <div class="absolute inset-x-0 bottom-0" *ngIf="isLoading">
-        <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
-      </div>
-      <div class="text-4xl font-extrabold tracking-tight">Mi Entidad</div>
-      <div class="flex flex-col sm:flex-row shrink-0 items-center mt-6 sm:mt-0 sm:ml-4 search-add-wrapper">
-
-        <button
-          class="ml-4 mt-4 sm:mt-0 w-40 text-lg"
-          mat-flat-button
-          [color]="'primary'"
-          [disabled]="!canAddEntidad()"
-          (click)="openAddEntidadDialog()">
-          <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-          <span class="ml-2 mr-1">Agregar</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="flex flex-auto overflow-hidden ">
-      <div class="flex flex-col flex-auto sm:mb-18 overflow-x-auto">
-        <ng-container *ngIf="dataSource.data.length === 1; else multipleEntities">
-          <div class="flex flex-col w-full">
-
-            <!-- View mode -->
-            <ng-container *ngIf="!editMode">
-
-                <!-- Header -->
-<div class="relative w-full h-40 sm:h-48 px-8 sm:px-12 bg-accent-100 dark:bg-accent-700 custom-top-offset">
-    <!-- Background -->
-
-                    <!-- Background -->
-                    <ng-container *ngIf="dataSource.data[0].background">
-                        <img
-                            class="absolute inset-0 object-cover w-full h-full"
-                            [src]="dataSource.data[0].background">
-                    </ng-container>
-                    <!-- Close button -->
-                    <div class="flex items-center justify-end w-full max-w-3xl mx-auto pt-6">
-                        <a
-                            mat-icon-button
-                            [matTooltip]="'Close'"
-                            [routerLink]="['../']">
-                            <mat-icon
-                                class="text-white"
-                                [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Contact -->
-                <div class="relative flex flex-col flex-auto items-center p-6 pt-0 sm:p-12 sm:pt-0">
-                    <div class="w-full max-w-3xl">
-
-                        <!-- Avatar and actions -->
-                        <div class="flex flex-auto items-end -mt-16">
-                            <!-- Avatar -->
-                            <div class="flex items-center justify-center w-32 h-32 rounded-full overflow-hidden ring-4 ring-bg-card">
-                                <img
-                                    class="object-cover w-full h-full"
-                                    *ngIf="dataSource.data[0].avatar"
-                                    [src]="dataSource.data[0].avatar">
-                                <div
-                                    class="flex items-center justify-center w-full h-full rounded overflow-hidden uppercase text-8xl font-bold leading-none bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200"
-                                    *ngIf="!dataSource.data[0].avatar">
-                                    {{dataSource.data[0].nombre_entidad.charAt(0)}}
-                                </div>
-                            </div>
-                            <!-- Actions -->
-                            <div class="flex items-center ml-auto mb-1">
-                                <button
-                                    mat-stroked-button
-                                    (click)="openEditEntidadDialog(dataSource.data[0])">
-                                    <mat-icon
-                                        class="icon-size-5"
-                                        [svgIcon]="'heroicons_solid:pencil-square'"></mat-icon>
-                                    <span class="ml-2">Editar</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Name -->
-                        <div class="mt-3 text-4xl font-bold truncate">{{dataSource.data[0].nombre_entidad}}</div>
-
-                        <!-- Tags -->
-                        <ng-container *ngIf="dataSource.data[0].tags?.length">
-                            <div class="flex flex-wrap items-center mt-2">
-                                <!-- Tag -->
-                                <ng-container *ngFor="let tag of dataSource.data[0].tags; trackBy: trackByFn">
-                                    <div class="flex items-center justify-center py-1 px-3 mr-3 mb-3 rounded-full leading-normal text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700">
-                                        <span class="text-sm font-medium whitespace-nowrap">{{tag.title}}</span>
-                                    </div>
-                                </ng-container>
-                            </div>
-                        </ng-container>
-
-                        <div class="flex flex-col mt-4 pt-6 border-t space-y-8">
-                            <!-- Código -->
-                            <div class="flex sm:items-center">
-                                <mat-icon [svgIcon]="'heroicons_outline:identification'"></mat-icon>
-                                <div class="ml-6 leading-6">{{dataSource.data[0].codigo_entidad}}</div>
-                            </div>
-
-                            <!-- Domicilio Legal -->
-                            <div class="flex sm:items-center">
-                                <mat-icon [svgIcon]="'heroicons_outline:building-office'"></mat-icon>
-                                <div class="ml-6 leading-6">{{dataSource.data[0].domicilio_legal}}</div>
-                            </div>
-
-                            <!-- Teléfonos -->
-                            <div class="flex sm:items-center">
-                                <mat-icon [svgIcon]="'heroicons_outline:phone'"></mat-icon>
-                                <div class="ml-6 leading-6">{{dataSource.data[0].telefonos}}</div>
-                            </div>
-
-                            <!-- Municipio -->
-                            <div class="flex sm:items-center">
-                                <mat-icon [svgIcon]="'heroicons_outline:map-pin'"></mat-icon>
-                                <div class="ml-6 leading-6">{{dataSource.data[0].municipio?.nombre_municipio}}</div>
-                            </div>
-                             <div class="flex sm:items-center">
-                                <mat-icon [svgIcon]="'heroicons_outline:map-pin'"></mat-icon>
-                                <div class="ml-6 leading-6">{{dataSource.data[0].provincia?.nombre_provincia}}</div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </ng-container>
-            <ng-container *ngIf="editMode">
-                <div class="relative flex flex-col flex-auto items-center p-6 pt-0 sm:p-12 sm:pt-0">
-                    <div class="w-full max-w-3xl">
-                        <form [formGroup]="contactForm" (ngSubmit)="updateEntidad()">
-
-                            <!-- Logo and actions -->
-                            <div class="flex flex-auto items-end -mt-16">
-                                <!-- Logo -->
-                                <div class="relative flex items-center justify-center w-32 h-32 rounded-full overflow-hidden ring-4 ring-bg-card">
-                                    <!-- Upload / Remove logo -->
-                                    <div class="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
-                                    <div class="absolute inset-0 flex items-center justify-center z-20">
-                                        <div>
-                                            <input
-                                                id="logo-file-input"
-                                                class="absolute h-0 w-0 opacity-0 invisible pointer-events-none"
-                                                type="file"
-                                                [multiple]="false"
-                                                [accept]="'image/jpeg, image/png'"
-                                                (change)="uploadLogo($event.target.files)"
-                                                #logoFileInput>
-                                            <label
-                                                class="flex items-center justify-center w-10 h-10 rounded-full cursor-pointer hover:bg-hover"
-                                                for="logo-file-input"
-                                                matRipple>
-                                                <mat-icon
-                                                    class="text-white"
-                                                    [svgIcon]="'heroicons_outline:camera'"></mat-icon>
-                                            </label>
-                                        </div>
-                                        <div>
-                                            <button
-                                                mat-icon-button
-                                                (click)="removeLogo()">
-                                                <mat-icon
-                                                    class="text-white"
-                                                    [svgIcon]="'heroicons_outline:trash'"></mat-icon>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <!-- Image/Letter -->
-                                    <img
-                                        class="object-cover w-full h-full"
-                                        *ngIf="contactForm.get('logo').value"
-                                        [src]="contactForm.get('logo').value">
-                                    <div
-                                        class="flex items-center justify-center w-full h-full rounded overflow-hidden uppercase text-8xl font-bold leading-none bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200"
-                                        *ngIf="!contactForm.get('logo').value && contactForm.get('nombre_entidad').value">
-                                        {{contactForm.get('nombre_entidad').value.charAt(0)}}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Nombre Entidad -->
-                            <mat-form-field class="w-full" appearance="fill">
-                                <mat-label>Nombre Entidad</mat-label>
-                                <input matInput formControlName="nombre_entidad" placeholder="Nombre Entidad" required>
-                            </mat-form-field>
-
-                            <!-- Código Entidad -->
-                              <mat-form-field class="w-full" appearance="fill">
-                                  <mat-label>Código Entidad</mat-label>
-                                  <input matInput formControlName="codigo_entidad" placeholder="Código Entidad">
-                              </mat-form-field>
-  <!-- Domicilio Legal -->
-                            <mat-form-field class="w-full" appearance="fill">
-                                <mat-label>Domicilio Legal</mat-label>
-                                <input matInput formControlName="domicilio_legal" placeholder="Domicilio Legal">
-                            </mat-form-field>
-
-                            <!-- Teléfonos -->
-                            <mat-form-field class="w-full" appearance="fill">
-                                <mat-label>Teléfonos</mat-label>
-                                <input matInput formControlName="telefonos" placeholder="Teléfonos">
-                            </mat-form-field>
-
-                            <!-- Municipio -->
-                            <mat-form-field class="w-full" appearance="fill">
-                                <mat-label>Municipio</mat-label>
-                                <input matInput formControlName="municipio" placeholder="Municipio">
-                            </mat-form-field>
-
-                            <!-- Actions -->
-                            <div class="flex justify-end space-x-4 mt-6">
-                                <button mat-stroked-button type="button" (click)="cancelEdit()">Cancelar</button>
-                                <button mat-flat-button color="primary" type="submit" [disabled]="contactForm.invalid">Guardar</button>
-                            </div>
-
-                        </form>
-                    </div>
-                  </div>
-              </ng-container>
+    <!-- Modo Vista -->
+    <ng-container *ngIf="!editMode">
+      <div class="min-h-screen bg-gray-50 py-8 px-4">
+        <div class="max-w-2xl mx-auto">
+          
+          <!-- Header con botón de cierre -->
+          <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-semibold text-gray-900">Mi Entidad</h1>
+            <div class="flex items-center space-x-4">
+              <button mat-flat-button 
+                      color="primary"
+                      (click)="toggleEditMode(true)"
+                      class="px-6">
+                <mat-icon class="mr-2">edit</mat-icon>
+                Editar
+              </button>
+              <button mat-icon-button
+                      (click)="goBack()"
+                      class="w-10 h-10">
+                <mat-icon>close</mat-icon>
+              </button>
             </div>
-          </ng-container>
-          <ng-template #multipleEntities>
-          <ng-container *ngIf="dataSource.data.length > 0; else noEntities">
-            <div class="flex flex-col h-full overflow-y-auto">
-              <div class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
-                matSort
-                matSortDisableClear
-                style="grid-template-columns: 40px repeat(6, minmax(120px, 1fr)) 100px;">
-                <div></div>
-                <div [mat-sort-header]="'id'">ID</div>
-                <div [mat-sort-header]="'nombre_entidad'">Nombre</div>
-                <div [mat-sort-header]="'codigo_entidad'">Código</div>
-                <div [mat-sort-header]="'domicilio_legal'">Domicilio Legal</div>
-                <div [mat-sort-header]="'telefonos'">Teléfonos</div>
-                <div [mat-sort-header]="'municipio'">Municipio</div>
-                <div class="sticky-end">Detalles</div>
+          </div>
+
+          <!-- Tarjeta principal -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            
+            <!-- Foto de perfil y información principal -->
+            <div class="px-8 py-8 text-center">
+              <!-- Avatar -->
+              <div class="flex justify-center mb-6">
+                <div class="relative">
+                  <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                    <div *ngIf="dataSource.data[0].logo; else noLogo" class="w-full h-full">
+                      <img [src]="dataSource.data[0].logo" 
+                           [alt]="dataSource.data[0].nombre_entidad"
+                           class="w-full h-full object-cover">
+                    </div>
+                    <ng-template #noLogo>
+                      <div class="text-gray-600 text-2xl font-medium">
+                        {{ getInitials(dataSource.data[0].nombre_entidad) }}
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
               </div>
 
-              <ng-container *ngFor="let entidad of dataSource.filteredData; trackBy: trackByFn">
-                <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b items-center text-m"
-                  style="grid-template-columns: 40px repeat(6, minmax(120px, 1fr)) 100px;">
-                  <div></div>
-                  <div class="truncate">{{ entidad.id }}</div>
-                  <div class="truncate" [matTooltip]="entidad.nombre_entidad" matTooltipPosition="above">
-                    {{ entidad.nombre_entidad }}
-                  </div>
-                  <div class="truncate" [matTooltip]="entidad.codigo_entidad" matTooltipPosition="above">
-                    {{ entidad.codigo_entidad }}
-                  </div>
-                  <div class="truncate" [matTooltip]="entidad.domicilio_legal" matTooltipPosition="above">
-                    {{ entidad.domicilio_legal }}
-                  </div>
-                  <div class="truncate" [matTooltip]="entidad.telefonos" matTooltipPosition="above">
-                    {{ entidad.telefonos }}
-                  </div>
-                  <div class="truncate" [matTooltip]="entidad.municipio?.nombre" matTooltipPosition="above">
-                    {{ entidad.municipio?.nombre }}
-                  </div>
-                  <div class="flex items-center justify-center sticky-end">
-                    <!-- Details button placeholder -->
-                    <button
-                      class="min-w-10 min-h-7 h-7 px-2 leading-6 whitespace-nowrap"
-                      mat-stroked-button
-                      (click)="openEditEntidadDialog(entidad)">
-                      <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
-                    </button>
-                    <button
-                      class="min-w-10 min-h-7 h-7 px-2 leading-6 whitespace-nowrap ml-2"
-                      mat-stroked-button
-                      color="warn"
-                      (click)="deleteEntidad(entidad)">
-                      <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:trash'"></mat-icon>
-                    </button>
+              <!-- Nombre de la entidad -->
+              <h2 class="text-2xl font-semibold text-gray-900 mb-2">
+                {{ dataSource.data[0].nombre_entidad }}
+              </h2>
+
+              <!-- Chips de información -->
+              <div class="flex flex-wrap gap-2 justify-center mb-8">
+                <div class="flex items-center bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
+                  <mat-icon class="w-4 h-4 mr-1" style="font-size: 16px;">business</mat-icon>
+                  {{ dataSource.data[0].codigo_entidad }}
+                </div>
+                <div class="flex items-center bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm">
+                  <mat-icon class="w-4 h-4 mr-1" style="font-size: 16px;">location_city</mat-icon>
+                  {{ dataSource.data[0].tipo_empresa }}
+                </div>
+                <div class="flex items-center px-3 py-1 rounded-full text-sm"
+                     [class.bg-green-50]="dataSource.data[0].activo"
+                     [class.text-green-700]="dataSource.data[0].activo"
+                     [class.bg-red-50]="!dataSource.data[0].activo"
+                     [class.text-red-700]="!dataSource.data[0].activo">
+                  <mat-icon class="w-4 h-4 mr-1" style="font-size: 16px;">
+                    {{ dataSource.data[0].activo ? 'check_circle' : 'cancel' }}
+                  </mat-icon>
+                  {{ dataSource.data[0].activo ? 'Activa' : 'Inactiva' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Información de contacto -->
+            <div class="px-8 pb-8 space-y-6">
+              
+              <!-- Ministerio -->
+              <div class="flex items-center">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                  <mat-icon class="text-blue-600 w-5 h-5" style="font-size: 18px;">account_balance</mat-icon>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Ministerio</p>
+                  <p class="text-gray-900 font-medium">{{ dataSource.data[0].ministerio }}</p>
+                </div>
+              </div>
+
+              <!-- Teléfono -->
+              <div class="flex items-center">
+                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                  <mat-icon class="text-green-600 w-5 h-5" style="font-size: 18px;">phone</mat-icon>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Teléfono</p>
+                  <p class="text-gray-900 font-medium">{{ dataSource.data[0].telefonos }}</p>
+                </div>
+              </div>
+
+              <!-- Ubicación -->
+              <div class="flex items-center">
+                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                  <mat-icon class="text-purple-600 w-5 h-5" style="font-size: 18px;">location_on</mat-icon>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Ubicación</p>
+                  <p class="text-gray-900 font-medium">{{ dataSource.data[0].municipio?.nombre_municipio }}, {{ dataSource.data[0].provincia?.nombre_provincia }}</p>
+                </div>
+              </div>
+
+              <!-- Dirección -->
+              <div class="flex items-start">
+                <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                  <mat-icon class="text-orange-600 w-5 h-5" style="font-size: 18px;">home</mat-icon>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Domicilio Legal</p>
+                  <p class="text-gray-900 font-medium">{{ dataSource.data[0].domicilio_legal }}</p>
+                </div>
+              </div>
+
+              <!-- Fecha de creación -->
+              <div class="flex items-center">
+                <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                  <mat-icon class="text-gray-600 w-5 h-5" style="font-size: 18px;">calendar_today</mat-icon>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Fecha de Registro</p>
+                  <p class="text-gray-900 font-medium">{{ formatDate(dataSource.data[0].createdAt) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón de agregar (como en la imagen) -->
+          <div class="fixed bottom-8 right-8" *ngIf="canAddEntidad()">
+            <button mat-fab 
+                    color="primary"
+                    (click)="openAddEntidadDialog()"
+                    matTooltip="Agregar nueva entidad">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Modo Edición -->
+    <ng-container *ngIf="editMode">
+      <div class="min-h-screen bg-gray-50 py-8 px-4">
+        <div class="max-w-2xl mx-auto">
+          
+          <!-- Header del formulario -->
+          <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-semibold text-gray-900">Editar Entidad</h1>
+            <button mat-icon-button
+                    (click)="toggleEditMode(false)"
+                    class="w-10 h-10">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <!-- Formulario de edición -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <form [formGroup]="contactForm" class="p-8">
+              
+              <!-- Avatar con controles de edición -->
+              <div class="flex justify-center mb-8">
+                <div class="relative">
+                  <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                    <!-- Overlay para controles -->
+                    <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-200 flex items-center justify-center space-x-2">
+                      <input id="logo-file-input"
+                             class="hidden"
+                             type="file"
+                             accept="image/*"
+                             (change)="uploadLogo($event.target.files)"
+                             #logoFileInput>
+                      <button type="button"
+                              mat-icon-button
+                              (click)="logoFileInput.click()"
+                              class="text-white">
+                        <mat-icon>camera_alt</mat-icon>
+                      </button>
+                      <button type="button"
+                              mat-icon-button
+                              (click)="removeLogo()"
+                              class="text-white">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                    
+                    <!-- Imagen/Iniciales -->
+                    <div *ngIf="contactForm.get('logo')?.value; else noLogoEdit" class="w-full h-full">
+                      <img [src]="contactForm.get('logo')?.value" 
+                           [alt]="contactForm.get('nombre')?.value"
+                           class="w-full h-full object-cover">
+                    </div>
+                    <ng-template #noLogoEdit>
+                      <div class="text-gray-600 text-2xl font-medium">
+                        {{ getInitials(contactForm.get('nombre')?.value || 'E') }}
+                      </div>
+                    </ng-template>
                   </div>
                 </div>
-              </ng-container>
-            </div>
-            <mat-paginator
-              class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
-              [length]="pagination.length"
-              [pageIndex]="pagination.page"
-              [pageSize]="pagination.size"
-              [pageSizeOptions]="[5, 10, 25, 100]"
-              [showFirstLastButtons]="true"></mat-paginator>
-          </ng-container>
+              </div>
 
-          <ng-template #noEntities>
-            <div class="p-8 sm:p-16 border-b text-4xl font-semibold tracking-tight text-center">
-              ¡No hay entidades!
-            </div>
-          </ng-template>
-        </ng-template>
+              <!-- Campos del formulario -->
+              <div class="space-y-6">
+                <!-- Nombre -->
+                <mat-form-field class="w-full" appearance="outline">
+                  <mat-label>Nombre de la Entidad</mat-label>
+                  <input matInput
+                         [formControlName]="'nombre'"
+                         placeholder="Nombre de la entidad">
+                  <mat-error *ngIf="contactForm.get('nombre')?.hasError('required')">
+                    El nombre es requerido
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Código -->
+                <mat-form-field class="w-full" appearance="outline">
+                  <mat-label>Código de la Entidad</mat-label>
+                  <input matInput
+                         [formControlName]="'codigo'"
+                         placeholder="Código único">
+                  <mat-error *ngIf="contactForm.get('codigo')?.hasError('required')">
+                    El código es requerido
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Tipo de Empresa -->
+                <mat-form-field class="w-full" appearance="outline">
+                  <mat-label>Tipo de Empresa</mat-label>
+                  <mat-select [formControlName]="'tipo_empresa'">
+                    <mat-option *ngFor="let tipo of tiposEmpresa" [value]="tipo">
+                      {{ tipo }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="contactForm.get('tipo_empresa')?.hasError('required')">
+                    El tipo de empresa es requerido
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Ministerio -->
+                <mat-form-field class="w-full" appearance="outline">
+                  <mat-label>Ministerio</mat-label>
+                  <mat-select [formControlName]="'ministerio'">
+                    <mat-option *ngFor="let ministerio of ministerios" [value]="ministerio">
+                      {{ ministerio }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="contactForm.get('ministerio')?.hasError('required')">
+                    El ministerio es requerido
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Teléfonos -->
+                <mat-form-field class="w-full" appearance="outline">
+                  <mat-label>Teléfonos</mat-label>
+                  <input matInput
+                         [formControlName]="'telefonos'"
+                         placeholder="Número de teléfono">
+                  <mat-error *ngIf="contactForm.get('telefonos')?.hasError('required')">
+                    El teléfono es requerido
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Provincia -->
+                <mat-form-field class="w-full" appearance="outline">
+                  <mat-label>Provincia</mat-label>
+                  <input matInput
+                         [formControlName]="'provincia'"
+                         placeholder="Provincia">
+                  <mat-error *ngIf="contactForm.get('provincia')?.hasError('required')">
+                    La provincia es requerida
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Municipio -->
+                <mat-form-field class="w-full" appearance="outline">
+                  <mat-label>Municipio</mat-label>
+                  <input matInput
+                         [formControlName]="'municipio'"
+                         placeholder="Municipio">
+                  <mat-error *ngIf="contactForm.get('municipio')?.hasError('required')">
+                    El municipio es requerido
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Domicilio Legal -->
+                <mat-form-field class="w-full" appearance="outline">
+                  <mat-label>Domicilio Legal</mat-label>
+                  <textarea matInput
+                            [formControlName]="'domicilio_legal'"
+                            placeholder="Dirección completa"
+                            rows="3"></textarea>
+                  <mat-error *ngIf="contactForm.get('domicilio_legal')?.hasError('required')">
+                    El domicilio legal es requerido
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Estado Activo -->
+                <div class="flex items-center">
+                  <mat-slide-toggle [formControlName]="'activo'" color="primary">
+                    Entidad Activa
+                  </mat-slide-toggle>
+                </div>
+              </div>
+
+              <!-- Botones de acción -->
+              <div class="flex justify-between items-center mt-8 pt-6 border-t">
+                <button type="button"
+                        mat-button
+                        color="warn"
+                        (click)="deleteEntidad(dataSource.data[0])">
+                  <mat-icon class="mr-2">delete</mat-icon>
+                  Eliminar
+                </button>
+                
+                <div class="flex space-x-4">
+                  <button type="button"
+                          mat-button
+                          (click)="toggleEditMode(false)">
+                    Cancelar
+                  </button>
+                  
+                  <button type="button"
+                          mat-flat-button
+                          color="primary"
+                          [disabled]="contactForm.invalid"
+                          (click)="saveEntidad()">
+                    <mat-icon class="mr-2">save</mat-icon>
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
-    </div>
+    </ng-container>
   </div>
-</div>
+</ng-container>
+
+<!-- Vista múltiple (tu vista de tabla normal) -->
+<ng-template #multipleEntities>
+  <!-- Aquí va tu código original de la tabla -->
+</ng-template>

@@ -1,0 +1,131 @@
+<div class="trabajador-form-container">
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon>{{ isEdit ? 'edit' : 'person_add' }}</mat-icon>
+    {{ isEdit ? 'Editar Trabajador' : 'Nuevo Trabajador' }}
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <form [formGroup]="trabajadorForm" (ngSubmit)="onSubmit()" class="trabajador-form">
+      
+      <!-- Información Personal -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>person</mat-icon>
+          Información Personal
+        </h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" placeholder="Ingrese el nombre">
+            <mat-icon matSuffix>person</mat-icon>
+            <mat-error *ngIf="nombre?.invalid && nombre?.touched">
+              {{ getErrorMessage('nombre') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="apellido" placeholder="Ingrese el apellido">
+            <mat-icon matSuffix>person</mat-icon>
+            <mat-error *ngIf="apellido?.invalid && apellido?.touched">
+              {{ getErrorMessage('apellido') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="correo@ejemplo.com">
+            <mat-icon matSuffix>email</mat-icon>
+            <mat-error *ngIf="email?.invalid && email?.touched">
+              {{ getErrorMessage('email') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Información de Contacto -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>phone</mat-icon>
+          Información de Contacto
+        </h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="telefono" placeholder="Teléfono fijo">
+            <mat-icon matSuffix>phone</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Teléfono Móvil</mat-label>
+            <input matInput formControlName="telefono_movil" placeholder="Teléfono móvil">
+            <mat-icon matSuffix>smartphone</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Información Laboral -->
+      <div class="form-section">
+        <h3 class="section-title">
+            <!--
+              Icono que representa la información laboral del trabajador.
+              Se utiliza el icono "work" de Material Design Icons.
+            -->
+          <mat-icon>work</mat-icon>
+          Información Laboral
+        </h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Cargo</mat-label>
+            <input matInput formControlName="cargo" placeholder="Ingrese el cargo">
+            <mat-icon matSuffix>badge</mat-icon>
+            <mat-error *ngIf="cargo?.invalid && cargo?.touched">
+              {{ getErrorMessage('cargo') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Departamento</mat-label>
+            <mat-select formControlName="departamento_id">
+              <mat-option *ngFor="let departamento of departamentos$ | async" [value]="departamento.id">
+                {{ departamento.nombre_departamento }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>business</mat-icon>
+            <mat-error *ngIf="departamento_id?.invalid && departamento_id?.touched">
+              {{ getErrorMessage('departamento_id') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Rol</mat-label>
+            <mat-select formControlName="rol">
+              <mat-option *ngFor="let rol of roles" [value]="rol.value">
+                {{ rol.label }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>admin_panel_settings</mat-icon>
+            <mat-error *ngIf="rol?.invalid && rol?.touched">
+              {{ getErrorMessage('rol') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Información de Acceso -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>lock</mat-icon>
+          Información de Acceso
+        </h3>
+      </div>
+    </form>
+  </mat-dialog-content>
+</div>

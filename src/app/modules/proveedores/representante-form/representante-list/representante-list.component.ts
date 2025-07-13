@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -51,12 +51,12 @@ import { RepresentanteFormComponent } from '../representante-form.component';
   templateUrl: './representante-list.component.html',
   styleUrls: ['./representante-list.component.scss']
 })
-export class RepresentanteListComponent implements OnInit {
+export class RepresentanteListComponent implements OnInit, AfterViewInit {
   dataSource: MatTableDataSource<Representante> = new MatTableDataSource();
   suplementosDataSource: MatTableDataSource<Suplemento> = new MatTableDataSource();
 
   // Columnas para la tabla de representantes
-  displayedColumns: string[] = ['select', 'nombre', 'apellidos', 'cargo', 'telefono', 'email', 'activo', 'acciones'];
+  displayedColumns: string[] = ['select', 'nombre', 'apellido', 'cargo', 'telefono', 'email', 'activo', 'acciones'];
 
   // Columnas para la tabla de suplementos
   displayedSuplementosColumns: string[] = ['no_suplemento', 'fecha_firmado', 'valor_cup', 'valor_usd', 'estado', 'acciones'];
@@ -69,11 +69,14 @@ export class RepresentanteListComponent implements OnInit {
 
   contratos: Contrato[] = [];
   suplementos: Suplemento[] = [];
-  showSuplementos = false; // Controla si se muestran los suplementos
+  showSuplementos = false;
   selectedContratoId: number | null = null;
   searchControl = new FormControl('');
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  selectedRowForm: FormGroup;
+
+@ViewChild('sort') sort: MatSort;
+@ViewChild('paginator') paginator: MatPaginator;
+
 
   pagination = {
     length: 0,
@@ -88,26 +91,61 @@ export class RepresentanteListComponent implements OnInit {
     private contratoService: ContratoService,
     private suplementoService: SuplementoService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private fb: FormBuilder
   ) {
     this.dataSource = new MatTableDataSource<Representante>([]);
     this.suplementosDataSource = new MatTableDataSource<Suplemento>([]);
+    
+    // Inicializar el formulario de edición
+    this.selectedRowForm = this.fb.group({
+      nombre: [''],
+      apellido: [''],
+      telefono: [''],
+      email: [''],
+      cargo: [''],
+      estado: ['']
+    });
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   ngOnInit(): void {
     this.loadRepresentantes();
     this.loadSuplementos();
     this.setupFilter();
+    this.dataSource.filterPredicate = (data: any, filter: string) => {
+      const searchStr = [
+        data.Proveedor?.nombre || '',
+        data.Proveedor?.codigo || '',
+        data.nombre || '',
+        data.apellido || '',
+        data.cargo || '',
+        data.telefono || '',
+        data.email || '',
+        data.estado || '',
+        data.Proveedor?.tipo_empresa || '',
+        data.numero_documento || ''
+      ].join(' ').toLowerCase();
+      
+      return searchStr.includes(filter);
+    };
   }
 
   loadRepresentantes(): void {
     this.isLoading = true;
     this.representanteService.getRepresentantes().subscribe({
       next: (representantes) => {
+        console.log('Representantes cargados:', representantes);
+        console.log('=== DEBUG: Datos recibidos ===');
+      console.log('Total representantes:', representantes.length);
+      console.log('Primer representante:', representantes[0]);
+      console.log('Estructura del primer representante:', Object.keys(representantes[0] || {}));
         this.dataSource.data = representantes;
         this.pagination.length = representantes.length;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
         if (this.selectedContratoId) {
           this.applyContratoFilter();
         }
@@ -183,6 +221,46 @@ export class RepresentanteListComponent implements OnInit {
     } else {
       const found = this.dataSource.data.find(r => r.id === id);
       this.selectedRow = found ? found : null;
+      
+      if (this.selectedRow) {
+        // Poblar el formulario con los datos del representante seleccionado
+        this.selectedRowForm.patchValue({
+          nombre: this.selectedRow.nombre,
+          apellido: this.selectedRow.apellido,
+          telefono: this.selectedRow.telefono,
+          email: this.selectedRow.email,
+          cargo: this.selectedRow.cargo,
+          estado: this.selectedRow.estado
+        });
+      }
+    }
+  }
+
+  updateSelectedRecord(): void {
+    if (this.selectedRow && this.selectedRowForm.valid) {
+      const updatedData = {
+        ...this.selectedRow,
+        ...this.selectedRowForm.value
+      };
+      
+      this.representanteService.updateRepresentante(this.selectedRow.id, updatedData).subscribe({
+        next: () => {
+          this.showMessage('Representante actualizado correctamente');
+          this.loadRepresentantes();
+          this.selectedRow = null;
+        },
+        error: (error) => {
+          console.error('Error al actualizar el representante', error);
+          this.showMessage('Error al actualizar el representante', 'error');
+        }
+      });
+    }
+  }
+
+  deleteSelectedRecord(): void {
+    if (this.selectedRow) {
+      this.deleteRepresentante(this.selectedRow.id);
+      this.selectedRow = null;
     }
   }
 
@@ -257,5 +335,9 @@ export class RepresentanteListComponent implements OnInit {
 
   onContratoChange(): void {
     this.applyContratoFilter();
+  }
+
+  trackByFn(index: number, item: any): any {
+    return item.id || index;
   }
 }

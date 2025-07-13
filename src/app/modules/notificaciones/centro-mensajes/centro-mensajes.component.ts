@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
+import { NotificacionesService } from '../notificaciones.service';
 interface Recipient {
   id: number;
   email: string;
@@ -87,9 +88,15 @@ templates = [
 ];
 
 
-  constructor() { }
+  constructor(
+   private notificacionesService:NotificacionesService
+
+  ) { }
 
   ngOnInit(): void {
+    this.notificacionesService.getNotificacion().subscribe((data) => {
+      console.log(data);
+    });
     this.updateStats();
   }
 

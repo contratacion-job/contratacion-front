@@ -56,73 +56,68 @@
         <ng-container *ngIf="dataSource.data.length > 0; else noEjecuciones">
           <div class="flex flex-col h-full overflow-y-auto">
             <div class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
-              matSort
-              matSortDisableClear
-              style="grid-template-columns: repeat(11, minmax(100px, 1fr)) 100px;">
-              <div [mat-sort-header]="'no_suplemento_id'">No. Suplemento</div>
-              <div [mat-sort-header]="'proveedor'">Proveedor</div>
-              <div [mat-sort-header]="'contrato'">Contrato</div>
-              <div [mat-sort-header]="'trabajo_ejecutado'">Trabajo Ejecutado</div>
-              <div [mat-sort-header]="'costo_cup'" class="text-right">Costo (CUP)</div>
-              <div [mat-sort-header]="'costo_cl'" class="text-right">Costo (CL)</div>
-              <div [mat-sort-header]="'fecha_ejecucion'">Fecha de Ejecución</div>
-              <div class="sticky-end">Acciones</div>
-            </div>
+            matSort
+            matSortDisableClear
+            style="grid-template-columns: 120px 200px 150px 150px 150px 150px 150px 80px;">
+            <div [mat-sort-header]="'codigo_proveedor'">Código Proveedor</div>
+            <div [mat-sort-header]="'proveedor_nombre'">Proveedor</div>
+            <div [mat-sort-header]="'suplemento_fecha'">Fecha Suplemento</div>
+            <div [mat-sort-header]="'trabajo_ejecutado'">Trabajo Ejecutado</div>
+            <div [mat-sort-header]="'costo_cup'" class="text-right">Costo (CUP)</div>
+            <div [mat-sort-header]="'costo_usd'" class="text-right">Costo (USD)</div>
+            <div [mat-sort-header]="'fecha_ejecucion'">Fecha de Ejecución</div>
+            <div>Acciones</div>
+          </div>
+          
 
-            <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b bg-gray-50 dark:bg-gray-800"
-                 style="grid-template-columns: repeat(11, minmax(100px, 1fr)) 100px;"
-                 [formGroup]="filterForm">
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <input matInput placeholder="No. Suplemento" formControlName="no_suplemento_id_filter" />
-                </mat-form-field>
-              </div>
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <input matInput placeholder="Proveedor" formControlName="proveedor_filter" />
-                </mat-form-field>
-              </div>
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <input matInput placeholder="Contrato" formControlName="contrato_filter" />
-                </mat-form-field>
-              </div>
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <input matInput placeholder="Trabajo Ejecutado" formControlName="trabajo_ejecutado_filter" />
-                </mat-form-field>
-              </div>
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <input matInput type="number" placeholder="Costo CUP" formControlName="costo_cup_filter" />
-                </mat-form-field>
-              </div>
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <input matInput type="number" placeholder="Costo CL" formControlName="costo_cl_filter" />
-                </mat-form-field>
-              </div>
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <input matInput type="date" placeholder="Fecha Ejecución" formControlName="fecha_ejecucion_filter" />
-                </mat-form-field>
-              </div>
+          <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b bg-gray-50 dark:bg-gray-800"
+          style="grid-template-columns: 120px 200px 150px 150px 150px 150px 150px 80px;"
+          [formGroup]="filterForm">
+       <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
+         <input matInput formControlName="codigo_proveedor_filter" placeholder="Filtrar código...">
+       </mat-form-field>
+       
+       <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
+         <input matInput formControlName="proveedor_filter" placeholder="Filtrar proveedor...">
+       </mat-form-field>
+       
+       <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
+         <input matInput formControlName="suplemento_fecha_filter" placeholder="Filtrar fecha...">
+       </mat-form-field>
+       
+       <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
+         <input matInput formControlName="trabajo_ejecutado_filter" placeholder="Filtrar trabajo...">
+       </mat-form-field>
+       
+       <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
+         <input matInput formControlName="costo_cup_filter" placeholder="Filtrar CUP...">
+       </mat-form-field>
+       
+       <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
+         <input matInput formControlName="costo_usd_filter" placeholder="Filtrar USD...">
+       </mat-form-field>
+       
+       <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full">
+         <input matInput formControlName="fecha_ejecucion_filter" placeholder="Filtrar fecha...">
+       </mat-form-field>
+       
+             
               <div></div>
             </div>
 
-            <ng-container *ngFor="let element of dataSource.filteredData; trackBy: trackByFn">
-              <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b items-center text-m hover:bg-gray-50 dark:hover:bg-gray-800"
-                style="grid-template-columns: repeat(7, minmax(100px, 1fr)) 80px;">
-                <div class="truncate" [matTooltip]="element.no_suplemento_id">{{ element.no_suplemento_id || 'N/A' }}</div>
-                <div class="truncate" [matTooltip]="element.proveedor?.nombre">{{ element.proveedor?.nombre || 'N/A' }}</div>
-                <div class="truncate" [matTooltip]="element.contrato?.no_contrato_contratacion">{{ element.contrato?.no_contrato_contratacion || 'N/A' }}</div>
-                <div class="truncate max-w-xs" [matTooltip]="element.trabajo_ejecutado">{{ element.trabajo_ejecutado || 'N/A' }}</div>
+            <ng-container *ngFor="let element of dataSource.data; trackBy: trackByFn">
+              <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b items-center text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+                style="grid-template-columns: 120px 200px 150px 150px 150px 150px 150px 80px;">
+                <div class="truncate" [matTooltip]="element.codigo_proveedor">{{ element.codigo_proveedor || 'N/A' }}</div>
+                <div class="truncate" [matTooltip]="element.proveedor?.nombre">{{ element.proveedor?.nombre || '—' }}</div>
+                <div class="truncate" [matTooltip]="element.suplemento?.fecha_suplemento">{{ (element.suplemento?.fecha_suplemento | date:'dd/MM/yyyy') || 'N/A' }}</div>
+                <div class="truncate" [matTooltip]="element.trabajo_ejecutado">{{ element.trabajo_ejecutado || 'N/A' }}</div>
                 <div class="text-right">{{ element.costo_cup | number:'1.2-2' }}</div>
-                <div class="text-right">{{ element.costo_cl | number:'1.2-2' }}</div>
+                <div class="text-right">{{ element.costo_usd | number:'1.2-2' }}</div>
                 <div>{{ element.fecha_ejecucion | date:'dd/MM/yyyy' }}</div>
-                <div class="flex items-center justify-end gap-2 sticky-end">
+                <div class="flex items-center justify-end">
                   <button
-                    class="min-w-10 min-h-7 h-7 px-2 leading-6 whitespace-nowrap"
+                    class="min-w-10 min-h-7 h-7 px-2 leading-6"
                     mat-stroked-button
                     (click)="toggleDetails(element.id)">
                     <mat-icon
@@ -156,14 +151,16 @@
                           <!-- Proveedor -->
                           <mat-form-field class="w-full">
                             <mat-label>Proveedor</mat-label>
-                            <input matInput [value]="selectedEjecucion?.proveedor?.nombre || 'N/A'" readonly />
+                            <input matInput [value]="selectedEjecucion?.proveedor?.nombre || selectedEjecucion?.Proveedor?.nombre || 'N/A'" readonly />
                           </mat-form-field>
                           
-                          <!-- Contrato -->
+                          <!-- Fecha Suplemento (agregar este campo si no existe) -->
                           <mat-form-field class="w-full">
-                            <mat-label>No. Contrato</mat-label>
-                            <input matInput [value]="selectedEjecucion?.contrato?.no_contrato_contratacion || 'N/A'" readonly />
+                            <mat-label>Fecha Suplemento</mat-label>
+                            <input matInput [value]="(selectedEjecucion?.suplemento?.fecha_suplemento || selectedEjecucion?.Suplemento?.fecha_suplemento) | date:'dd/MM/yyyy'" readonly />
                           </mat-form-field>
+                          
+            
                           
                           <!-- Trabajo Ejecutado -->
                           <mat-form-field class="w-full">
@@ -189,17 +186,7 @@
                             </mat-error>
                           </mat-form-field>
                           
-                          <!-- Costo CL -->
-                          <mat-form-field class="w-full">
-                            <mat-label>Costo CL</mat-label>
-                            <input matInput type="number" step="0.01" min="0" formControlName="costo_cl" />
-                            <mat-error *ngIf="selectedEjecucionForm.get('costo_cl')?.hasError('required')">
-                              Este campo es requerido
-                            </mat-error>
-                            <mat-error *ngIf="selectedEjecucionForm.get('costo_cl')?.hasError('min')">
-                              El valor debe ser mayor o igual a 0
-                            </mat-error>
-                          </mat-form-field>
+                        
                           
                           <!-- Fecha Ejecución -->
                           <mat-form-field class="w-full">

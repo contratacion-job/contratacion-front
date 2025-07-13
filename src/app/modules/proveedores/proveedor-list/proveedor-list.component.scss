@@ -1,6 +1,6 @@
 .inventory-grid {
   display: grid;
-  grid-template-columns: 25px repeat(9, 1fr) 35px;
+  grid-template-columns: 1fr 120px 120px 150px 180px 180px 180px 180px 180px 180px 180px 180px 80px;
   gap: 1rem;
   width: 100%;
   box-sizing: border-box;

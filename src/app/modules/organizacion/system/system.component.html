@@ -1,185 +1,232 @@
 <div class="logs-container">
-    <!-- Header -->
-    <div class="header">
-      <div class="header-title">
-        <div class="title-section">
-          <i class="icon-activity"></i>
-          <h1>Logs del Sistema</h1>
-        </div>
-        <div class="action-buttons">
-          <button class="btn btn-primary" (click)="refresh()">
-            <i class="icon-refresh"></i>
-            Actualizar
-          </button>
-          <button class="btn btn-success" (click)="export()">
-            <i class="icon-download"></i>
-            Exportar
-          </button>
-        </div>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-title">
+      <div class="title-section">
+        <i class="icon-activity"></i>
+        <h1>Logs del Sistema</h1>
       </div>
+      <div class="action-buttons">
+        <button class="btn btn-primary" (click)="refresh()" [disabled]="loading">
+          <i class="icon-refresh"></i>
+          Actualizar
+        </button>
+        <button class="btn btn-success" (click)="export()" [disabled]="loading">
+          <i class="icon-download"></i>
+          Exportar
+        </button>
+      </div>
+    </div>
+          
+    <div class="search-filters-section" *ngIf="!loading">
+      <div class="search-and-filter">
+        <div class="search-container">
+          <i class="icon-search"></i>
+          <input 
+            type="text"
+            placeholder="Buscar logs..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            class="search-input">
+        </div>
+        <button 
+          class="btn-filter"
+          [class.active]="showFilters"
+          (click)="toggleFilters()">
+          <i class="icon-filter"></i>
+          Filtros
+        </button>
+      </div>
+              
+      <div class="results-count">
+        Mostrando {{filteredLogs.length}} de {{logs.length}} registros locales
+        <span class="server-info">({{serverPagination.total}} total en servidor)</span>
+      </div>
+    </div>
       
-      <div class="search-filters-section">
-        <div class="search-and-filter">
-          <div class="search-container">
-            <i class="icon-search"></i>
-            <input 
-              type="text" 
-              placeholder="Buscar logs..." 
-              [(ngModel)]="searchTerm"
-              (input)="onSearchChange()"
-              class="search-input">
-          </div>
-          <button 
-            class="btn-filter" 
-            [class.active]="showFilters"
-            (click)="toggleFilters()">
-            <i class="icon-filter"></i>
-            Filtros
-          </button>
+    <!-- Filtros -->
+    <div class="filters-section" *ngIf="showFilters && !loading">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Usuario</label>
+          <select [(ngModel)]="filterUser" (change)="onFilterChange()">
+            <option value="">Todos los usuarios</option>
+            <option *ngFor="let user of uniqueUsers" [value]="user">{{user}}</option>
+          </select>
         </div>
-        
-        <div class="results-count">
-          Mostrando {{filteredLogs.length}} de {{logs.length}} registros
+                  
+        <div class="filter-group">
+          <label>Tabla</label>
+          <select [(ngModel)]="filterTable" (change)="onFilterChange()">
+            <option value="">Todas las tablas</option>
+            <option *ngFor="let table of uniqueTables" [value]="table">{{table}}</option>
+          </select>
         </div>
-      </div>
-  
-      <!-- Filtros -->
-      <div class="filters-section" *ngIf="showFilters">
-        <div class="filters-grid">
-          <div class="filter-group">
-            <label>Usuario</label>
-            <select [(ngModel)]="filterUser" (change)="onFilterChange()">
-              <option value="">Todos los usuarios</option>
-              <option *ngFor="let user of uniqueUsers" [value]="user">{{user}}</option>
-            </select>
-          </div>
-          
-          <div class="filter-group">
-            <label>Tabla</label>
-            <select [(ngModel)]="filterTable" (change)="onFilterChange()">
-              <option value="">Todas las tablas</option>
-              <option *ngFor="let table of uniqueTables" [value]="table">{{table}}</option>
-            </select>
-          </div>
-          
-          <div class="filter-group">
-            <label>Acción</label>
-            <select [(ngModel)]="filterAction" (change)="onFilterChange()">
-              <option value="">Todas las acciones</option>
-              <option *ngFor="let action of uniqueActions" [value]="action">{{action}}</option>
-            </select>
-          </div>
-          
-          <div class="filter-group">
-            <button class="btn btn-secondary full-width" (click)="clearFilters()">
-              Limpiar filtros
-            </button>
-          </div>
+                  
+        <div class="filter-group">
+          <label>Acción</label>
+          <select [(ngModel)]="filterAction" (change)="onFilterChange()">
+            <option value="">Todas las acciones</option>
+            <option *ngFor="let action of uniqueActions" [value]="action">{{action}}</option>
+          </select>
         </div>
-      </div>
-    </div>
-  
-    <!-- Tabla de logs -->
-    <div class="table-container">
-      <table class="logs-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>
-              <i class="icon-user"></i>
-              Usuario
-            </th>
-            <th>
-              <i class="icon-calendar"></i>
-              Fecha
-            </th>
-            <th>
-              <i class="icon-database"></i>
-              Tabla
-            </th>
-            <th>
-              <i class="icon-activity"></i>
-              Acción
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let log of paginatedLogs" class="table-row">
-            <td class="log-id">#{{log.id}}</td>
-            <td class="log-user">
-              <div class="user-info">
-                <div class="user-avatar">
-                  <i class="icon-user"></i>
-                </div>
-                {{log.usuario}}
-              </div>
-            </td>
-            <td class="log-date">{{formatDate(log.fecha)}}</td>
-            <td class="log-table">
-              <span class="table-badge">{{log.tabla}}</span>
-            </td>
-            <td class="log-action">
-              <span class="action-badge" [ngClass]="getActionClass(log.accion)">
-                {{log.accion}}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-  
-      <!-- Paginación -->
-      <div class="pagination-container" *ngIf="totalPages > 1">
-        <div class="pagination-info">
-          <span>
-            Mostrando {{getStartIndex()}} a {{getEndIndex()}} de {{filteredLogs.length}} resultados
-          </span>
-        </div>
-        <div class="pagination-controls">
-          <button 
-            class="btn-pagination"
-            [disabled]="currentPage === 1"
-            (click)="changePage(currentPage - 1)">
-            <i class="icon-chevron-left"></i>
-            Anterior
-          </button>
-          
-          <div class="page-numbers">
-            <button 
-              *ngFor="let page of getPagesArray()"
-              class="btn-page"
-              [class.active]="currentPage === page"
-              (click)="changePage(page)">
-              {{page}}
-            </button>
-          </div>
-          
-          <button 
-            class="btn-pagination"
-            [disabled]="currentPage === totalPages"
-            (click)="changePage(currentPage + 1)">
-            Siguiente
-            <i class="icon-chevron-right"></i>
+                  
+        <div class="filter-group">
+          <button class="btn btn-secondary full-width" (click)="clearFilters()">
+            Limpiar filtros
           </button>
         </div>
       </div>
-    </div>
-  
-    <!-- Estado vacío -->
-    <div class="empty-state" *ngIf="filteredLogs.length === 0">
-      <i class="icon-activity"></i>
-      <h3>No se encontraron logs</h3>
-      <p *ngIf="searchTerm || filterUser || filterTable || filterAction; else noLogs">
-        No hay logs que coincidan con los filtros aplicados.
-      </p>
-      <ng-template #noLogs>
-        <p>No hay logs disponibles en el sistema.</p>
-      </ng-template>
-      <button 
-        *ngIf="searchTerm || filterUser || filterTable || filterAction"
-        class="btn btn-primary" 
-        (click)="clearFilters()">
-        Limpiar filtros
-      </button>
     </div>
   </div>
-  
+    
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando logs del sistema...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="error && !loading">
+    <i class="icon-alert-circle"></i>
+    <h3>Error al cargar los logs</h3>
+    <p>{{error}}</p>
+    <button class="btn btn-primary" (click)="refresh()">
+      Reintentar
+    </button>
+  </div>
+
+  <!-- Tabla de logs -->
+  <div class="table-container" *ngIf="!loading && !error">
+    <table class="logs-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>
+            <i class="icon-user"></i>
+            Usuario
+          </th>
+          <th>
+            <i class="icon-calendar"></i>
+            Fecha
+          </th>
+          <th>
+            <i class="icon-database"></i>
+            Tabla
+          </th>
+          <th>
+            <i class="icon-activity"></i>
+            Acción
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of paginatedLogs" class="table-row">
+          <td class="log-id">#{{log.id}}</td>
+          <td class="log-user">
+            <div class="user-info">
+              <div class="user-avatar">
+                <i class="icon-user"></i>
+              </div>
+              {{log.usuario}}
+            </div>
+          </td>
+          <td class="log-date">{{formatDate(log.fecha)}}</td>
+          <td class="log-table">
+            <span class="table-badge">{{log.tabla}}</span>
+          </td>
+          <td class="log-action">
+            <span class="action-badge" [ngClass]="getActionClass(log.accion)">
+              {{log.accion}}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+      
+    <!-- Paginación Local -->
+    <div class="pagination-container" *ngIf="localTotalPages > 1">
+      <div class="pagination-info">
+        <span>
+          Mostrando {{getStartIndex()}} a {{getEndIndex()}} de {{filteredLogs.length}} resultados filtrados
+        </span>
+      </div>
+      <div class="pagination-controls">
+        <button 
+          class="btn-pagination"
+          [disabled]="localCurrentPage === 1"
+          (click)="changePage(localCurrentPage - 1)">
+          <i class="icon-chevron-left"></i>
+          Anterior
+        </button>
+                  
+        <div class="page-numbers">
+          <button 
+            *ngFor="let page of getPagesArray()"
+            class="btn-page"
+            [class.active]="localCurrentPage === page"
+            (click)="changePage(page)">
+            {{page}}
+          </button>
+        </div>
+                  
+        <button 
+          class="btn-pagination"
+          [disabled]="localCurrentPage === localTotalPages"
+          (click)="changePage(localCurrentPage + 1)">
+          Siguiente
+          <i class="icon-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Paginación del Servidor (opcional, para navegar entre páginas del servidor) -->
+    <div class="server-pagination-container" *ngIf="serverPagination.totalPages > 1">
+      <div class="server-pagination-info">
+        <span>
+          Página {{serverPagination.currentPage}} de {{serverPagination.totalPages}} del servidor
+          ({{serverPagination.total}} registros totales)
+        </span>
+      </div>
+      <div class="server-pagination-controls">
+        <button 
+          class="btn-pagination server-btn"
+          [disabled]="serverPagination.currentPage === 1"
+          (click)="changeServerPage(serverPagination.currentPage - 1)">
+          <i class="icon-chevron-left"></i>
+          Página Anterior
+        </button>
+                  
+        <div class="server-page-info">
+          <span>{{serverPagination.currentPage}} / {{serverPagination.totalPages}}</span>
+        </div>
+                  
+        <button 
+          class="btn-pagination server-btn"
+          [disabled]="serverPagination.currentPage === serverPagination.totalPages"
+          (click)="changeServerPage(serverPagination.currentPage + 1)">
+          Página Siguiente
+          <i class="icon-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+    
+  <!-- Estado vacío -->
+  <div class="empty-state" *ngIf="filteredLogs.length === 0 && !loading && !error">
+    <i class="icon-activity"></i>
+    <h3>No se encontraron logs</h3>
+    <p *ngIf="searchTerm || filterUser || filterTable || filterAction; else noLogs">
+      No hay logs que coincidan con los filtros aplicados.
+    </p>
+    <ng-template #noLogs>
+      <p>No hay logs disponibles en esta página.</p>
+    </ng-template>
+    <button 
+      *ngIf="searchTerm || filterUser || filterTable || filterAction"
+      class="btn btn-primary" 
+      (click)="clearFilters()">
+      Limpiar filtros
+    </button>
+  </div>
+</div>

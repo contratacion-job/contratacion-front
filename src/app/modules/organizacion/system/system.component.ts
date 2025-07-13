@@ -1,33 +1,50 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Log } from 'app/models/Type';
+import { SystemService } from './system.service';
+
+interface ApiLog {
+  id: number;
+  action: string;
+  createdAt: string;
+  description: string;
+  details: string;
+  timestamp: string;
+  updatedAt: string;
+  user_id: number;
+}
+
+interface ApiResponse {
+  message: string;
+  data: ApiLog[];
+  pagination: {
+    total: number;
+    page: number;
+    pages: number;
+    limit: number;
+  };
+}
 
 @Component({
   selector: 'app-system',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './system.component.html',
   styleUrl: './system.component.scss'
 })
 export class SystemComponent implements OnInit {
-  logs: Log[] = [
-    { id: 1, usuario: 'admin', fecha: new Date('2024-06-23T10:30:00'), tabla: 'contrato', accion: 'CREATE' },
-    { id: 2, usuario: 'juan.perez', fecha: new Date('2024-06-23T10:25:00'), tabla: 'suplemento', accion: 'UPDATE' },
-    { id: 3, usuario: 'maria.garcia', fecha: new Date('2024-06-23T10:20:00'), tabla: 'ejecucion de contrato', accion: 'DELETE' },
-    { id: 4, usuario: 'admin', fecha: new Date('2024-06-23T10:15:00'), tabla: 'usuario', accion: 'READ' },
-    { id: 5, usuario: 'carlos.lopez', fecha: new Date('2024-06-23T10:10:00'), tabla: 'ejecucion de suplemento', accion: 'UPDATE' },
-    { id: 6, usuario: 'ana.martinez', fecha: new Date('2024-06-23T10:05:00'), tabla: 'proveedores', accion: 'CREATE' },
-    { id: 7, usuario: 'pedro.rodriguez', fecha: new Date('2024-06-23T10:00:00'), tabla: 'representante', accion: 'READ' },
-    { id: 8, usuario: 'lucia.fernandez', fecha: new Date('2024-06-23T09:55:00'), tabla: 'contrato', accion: 'CREATE' },
-    { id: 9, usuario: 'miguel.torres', fecha: new Date('2024-06-23T09:50:00'), tabla: 'suplemento', accion: 'UPDATE' },
-    { id: 10, usuario: 'sofia.ramirez', fecha: new Date('2024-06-23T09:45:00'), tabla: 'proveedores', accion: 'DELETE' },
-    { id: 11, usuario: 'diego.vargas', fecha: new Date('2024-06-23T09:40:00'), tabla: 'ejecucion de contrato', accion: 'CREATE' },
-    { id: 12, usuario: 'Carmen.ruiz', fecha: new Date('2024-06-23T09:35:00'), tabla: 'representante', accion: 'UPDATE' },
-    { id: 13, usuario: 'fernando.lopez', fecha: new Date('2024-06-23T09:30:00'), tabla: 'ejecucion de suplemento', accion: 'READ' },
-    { id: 14, usuario: 'patricia.mendez', fecha: new Date('2024-06-23T09:25:00'), tabla: 'usuario', accion: 'CREATE' },
-    { id: 15, usuario: 'roberto.castro', fecha: new Date('2024-06-23T09:20:00'), tabla: 'contrato', accion: 'DELETE' }
-  ];
+  logs: Log[] = [];
+  loading: boolean = true;
+  error: string = '';
+
+  // Paginación del servidor
+  serverPagination = {
+    total: 0,
+    currentPage: 1,
+    totalPages: 0,
+    limit: 50
+  };
 
   // Filtros
   searchTerm: string = '';
@@ -36,9 +53,9 @@ export class SystemComponent implements OnInit {
   filterAction: string = '';
   showFilters: boolean = false;
 
-  // Paginación
-  currentPage: number = 1;
-  itemsPerPage: number = 5;
+  // Paginación local (para los datos filtrados)
+  localCurrentPage: number = 1;
+  itemsPerPage: number = 10;
 
   // Datos calculados
   filteredLogs: Log[] = [];
@@ -46,11 +63,107 @@ export class SystemComponent implements OnInit {
   uniqueUsers: string[] = [];
   uniqueTables: string[] = [];
   uniqueActions: string[] = [];
-  totalPages: number = 0;
+  localTotalPages: number = 0;
+
+  constructor(
+    private logService: SystemService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    this.calculateUniqueValues();
-    this.applyFilters();
+    this.loadLogs();
+  }
+
+  loadLogs(page: number = 1): void {
+    this.loading = true;
+    this.error = '';
+    
+    this.logService.getLogs().subscribe({
+      next: (response: any) => {
+        console.log('Respuesta completa:', response);
+        
+        if (response && response.data && Array.isArray(response.data)) {
+          const apiResponse = response as ApiResponse;
+          
+          // Actualizar información de paginación del servidor
+          this.serverPagination = {
+            total: apiResponse.pagination.total,
+            currentPage: apiResponse.pagination.page,
+            totalPages: apiResponse.pagination.pages,
+            limit: apiResponse.pagination.limit
+          };
+          
+          // Transformar los datos
+          this.logs = this.transformApiData(apiResponse.data);
+          this.calculateUniqueValues();
+          this.applyFilters();
+        } else {
+          console.error('Estructura de datos inesperada:', response);
+          this.error = 'Estructura de datos inesperada del servidor';
+        }
+        
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar logs:', error);
+        this.error = 'Error al cargar los logs del sistema';
+        this.loading = false;
+      }
+    });
+  }
+
+  transformApiData(apiData: ApiLog[]): Log[] {
+    return apiData.map(item => {
+      let tabla = this.extractTableFromDetails(item.details);
+      if (!tabla) {
+        tabla = this.extractTableFromDescription(item.description);
+      }
+      
+      return {
+        id: item.id,
+        usuario: `ID: ${item.user_id}`, // Por ahora mostramos el ID, después se cambiará por el nombre
+        fecha: new Date(item.createdAt),
+        tabla: tabla,
+        accion: this.mapActionToSpanish(item.action)
+      };
+    });
+  }
+
+  extractTableFromDetails(details: string): string {
+    try {
+      const parsedDetails = JSON.parse(details);
+      if (parsedDetails.tipo) {
+        return parsedDetails.tipo;
+      }
+    } catch (e) {
+      console.warn('No se pudo parsear details:', details);
+    }
+    return '';
+  }
+
+  extractTableFromDescription(description: string): string {
+    // Extraer información de la tabla desde la descripción
+    if (description.includes('Catalogo')) {
+      return 'catalogo';
+    }
+    if (description.includes('ministerios')) {
+      return 'ministerios';
+    }
+    if (description.includes('municipios')) {
+      return 'municipios';
+    }
+    // Agregar más casos según sea necesario
+    return 'sistema';
+  }
+
+  mapActionToSpanish(action: string): string {
+    const actionMap: { [key: string]: string } = {
+      'consultar': 'READ',
+      'crear': 'CREATE',
+      'actualizar': 'UPDATE',
+      'eliminar': 'DELETE'
+    };
+    return actionMap[action] || action.toUpperCase();
   }
 
   calculateUniqueValues(): void {
@@ -61,11 +174,11 @@ export class SystemComponent implements OnInit {
 
   applyFilters(): void {
     this.filteredLogs = this.logs.filter(log => {
-      const matchesSearch = this.searchTerm === '' || 
+      const matchesSearch = this.searchTerm === '' ||
         log.usuario.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         log.tabla.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         log.accion.toLowerCase().includes(this.searchTerm.toLowerCase());
-      
+
       const matchesUser = this.filterUser === '' || log.usuario === this.filterUser;
       const matchesTable = this.filterTable === '' || log.tabla === this.filterTable;
       const matchesAction = this.filterAction === '' || log.accion === this.filterAction;
@@ -73,23 +186,23 @@ export class SystemComponent implements OnInit {
       return matchesSearch && matchesUser && matchesTable && matchesAction;
     });
 
-    this.totalPages = Math.ceil(this.filteredLogs.length / this.itemsPerPage);
-    this.currentPage = Math.min(this.currentPage, Math.max(1, this.totalPages));
+    this.localTotalPages = Math.ceil(this.filteredLogs.length / this.itemsPerPage);
+    this.localCurrentPage = Math.min(this.localCurrentPage, Math.max(1, this.localTotalPages));
     this.updatePagination();
   }
 
   updatePagination(): void {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const startIndex = (this.localCurrentPage - 1) * this.itemsPerPage;
     this.paginatedLogs = this.filteredLogs.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
   onSearchChange(): void {
-    this.currentPage = 1;
+    this.localCurrentPage = 1;
     this.applyFilters();
   }
 
   onFilterChange(): void {
-    this.currentPage = 1;
+    this.localCurrentPage = 1;
     this.applyFilters();
   }
 
@@ -102,14 +215,21 @@ export class SystemComponent implements OnInit {
     this.filterUser = '';
     this.filterTable = '';
     this.filterAction = '';
-    this.currentPage = 1;
+    this.localCurrentPage = 1;
     this.applyFilters();
   }
 
   changePage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
+    if (page >= 1 && page <= this.localTotalPages) {
+      this.localCurrentPage = page;
       this.updatePagination();
+    }
+  }
+
+  // Métodos para paginación del servidor (si quieres implementarla después)
+  changeServerPage(page: number): void {
+    if (page >= 1 && page <= this.serverPagination.totalPages) {
+      this.loadLogs(page);
     }
   }
 
@@ -135,20 +255,19 @@ export class SystemComponent implements OnInit {
   }
 
   getPagesArray(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    return Array.from({ length: this.localTotalPages }, (_, i) => i + 1);
   }
 
   getStartIndex(): number {
-    return (this.currentPage - 1) * this.itemsPerPage + 1;
+    return (this.localCurrentPage - 1) * this.itemsPerPage + 1;
   }
 
   getEndIndex(): number {
-    return Math.min(this.currentPage * this.itemsPerPage, this.filteredLogs.length);
+    return Math.min(this.localCurrentPage * this.itemsPerPage, this.filteredLogs.length);
   }
 
   refresh(): void {
-    // Implementar lógica de actualización
-    console.log('Actualizando logs...');
+    this.loadLogs(this.serverPagination.currentPage);
   }
 
   export(): void {

@@ -4,8 +4,8 @@ import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormControl, FormGroup } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, takeUntil, switchMap, map } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil, map } from 'rxjs/operators';
+import { forkJoin, Subject } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -24,12 +24,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProveedorFormComponent } from '../proveedor-form/proveedor-form.component';
 import { ProveedorService } from '../services/proveedor.service';
 import { RepresentanteService } from '../services/representante.service';
-import { 
-  mockMinisterio, 
-  mockMunicipio 
-} from 'app/mock-api/contrato-fake/fake'; 
+
 import { Proveedor, Representante } from 'app/models/Type';
-import { Subject, of, combineLatest } from 'rxjs';
 import autoTable from 'jspdf-autotable';
 import jsPDF from 'jspdf';
 
@@ -61,15 +57,33 @@ import jsPDF from 'jspdf';
 export class ProveedorListComponent implements OnInit {
   data: any[] = [];
 
+  ministerios: any[] = [];
+  municipios: any[] = [];
+  mockMinisterio: any[] = []; // Agregar esta línea
+  mockMunicipio: any[] = [];  // Agregar esta línea
+  
   columns = [
     { key: 'nombre', label: 'Nombre', editable: true },
     { key: 'codigo', label: 'Código', editable: true },
-    { key: 'representante', label: 'Representante', editable: true },
+    { key: 'estado', label: 'Estado', editable: false },
+    // Removed tipo_empresa as it does not exist in Proveedor
+    { key: 'representantes', label: 'Representantes', editable: false },
     { key: 'telefonos', label: 'Teléfonos', editable: true },
-    { key: 'domicilio', label: 'Domicilio', editable: true },
-    { key: 'municipio', label: 'Municipio', nestedKey: 'nombre_municipio', editable: false, selectOptions: mockMunicipio },
-    { key: 'ministerio', label: 'Ministerio', nestedKey: 'nombre_ministerio', editable: false, selectOptions: mockMinisterio }
+    { key: 'prefijo_provincia', label: 'Prefijo Provincia', editable: false },
+    { key: 'provincia', label: 'Provincia', editable: false },
+    { key: 'municipio', label: 'Municipio', nestedKey: 'nombre_municipio', editable: false, selectOptions: [] },
+    { key: 'ministerio', label: 'Ministerio', nestedKey: 'nombre_ministerio', editable: false, selectOptions: [] },
+    { key: 'createdAt', label: 'Creado', editable: false },
+    { key: 'updatedAt', label: 'Actualizado', editable: false }
   ];
+
+  // Helper method to get concatenated representantes names
+  getRepresentantesNames(proveedor: any): string {
+    if (!proveedor.representantes || !Array.isArray(proveedor.representantes)) {
+      return 'Sin representantes';
+    }
+    return proveedor.representantes.map((r: any) => `${r.nombre} ${r.apellido}`).join(', ');
+  }
 
   title = 'Proveedores';
   addButtonText = 'Agregar Proveedor';
@@ -100,80 +114,139 @@ export class ProveedorListComponent implements OnInit {
   ngOnDestroy(): void {
     this._unsubscribeAll.next();
     this._unsubscribeAll.complete();
-}
+  }
 
-ngAfterViewInit(): void {
+  ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
     this.cdr.detectChanges();
-}
+  }
+
   ngOnInit(): void {
     this.displayedColumns = this.columns.map(col => col.key).concat('details');
-    this.loadProveedores();
-  this.CatalogService.getMinisterios().subscribe((ministerios) => {
-    this.columns.find(col => col.key === 'ministerio')!.selectOptions = ministerios;
-  });
-    this.CatalogService.getMunicipios();
+    
+    // Cargar catálogos primero
+    forkJoin({
+      ministerios: this.CatalogService.getMinisterios(),
+      municipios: this.CatalogService.getMunicipios()
 
+    }).subscribe({
+      next: (catalogs) => {
+        // Procesar ministerios - viene como array de objetos con nombre y sigla
+        this.ministerios = catalogs.ministerios?.data || [];
+        this.columns.find(col => col.key === 'ministerio').selectOptions = this.ministerios;
+        this.mockMinisterio = this.ministerios;
+  
+        // Procesar municipios - viene como objeto con claves numéricas y arrays de strings
+        let municipiosArray: any[] = [];
+        if (catalogs.municipios?.data) {
+          let idCounter = 1;
+          for (const [provinciaId, municipios] of Object.entries(catalogs.municipios.data)) {
+            if (Array.isArray(municipios)) {
+              municipios.forEach((nombreMunicipio: string) => {
+                municipiosArray.push({
+                  id: idCounter++,
+                  provincia_id: Number(provinciaId),
+                  nombre_municipio: nombreMunicipio
+                });
+              });
+            }
+          }
+        }
+        this.municipios = municipiosArray;
+        this.columns.find(col => col.key === 'municipio').selectOptions = this.municipios;
+        this.mockMunicipio = this.municipios;
+  
+        // Cargar proveedores después de tener los catálogos
+        this.loadProveedores();
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error loading catalogs:', error);
+        // Cargar proveedores aunque falle la carga de catálogos
+        this.loadProveedores();
+      }
+    });
+   this.proveedorService.getDashboardproveedor();
+    // Configurar búsqueda
     this.searchInputControl.valueChanges
-    .pipe(
+      .pipe(
         debounceTime(300),
         distinctUntilChanged(),
         takeUntil(this._unsubscribeAll)
-    )
-    .subscribe(value => {
-        console.log('Search query:', value);
+      )
+      .subscribe(value => {
         this.closeDetails();
         this.dataSource.filter = value?.trim().toLowerCase() || '';
-        console.log('Filtered data:', this.dataSource.filteredData);
-        this.cdr.detectChanges(); // Use detectChanges for immediate update
-        this.dataSource._updateChangeSubscription(); // Force table update
-    });
-
+        this.cdr.detectChanges();
+        this.dataSource._updateChangeSubscription();
+      });
+  
     this.dataSource.filterPredicate = (data: any, filter: string) => {
-      const searchStr = Object.keys(data)
-        .reduce((currentTerm: string, key: string) => {
-          const value = this.getNestedValue(data, key, this.columns.find(col => col.key === key)?.nestedKey);
-          return currentTerm + (value || '') + ' ';
-        }, '')
-        .toLowerCase();
+      const searchStr = [
+        data.nombre || '',
+        data.codigo || '',
+        data.representante || '',
+        data.telefonos || '',
+        data.domicilio || '',
+        this.getMunicipioName(data.municipio),
+        this.getMinisterioName(data.ministerio)
+      ].join(' ').toLowerCase();
+      
       return searchStr.includes(filter);
     };
   }
+  getMunicipioName(municipio: any): string {
+    if (!municipio) return 'N/A';
+    if (typeof municipio === 'string') {
+      // Si es string, ya es el nombre del municipio
+      return municipio;
+    }
+    return municipio.nombre_municipio || 'N/A';
+  }
+  
+  getMinisterioName(ministerio: any): string {
+    if (!ministerio) return 'N/A';
+    if (typeof ministerio === 'string') {
+      // Si es string, buscar en el catálogo para obtener el nombre completo
+      const found = this.ministerios.find(m => m.sigla === ministerio || m.nombre === ministerio);
+      return found ? found.nombre : ministerio;
+    }
+    return ministerio.nombre || 'N/A';
+  }
+  
   closeDetails(): void {
     this.selectedRow = null;
     this.cdr.detectChanges();
-}
+  }
 
   loadProveedores(): void {
     this.isLoading = true;
-    
-    // Obtener proveedores y representantes en paralelo
-    forkJoin([
-      this.proveedorService.getProveedores(),
-      this.representanteService.getRepresentantes()
-    ]).subscribe({
-      next: ([proveedores, representantes]) => {
-        // Mapear los representantes a sus respectivos proveedores
-        this.data = proveedores.map(proveedor => {
-          const representanteProveedor = representantes.find(r => r.entidad_id === proveedor.id);
-          return {
-            ...proveedor,
-            representante: representanteProveedor 
-              ? `${representanteProveedor.nombre} ${representanteProveedor.apellidos}`
-              : 'Sin representante'
-          };
-        });
 
+    this.proveedorService.getProveedores().subscribe({
+      next: (proveedores) => {
+        console.log('Proveedores received from service:', proveedores);
+        this.data = proveedores;
         this.dataSource.data = this.data;
+
         this.pagination.length = this.data.length;
-        this.dataSource.sort = this.sort;
-        this.dataSource.paginator = this.paginator;
+
+        // Asignar sort y paginator después de asignar data
+        if (this.sort) {
+          this.dataSource.sort = this.sort;
+        }
+        if (this.paginator) {
+          this.dataSource.paginator = this.paginator;
+        }
+
+        // Forzar actualización de la tabla
+        this.dataSource._updateChangeSubscription();
+
         this.isLoading = false;
         this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Error loading data:', error);
+        console.error('Error loading proveedores:', error);
         this.isLoading = false;
         this.cdr.markForCheck();
       }
@@ -276,10 +349,15 @@ ngAfterViewInit(): void {
     const headers = [
       'Nombre',
       'Código',
+      'Estado',
+      'Representantes',
       'Teléfonos',
-      'Domicilio',
+      'Prefijo Provincia',
+      'Provincia',
       'Municipio',
-      'Ministerio'
+      'Ministerio',
+      'Creado',
+      'Actualizado'
     ];
     csvRows.push(headers.join(','));
 
@@ -288,10 +366,15 @@ ngAfterViewInit(): void {
       const row = [
         proveedor.nombre || '',
         proveedor.codigo || '',
+        proveedor.estado || '',
+        this.getRepresentantesNames(proveedor),
         proveedor.telefonos || '',
-        proveedor.domicilio || '',
-        proveedor.municipio?.nombre_municipio || '',
-        proveedor.ministerio?.nombre_ministerio || ''
+        proveedor.prefijo_provincia || '',
+        proveedor.provincia || '',
+        proveedor.municipio || '',
+        proveedor.ministerio || '',
+        proveedor.createdAt || '',
+        proveedor.updatedAt || ''
       ];
       // Escape commas and quotes in values
       const escapedRow = row.map(value => {
@@ -351,14 +434,14 @@ ngAfterViewInit(): void {
         'Ministerio'
       ];
 
-      const tableData = this.dataSource.filteredData.map(proveedor => [
-        this.truncateText(proveedor.nombre || '', 25),
-        proveedor.codigo || '',
-        this.truncateText(proveedor.telefonos || '', 20),
-        this.truncateText(proveedor.domicilio || '', 30),
-        this.truncateText(proveedor.municipio?.nombre_municipio || '', 20),
-        this.truncateText(proveedor.ministerio?.nombre_ministerio || '', 25)
-      ]);
+        const tableData = this.dataSource.filteredData.map(proveedor => [
+          this.truncateText(proveedor.nombre || '', 25),
+          proveedor.codigo || '',
+          this.truncateText(proveedor.telefonos || '', 20),
+          this.truncateText(proveedor.domicilio || '', 30),
+          this.truncateText(typeof proveedor.municipio === 'string' ? proveedor.municipio : proveedor.municipio?.nombre_municipio || '', 20),
+          this.truncateText(typeof proveedor.ministerio === 'string' ? proveedor.ministerio : proveedor.ministerio?.nombre_ministerio || '', 25)
+        ]);
 
       console.log('Datos preparados para la tabla:', tableData.length, 'filas');
 
@@ -397,17 +480,17 @@ ngAfterViewInit(): void {
           const pageCount = doc.getNumberOfPages();
           const pageSize = doc.internal.pageSize;
           const pageHeight = pageSize.height || pageSize.getHeight();
-          
+
           doc.setFontSize(8);
           doc.setTextColor(100, 100, 100);
-          
+
           // Número de página
           doc.text(
             `Página ${data.pageNumber} de ${pageCount}`,
             14,
             pageHeight - 10
           );
-          
+
           // Nombre del sistema
           const systemText = 'Sistema de Gestión de Proveedores';
           const textWidth = doc.getTextWidth(systemText);
@@ -433,6 +516,8 @@ ngAfterViewInit(): void {
       alert('Error al generar el PDF. Por favor, intente nuevamente.');
     }
   }
+// Agregar este método al final de la clase
+
 
   /**
    * Trunca texto para que quepa en las celdas del PDF

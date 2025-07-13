@@ -53,6 +53,7 @@ export interface Municipio {
 }
 
 // Table: entidad
+
 export interface Entidad {
   id: number;
   municipio_id: number;
@@ -60,8 +61,13 @@ export interface Entidad {
   codigo_entidad: string;
   domicilio_legal: string;
   telefonos: string;
-  logo: string;
+  logo: string | null;
   tipo_empresa: string;
+  ministerio: string; // Agregar esta propiedad
+  activo: boolean; // Agregar esta propiedad
+  director_id: number | null; // Agregar esta propiedad
+  createdAt?: string; // Agregar esta propiedad opcional
+  updatedAt?: string; // Agregar esta propiedad opcional
   provincia?: Provincia;
   municipio: Municipio;
 }
@@ -83,10 +89,16 @@ export interface Proveedor {
   codigo: string;
   telefonos: string;
   domicilio: string;
-  municipio: Municipio;
-  ministerio: Ministerio;
+  municipio: Municipio | string;
+  ministerio: Ministerio | string;
   fechaCreacion: string;
-   representantes?: Representante[];
+  representantes?: Representante[];
+  estado?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  prefijo_provincia?: string;
+  provincia?: string;
+  representante_legal_id?: number | null;
 }
 
 // Table: suplemento
@@ -239,11 +251,12 @@ export interface Representante {
   id: number;
   entidad_id: number;
   nombre: string;
-  apellidos: string;
+  apellido: string;
   cargo: string;
   telefono?: string;
   email?: string;
   activo: boolean;
+  estado?: string;
   entidad: Entidad;
 }
 

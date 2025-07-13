@@ -60,108 +60,115 @@
         <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden">
           <ng-container *ngIf="dataSource?.data?.length > 0; else noRepresentantes">
             
-            <!-- Desktop Table View (hidden on mobile) -->
+            <!-- Desktop Table View -->
             <div class="hidden lg:block w-full">
               <div class="w-full">
                 <!-- Header -->
-                <div
-                  class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
-                  matSort
-                  matSortDisableClear
-                  style="grid-template-columns: 1fr 150px 200px 180px 1fr 200px 200px 100px;">
-                  <div class="truncate" [matTooltip]="'Nombre completo'" matTooltipPosition="above">
-                    <span>Nombre</span>
-                  </div>
-                  <div class="truncate" [matTooltip]="'Apellidos completos'" matTooltipPosition="above">
-                    <span>Apellidos</span>
-                  </div>
-                  <div class="truncate" [matTooltip]="'Cargo completo'" matTooltipPosition="above">
-                    <span>Cargo</span>
-                  </div>
-                  <div class="truncate" [matTooltip]="'Teléfono completo'" matTooltipPosition="above">
-                    <span>Teléfono</span>
-                  </div>
-                  <div class="truncate" [matTooltip]="'Email completo'" matTooltipPosition="above">
-                    <span>Email</span>
-                  </div>
-                  <div class="truncate" [matTooltip]="'Estado completo'" matTooltipPosition="above">
-                    <span>Estado</span>
-                  </div>
-                  <div class="truncate" [matTooltip]="'Entidad completa'" matTooltipPosition="above">
-                    <span>Entidad</span>
-                  </div>
+<div
+  #sort
+  class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+  matSort
+  matSortDisableClear
+  style="grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 100px;">
+                  <div>Nombre Proveedor</div>
+                  <div>Código</div>
+                  <div>Representante</div>
+                  <div>Cargo</div>
+                  <div>Teléfono</div>
+                  <div>Email</div>
+                  <div>Estado</div>
+                  <div>Tipo Empresa</div>
+                  <div>Ministerio</div>
                   <div>Detalles</div>
                 </div>
+                
                 <!-- Rows -->
-                <ng-container *ngFor="let representante of dataSource.filteredData; trackBy: trackByFn">
+                <ng-container *ngFor="let item of dataSource.data; trackBy: trackByFn">
                   <div
                     class="inventory-grid grid items-center gap-4 py-3 px-6 md:px-8 border-b"
-                    style="grid-template-columns: 1fr 150px 200px 180px 1fr 200px 200px 100px;">
-                    <div class="truncate" [matTooltip]="representante.nombre" matTooltipPosition="above">
-                      {{representante.nombre}}
+                    style="grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 100px;">
+                    
+                    <div class="truncate" [matTooltip]="item.Proveedor?.nombre">
+                      {{item.Proveedor?.nombre || 'N/A'}}
                     </div>
-                    <div class="truncate" [matTooltip]="representante.apellidos" matTooltipPosition="above">
-                      {{representante.apellidos}}
+                    
+                    <div class="truncate" [matTooltip]="item.Proveedor?.codigo">
+                      {{item.Proveedor?.codigo || 'N/A'}}
                     </div>
-                    <div class="truncate" [matTooltip]="representante.cargo" matTooltipPosition="above">
-                      {{representante.cargo}}
+                    
+                    <div class="truncate" [matTooltip]="item.nombre + ' ' + item.apellido">
+                      {{item.nombre}} {{item.apellido}}
                     </div>
-                    <div class="truncate" [matTooltip]="representante.telefono" matTooltipPosition="above">
-                      {{representante.telefono}}
+                    
+                    <div class="truncate" [matTooltip]="item.cargo">
+                      {{item.cargo || 'N/A'}}
                     </div>
-                    <div class="truncate" [matTooltip]="representante.email" matTooltipPosition="above">
-                      {{representante.email}}
+                    
+                    <div class="truncate" [matTooltip]="item.telefono">
+                      {{item.telefono || 'N/A'}}
                     </div>
-                    <div class="truncate" [matTooltip]="representante.activo ? 'Activo' : 'Inactivo'" matTooltipPosition="above">
+                    
+                    <div class="truncate" [matTooltip]="item.email">
+                      {{item.email || 'N/A'}}
+                    </div>
+                    
+                    <div class="truncate" [matTooltip]="item.estado">
                       <span class="px-2 py-1 rounded-full text-xs font-medium"
-                            [ngClass]="representante.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                        {{ representante.activo ? 'Activo' : 'Inactivo' }}
+                            [ngClass]="item.estado === 'activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                        {{item.estado || 'N/A'}}
                       </span>
                     </div>
-                    <div class="truncate" [matTooltip]="representante.entidad?.nombre_entidad" matTooltipPosition="above">
-                      {{representante.entidad?.nombre_entidad}}
+                    
+                    <div class="truncate" [matTooltip]="item.Proveedor?.tipo_empresa">
+                      {{item.Proveedor?.tipo_empresa || 'N/A'}}
                     </div>
+                    
+                    <div class="truncate" [matTooltip]="item.Proveedor?.ministerio">
+                      {{item.Proveedor?.ministerio || 'N/A'}}
+                    </div>
+                    
                     <div class="flex items-center justify-center">
                       <button
                         class="min-w-10 min-h-7 h-7 px-2 leading-6"
                         mat-stroked-button
-                        (click)="toggleDetails(representante.id)">
+                        (click)="toggleDetails(item.id)">
                         <mat-icon
                           class="icon-size-5"
-                          [svgIcon]="selectedRow?.id === representante.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                          [svgIcon]="selectedRow?.id === item.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
                       </button>
                     </div>
                   </div>
+                  
                   <div class="grid">
-                    <ng-container *ngIf="selectedRow?.id === representante.id">
-                      <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: representante}"></ng-container>
+                    <ng-container *ngIf="selectedRow?.id === item.id">
+                      <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: item}"></ng-container>
                     </ng-container>
                   </div>
                 </ng-container>
               </div>
             </div>
 
-            <!-- Mobile/Tablet Card View (shown on smaller screens) -->
+            <!-- Mobile/Tablet Card View -->
             <div class="lg:hidden">
-              <ng-container *ngFor="let representante of dataSource.filteredData; trackBy: trackByFn">
+              <ng-container *ngFor="let item of dataSource.data; trackBy: trackByFn">
                 <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg mb-4 mx-4 shadow-sm">
                   <!-- Card Header -->
                   <div class="p-4 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex items-center justify-between">
                       <div class="flex-1 min-w-0">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                          {{representante.nombre}} {{representante.apellidos}}
+                          {{item.Proveedor?.nombre || 'N/A'}}
                         </h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400">
-                          {{representante.cargo}}
+                          {{item.Proveedor?.codigo || 'N/A'}} - {{item.nombre}} {{item.apellido}}
                         </p>
                       </div>
                       <button
                         class="ml-4 flex-shrink-0"
                         mat-icon-button
-                        (click)="toggleDetails(representante.id)">
+                        (click)="toggleDetails(item.id)">
                         <mat-icon
-                          [svgIcon]="selectedRow?.id === representante.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                          [svgIcon]="selectedRow?.id === item.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
                       </button>
                     </div>
                   </div>
@@ -170,47 +177,49 @@
                   <div class="p-4 space-y-3">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
+                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Cargo</label>
+                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{item.cargo || 'N/A'}}</p>
+                      </div>
+                      <div>
                         <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Teléfono</label>
-                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{representante.telefono}}</p>
+                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{item.telefono || 'N/A'}}</p>
                       </div>
                       <div>
                         <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Email</label>
-                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{representante.email}}</p>
+                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{item.email || 'N/A'}}</p>
                       </div>
                       <div>
                         <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Estado</label>
                         <p class="mt-1 text-sm text-gray-900 dark:text-white">
                           <span class="px-2 py-1 rounded-full text-xs font-medium"
-                                [ngClass]="representante.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                            {{ representante.activo ? 'Activo' : 'Inactivo' }}
+                                [ngClass]="item.estado === 'activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                            {{item.estado || 'N/A'}}
                           </span>
                         </p>
                       </div>
                       <div>
-                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Entidad</label>
-                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{representante.entidad?.nombre_entidad}}</p>
+                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Tipo Empresa</label>
+                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{item.Proveedor?.tipo_empresa || 'N/A'}}</p>
+                      </div>
+                      <div>
+                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Ministerio</label>
+                        <p class="mt-1 text-sm text-gray-900 dark:text-white">{{item.Proveedor?.ministerio || 'N/A'}}</p>
                       </div>
                     </div>
                   </div>
-
-                  <!-- Expanded Details -->
-                  <ng-container *ngIf="selectedRow?.id === representante.id">
-                    <div class="border-t border-gray-200 dark:border-gray-700">
-                      <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: representante}"></ng-container>
-                    </div>
-                  </ng-container>
                 </div>
               </ng-container>
             </div>
 
-            <mat-paginator
-              class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
-              [ngClass]="{'pointer-events-none': isLoading}"
-              [length]="pagination.length"
-              [pageIndex]="pagination.page"
-              [pageSize]="pagination.size"
-              [pageSizeOptions]="[5, 10, 25, 100]"
-              [showFirstLastButtons]="true"></mat-paginator>
+<mat-paginator
+  #paginator
+  class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+  [ngClass]="{'pointer-events-none': isLoading}"
+  [length]="pagination.length"
+  [pageIndex]="pagination.page"
+  [pageSize]="pagination.size"
+  [pageSizeOptions]="[5, 10, 25, 100]"
+  [showFirstLastButtons]="true"></mat-paginator>
           </ng-container>
 
           <ng-template
@@ -234,10 +243,10 @@
                             formControlName="nombre">
                         </mat-form-field>
                         <mat-form-field class="w-full">
-                          <mat-label>Apellidos</mat-label>
+                          <mat-label>Apellido</mat-label>
                           <input
                             matInput
-                            formControlName="apellidos">
+                            formControlName="apellido">
                         </mat-form-field>
                         <mat-form-field class="w-full">
                           <mat-label>Teléfono</mat-label>
@@ -262,11 +271,10 @@
                       </div>
                       <div class="flex flex-col w-full lg:w-1/3 sm:pl-8">
                         <mat-form-field class="w-full">
-                          <mat-label>Entidad</mat-label>
-                          <mat-select formControlName="entidad">
-                            <mat-option *ngFor="let entidad of entidades" [value]="entidad">
-                              {{entidad.nombre_entidad}}
-                            </mat-option>
+                          <mat-label>Estado</mat-label>
+                          <mat-select formControlName="estado">
+                            <mat-option value="activo">Activo</mat-option>
+                            <mat-option value="inactivo">Inactivo</mat-option>
                           </mat-select>
                         </mat-form-field>
                       </div>

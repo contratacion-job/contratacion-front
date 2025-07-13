@@ -208,5 +208,14 @@ getContratos(): Observable<Contrato[]> {
         })
       );
   }
-
+  getDashboardcontrato(): Observable<Contrato[]> {
+    return this.http.get<Contrato[]>(API_ENDPOINTS.ESTADISTICAS.CONTRATOS)
+      .pipe(
+        tap(data => console.log('Contratos fetched:', data)),
+        catchError(error => {
+          console.error('Error fetching contratos:', error);
+          return of([...this.contratos]);
+        })
+      );
+  }
 }

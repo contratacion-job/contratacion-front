@@ -1,146 +1,450 @@
-
-<div class="flex flex-col flex-auto min-w-0">
-
-  <!-- Main -->
-  <div class="flex-auto p-6 sm:p-10">
- 
-      <!-- CONTENT GOES HERE -->
-      <div class="h-400 min-h-400 max-h-400 border-2   rounded-2xl">
-
-
-
-        <div class="p-6 space-y-6 w-full">
-         
-        
-          <!-- Nuevas gráficas -->
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-6">
-          <mat-card class="p-4">
-
-      <apx-chart
-        #topMontoMayorChart
-        [series]="topMontoMayorChartOptions.series"
-        [chart]="topMontoMayorChartOptions.chart"
-        [xaxis]="topMontoMayorChartOptions.xaxis"
-        [dataLabels]="topMontoMayorChartOptions.dataLabels"
-        [plotOptions]="topMontoMayorChartOptions.plotOptions"
-        [title]="topMontoMayorChartOptions.title"
-      ></apx-chart>
-     </mat-card>
-
-    <div class="chart-container">
-      <div class="chart-header">
-
-        <button (click)="downloadChart('topMontoMenor')">
-          <i class="pi pi-download"></i>
+<div class="flex flex-col flex-auto min-w-0 bg-gray-50 dark:bg-gray-900">
+  <!-- Header -->
+  <div class="flex-auto p-6 sm:p-8">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+          Dashboard de Contratos
+        </h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">
+          Análisis completo de contratos y proveedores
+        </p>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          Exportar Todo
         </button>
       </div>
-      <apx-chart
-        #topMontoMenorChart
-        [series]="topMontoMenorChartOptions.series"
-        [chart]="topMontoMenorChartOptions.chart"
-        [xaxis]="topMontoMenorChartOptions.xaxis"
-        [dataLabels]="topMontoMenorChartOptions.dataLabels"
-        [plotOptions]="topMontoMenorChartOptions.plotOptions"
-        [title]="topMontoMenorChartOptions.title"
-      ></apx-chart>
     </div>
-
-    <!-- Top 10 Vigencias -->
-    <div class="chart-container">
-      <div class="chart-header">
-
-        <button (click)="downloadChart('topVigenciaMayor')">
-          <i class="pi pi-download"></i>
-        </button>
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Contratos</p>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">{{totalContratos}}</p>
+          </div>
+          <div class="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-full">
+            <mat-icon class="text-blue-600 dark:text-blue-400">description</mat-icon>
+          </div>
+        </div>
       </div>
-      <apx-chart
-        #topVigenciaMayorChart
-        [series]="topVigenciaMayorChartOptions.series"
-        [chart]="topVigenciaMayorChartOptions.chart"
-        [xaxis]="topVigenciaMayorChartOptions.xaxis"
-        [dataLabels]="topVigenciaMayorChartOptions.dataLabels"
-        [plotOptions]="topVigenciaMayorChartOptions.plotOptions"
-        [title]="topVigenciaMayorChartOptions.title"
-      ></apx-chart>
-    </div>
-
-    <div class="chart-container">
-      <div class="chart-header">
-
-        <button (click)="downloadChart('topVigenciaMenor')">
-          <i class="pi pi-download"></i>
-        </button>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Valor Total</p>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+              ${{valorTotal}}M
+            </p>
+          </div>
+          <div class="p-3 bg-green-50 dark:bg-green-900/30 rounded-full">
+            <mat-icon class="text-green-600 dark:text-green-400">attach_money</mat-icon>
+          </div>
+        </div>
       </div>
-      <apx-chart
-        #topVigenciaMenorChart
-        [series]="topVigenciaMenorChartOptions.series"
-        [chart]="topVigenciaMenorChartOptions.chart"
-        [xaxis]="topVigenciaMenorChartOptions.xaxis"
-        [dataLabels]="topVigenciaMenorChartOptions.dataLabels"
-        [plotOptions]="topVigenciaMenorChartOptions.plotOptions"
-        [title]="topVigenciaMenorChartOptions.title"
-      ></apx-chart>
-    </div>
-
-    <!-- Distribución por Duración -->
-    <div class="chart-container">
-      <div class="chart-header">
-
-        <button (click)="downloadChart('duracionBuckets')">
-          <i class="pi pi-download"></i>
-        </button>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Proveedores</p>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+              {{totalProveedores}}
+            </p>
+          </div>
+          <div class="p-3 bg-purple-50 dark:bg-purple-900/30 rounded-full">
+            <mat-icon class="text-purple-600 dark:text-purple-400">business</mat-icon>
+          </div>
+        </div>
       </div>
-      <apx-chart
-        #duracionBucketsChart
-        [series]="duracionBucketsChartOptions.series"
-        [chart]="duracionBucketsChartOptions.chart"
-        [xaxis]="duracionBucketsChartOptions.xaxis"
-        [dataLabels]="duracionBucketsChartOptions.dataLabels"
-        [plotOptions]="duracionBucketsChartOptions.plotOptions"
-        [title]="duracionBucketsChartOptions.title"
-      ></apx-chart>
-    </div>
-
-    <!-- Tipos de Contratos -->
-    <div class="chart-container">
-      <div class="chart-header">
-
-        <button (click)="downloadChart('tiposContratos')">
-          <i class="pi pi-download"></i>
-        </button>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Departamentos</p>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+              {{totalDepartamentos}}
+            </p>
+          </div>
+          <div class="p-3 bg-orange-50 dark:bg-orange-900/30 rounded-full">
+            <mat-icon class="text-orange-600 dark:text-orange-400">location_city</mat-icon>
+          </div>
+        </div>
       </div>
-      <apx-chart
-        #tiposContratosChart
-        [series]="tiposContratosChartOptions.series"
-        [chart]="tiposContratosChartOptions.chart"
-        [xaxis]="tiposContratosChartOptions.xaxis"
-        [dataLabels]="tiposContratosChartOptions.dataLabels"
-        [plotOptions]="tiposContratosChartOptions.plotOptions"
-        [title]="tiposContratosChartOptions.title"
-      ></apx-chart>
     </div>
-
-    <!-- Departamentos -->
-    <div class="chart-container">
-      <div class="chart-header">
-       
-        <button (click)="downloadChart('departamentos')">
-          <i class="pi pi-download"></i>
-        </button>
+    
+    <!-- Charts Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+      <!-- Top Montos - Bar Chart -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              Contratos por Monto
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Top 10 contratos de mayor valor
+            </p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button 
+              mat-icon-button
+              [matMenuTriggerFor]="chartMenu1"
+              class="text-gray-400 hover:text-gray-600">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #chartMenu1="matMenu">
+              <button mat-menu-item (click)="downloadChart('topMontoMayor', 'png')">
+                <mat-icon>image</mat-icon>
+                <span>PNG</span>
+              </button>
+              <button mat-menu-item (click)="downloadChart('topMontoMayor', 'svg')">
+                <mat-icon>code</mat-icon>
+                <span>SVG</span>
+              </button>
+            </mat-menu>
+          </div>
+        </div>
+        <div class="p-6">
+          <apx-chart
+            #topMontoMayorChart
+            [series]="topMontoMayorChartOptions.series"
+            [chart]="topMontoMayorChartOptions.chart"
+            [xaxis]="topMontoMayorChartOptions.xaxis"
+            [yaxis]="topMontoMayorChartOptions.yaxis"
+            [plotOptions]="topMontoMayorChartOptions.plotOptions"
+            [dataLabels]="topMontoMayorChartOptions.dataLabels"
+            [colors]="topMontoMayorChartOptions.colors"
+            [grid]="topMontoMayorChartOptions.grid"
+            [tooltip]="topMontoMayorChartOptions.tooltip">
+          </apx-chart>
+        </div>
       </div>
-      <apx-chart
-        #departamentosChart
-        [series]="departamentosChartOptions.series"
-        [chart]="departamentosChartOptions.chart"
-        [xaxis]="departamentosChartOptions.xaxis"
-        [dataLabels]="departamentosChartOptions.dataLabels"
-        [plotOptions]="departamentosChartOptions.plotOptions"
-        [title]="departamentosChartOptions.title"
-      ></apx-chart>
+      
+      <!-- Top Montos Menor - Donut Chart -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              Contratos por Monto (Menores)
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Top 6 contratos de menor valor
+            </p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button 
+              mat-icon-button
+              [matMenuTriggerFor]="chartMenu2"
+              class="text-gray-400 hover:text-gray-600">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #chartMenu2="matMenu">
+              <button mat-menu-item (click)="downloadChart('topMontoMenor', 'png')">
+                <mat-icon>image</mat-icon>
+                <span>PNG</span>
+              </button>
+              <button mat-menu-item (click)="downloadChart('topMontoMenor', 'svg')">
+                <mat-icon>code</mat-icon>
+                <span>SVG</span>
+              </button>
+            </mat-menu>
+          </div>
+        </div>
+        <div class="p-6">
+          <apx-chart
+            #topMontoMenorChart
+            [series]="topMontoMenorChartOptions.series"
+            [chart]="topMontoMenorChartOptions.chart"
+            [labels]="topMontoMenorChartOptions.labels"
+            [colors]="topMontoMenorChartOptions.colors"
+            [dataLabels]="topMontoMenorChartOptions.dataLabels"
+            [plotOptions]="topMontoMenorChartOptions.plotOptions"
+            [legend]="topMontoMenorChartOptions.legend"
+            [tooltip]="topMontoMenorChartOptions.tooltip">
+          </apx-chart>
+        </div>
+      </div>
+      
+      <!-- Vigencia Mayor - Area Chart -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              Duración de Contratos (Meses)
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Top 10 contratos con mayor duración
+            </p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button 
+              mat-icon-button
+              [matMenuTriggerFor]="chartMenu3"
+              class="text-gray-400 hover:text-gray-600">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #chartMenu3="matMenu">
+              <button mat-menu-item (click)="downloadChart('topVigenciaMayor', 'png')">
+                <mat-icon>image</mat-icon>
+                <span>PNG</span>
+              </button>
+              <button mat-menu-item (click)="downloadChart('topVigenciaMayor', 'svg')">
+                <mat-icon>code</mat-icon>
+                <span>SVG</span>
+              </button>
+            </mat-menu>
+          </div>
+        </div>
+        <div class="p-6">
+          <apx-chart
+            #topVigenciaMayorChart
+            [series]="topVigenciaMayorChartOptions.series"
+            [chart]="topVigenciaMayorChartOptions.chart"
+            [xaxis]="topVigenciaMayorChartOptions.xaxis"
+            [yaxis]="topVigenciaMayorChartOptions.yaxis"
+            [dataLabels]="topVigenciaMayorChartOptions.dataLabels"
+            [stroke]="topVigenciaMayorChartOptions.stroke"
+            [fill]="topVigenciaMayorChartOptions.fill"
+            [colors]="topVigenciaMayorChartOptions.colors"
+            [grid]="topVigenciaMayorChartOptions.grid"
+            [tooltip]="topVigenciaMayorChartOptions.tooltip">
+          </apx-chart>
+        </div>
+      </div>
+      
+      <!-- Vigencia Menor - Line Chart -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              Contratos de Menor Duración
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Top 8 contratos con menor duración
+            </p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button 
+              mat-icon-button
+              [matMenuTriggerFor]="chartMenu4"
+              class="text-gray-400 hover:text-gray-600">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #chartMenu4="matMenu">
+              <button mat-menu-item (click)="downloadChart('topVigenciaMenor', 'png')">
+                <mat-icon>image</mat-icon>
+                <span>PNG</span>
+              </button>
+              <button mat-menu-item (click)="downloadChart('topVigenciaMenor', 'svg')">
+                <mat-icon>code</mat-icon>
+                <span>SVG</span>
+              </button>
+            </mat-menu>
+          </div>
+        </div>
+        <div class="p-6">
+          <apx-chart
+            #topVigenciaMenorChart
+            [series]="topVigenciaMenorChartOptions.series"
+            [chart]="topVigenciaMenorChartOptions.chart"
+            [xaxis]="topVigenciaMenorChartOptions.xaxis"
+            [yaxis]="topVigenciaMenorChartOptions.yaxis"
+            [dataLabels]="topVigenciaMenorChartOptions.dataLabels"
+            [stroke]="topVigenciaMenorChartOptions.stroke"
+            [markers]="topVigenciaMenorChartOptions.markers"
+            [colors]="topVigenciaMenorChartOptions.colors"
+            [grid]="topVigenciaMenorChartOptions.grid"
+            [tooltip]="topVigenciaMenorChartOptions.tooltip"
+            [legend]="topVigenciaMenorChartOptions.legend">
+          </apx-chart>
+        </div>
+      </div>
+      
+      <!-- Tipos de Contratos - Radar Chart -->
+          <!-- Tipos de Contratos - Radar Chart -->
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  Tipos de Contratos
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Distribución por tipo de contrato
+                </p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button 
+                  mat-icon-button
+                  [matMenuTriggerFor]="chartMenu5"
+                  class="text-gray-400 hover:text-gray-600">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #chartMenu5="matMenu">
+                  <button mat-menu-item (click)="downloadChart('tiposContratos', 'png')">
+                    <mat-icon>image</mat-icon>
+                    <span>PNG</span>
+                  </button>
+                  <button mat-menu-item (click)="downloadChart('tiposContratos', 'svg')">
+                    <mat-icon>code</mat-icon>
+                    <span>SVG</span>
+                  </button>
+                </mat-menu>
+              </div>
+            </div>
+            <div class="p-6">
+              <apx-chart
+                #tiposContratosChart
+                [series]="tiposContratosChartOptions.series"
+                [chart]="tiposContratosChartOptions.chart"
+                [xaxis]="tiposContratosChartOptions.xaxis"
+                [dataLabels]="tiposContratosChartOptions.dataLabels"
+                [plotOptions]="tiposContratosChartOptions.plotOptions"
+                [markers]="tiposContratosChartOptions.markers"
+                [fill]="tiposContratosChartOptions.fill"
+                [colors]="tiposContratosChartOptions.colors"
+                [tooltip]="tiposContratosChartOptions.tooltip">
+              </apx-chart>
+            </div>
+          </div>
+          
+          <!-- Departamentos - Horizontal Bar Chart -->
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  Contratos por Departamento
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Distribución por departamento
+                </p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button 
+                  mat-icon-button
+                  [matMenuTriggerFor]="chartMenu6"
+                  class="text-gray-400 hover:text-gray-600">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #chartMenu6="matMenu">
+                  <button mat-menu-item (click)="downloadChart('departamentos', 'png')">
+                    <mat-icon>image</mat-icon>
+                    <span>PNG</span>
+                  </button>
+                  <button mat-menu-item (click)="downloadChart('departamentos', 'svg')">
+                    <mat-icon>code</mat-icon>
+                    <span>SVG</span>
+                  </button>
+                </mat-menu>
+              </div>
+            </div>
+            <div class="p-6">
+              <apx-chart
+                #departamentosChart
+                [series]="departamentosChartOptions.series"
+                [chart]="departamentosChartOptions.chart"
+                [xaxis]="departamentosChartOptions.xaxis"
+                [yaxis]="departamentosChartOptions.yaxis"
+                [plotOptions]="departamentosChartOptions.plotOptions"
+                [dataLabels]="departamentosChartOptions.dataLabels"
+                [colors]="departamentosChartOptions.colors"
+                [grid]="departamentosChartOptions.grid"
+                [tooltip]="departamentosChartOptions.tooltip">
+              </apx-chart>
+            </div>
+          </div>
+          
+          <!-- Duración Buckets - Bar Chart -->
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  Duración de Contratos
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Distribución por rango de duración
+                </p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button 
+                  mat-icon-button
+                  [matMenuTriggerFor]="chartMenu7"
+                  class="text-gray-400 hover:text-gray-600">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #chartMenu7="matMenu">
+                  <button mat-menu-item (click)="downloadChart('duracionBuckets', 'png')">
+                    <mat-icon>image</mat-icon>
+                    <span>PNG</span>
+                  </button>
+                  <button mat-menu-item (click)="downloadChart('duracionBuckets', 'svg')">
+                    <mat-icon>code</mat-icon>
+                    <span>SVG</span>
+                  </button>
+                </mat-menu>
+              </div>
+            </div>
+            <div class="p-6">
+              <apx-chart
+                #duracionBucketsChart
+                [series]="duracionBucketsChartOptions.series"
+                [chart]="duracionBucketsChartOptions.chart"
+                [xaxis]="duracionBucketsChartOptions.xaxis"
+                [yaxis]="duracionBucketsChartOptions.yaxis"
+                [plotOptions]="duracionBucketsChartOptions.plotOptions"
+                [dataLabels]="duracionBucketsChartOptions.dataLabels"
+                [colors]="duracionBucketsChartOptions.colors"
+                [grid]="duracionBucketsChartOptions.grid"
+                [tooltip]="duracionBucketsChartOptions.tooltip">
+              </apx-chart>
+            </div>
+          </div>
+          
+          <!-- Evolución Mensual - Mixed Chart -->
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  Evolución Mensual
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Cantidad y monto de contratos por mes
+                </p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button 
+                  mat-icon-button
+                  [matMenuTriggerFor]="chartMenu8"
+                  class="text-gray-400 hover:text-gray-600">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #chartMenu8="matMenu">
+                  <button mat-menu-item (click)="downloadChart('evolucionMensual', 'png')">
+                    <mat-icon>image</mat-icon>
+                    <span>PNG</span>
+                  </button>
+                  <button mat-menu-item (click)="downloadChart('evolucionMensual', 'svg')">
+                    <mat-icon>code</mat-icon>
+                    <span>SVG</span>
+                  </button>
+                </mat-menu>
+              </div>
+            </div>
+            <div class="p-6">
+              <apx-chart
+                #evolucionMensualChart
+                [series]="evolucionMensualChartOptions.series"
+                [chart]="evolucionMensualChartOptions.chart"
+                [xaxis]="evolucionMensualChartOptions.xaxis"
+                [yaxis]="evolucionMensualChartOptions.yaxis"
+                [stroke]="evolucionMensualChartOptions.stroke"
+                [dataLabels]="evolucionMensualChartOptions.dataLabels"
+                [markers]="evolucionMensualChartOptions.markers"
+                [colors]="evolucionMensualChartOptions.colors"
+                [grid]="evolucionMensualChartOptions.grid"
+                [tooltip]="evolucionMensualChartOptions.tooltip"
+                [legend]="evolucionMensualChartOptions.legend">
+              </apx-chart>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
-  </div>
-  </div>
-  
+    

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { EjecucionContrato } from '../../../models/Type';
 import { mockEjecucionContrato } from '../../../mock-api/contrato-fake/fake';
+import { API_ENDPOINTS } from 'app/core/constants/api-endpoints';
 
 @Injectable({
   providedIn: 'root'

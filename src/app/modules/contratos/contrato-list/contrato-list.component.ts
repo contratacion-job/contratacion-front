@@ -244,7 +244,9 @@ private convertToArray(data: any): any[] {
     this.contratoService.getDashboard().subscribe((data) => {
       console.log(data);
     });
-
+    this.contratoService.getDashboardcontrato().subscribe((data) => {
+      console.log(data);
+    });
     this.dataSource.sortingDataAccessor = (item: Contrato, property: string) => {
       switch(property) {
         case 'proveedor': return item.proveedor?.nombre;

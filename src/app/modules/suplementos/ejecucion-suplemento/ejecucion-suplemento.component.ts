@@ -30,187 +30,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatDatepicker } from '@angular/material/datepicker';
-
-// Helper type to make all properties optional and add missing ones
-type PartialWithId<T> = Partial<T> & { id: number };
-
-// Extended EjecucionSuplemento for mock data
-interface EjecucionSuplementoMock extends Omit<EjecucionSuplemento, 'proveedor' | 'contrato' | 'suplemento' | 'fecha_creacion' | 'fecha_actualizacion' | 'usuario_creacion' | 'usuario_actualizacion' | 'estado'> {
-  proveedor: Proveedor;
-  contrato: Contrato;
-  suplemento: Suplemento;
-  fecha_creacion: Date | string;
-  fecha_actualizacion: Date | string;
-  usuario_creacion: string;
-  usuario_actualizacion: string;
-  estado: string;
-}
-
-// Mock data for testing
-const mockProvincia: Provincia = {
-  id: 1,
-  nombre_provincia: 'La Habana'
-};
-
-const mockMunicipio: Municipio = { 
-  id: 1, 
-  nombre_municipio: 'La Habana Vieja',
-  provincia_id: 1,
-  provincia: mockProvincia
-};
-
-const mockMinisterio: Ministerio = { 
-  id: 1, 
-  nombre_ministerio: 'MINSAP',
-  descripcion: 'Ministerio de Salud Pública'
-};
-
-const mockDepartamento: Departamento = { 
-  id: 1, 
-  nombre_departamento: 'Contratación',
-  codigo: 'DEP-001',
-  descripcion: 'Departamento de Contratación'
-};
-
-const mockVigencia: Vigencia = { 
-  id: 1, 
-  vigencia: 2024,
-  alerta_vigencia: 1,
-  tipo_vigencia: 'Anual',
-  tipo_alerta_vigencia: 'ninguna'
-};
-
-const mockTipoContrato: TipoContrato = { 
-  id: 1, 
-  nombre_tipo_contrato: 'Servicios',
-  descripcion: 'Contrato de servicios'
-};
-
-const mockProveedor: Proveedor = {
-  id: 1,
-  municipio_id: 1,
-  ministerio_id: 1,
-  nombre: 'Empresa de Prueba',
-  codigo: 'PRUEBA001',
-  telefonos: '555-1234',
-  domicilio: 'Calle 123',
-  municipio: mockMunicipio,
-  ministerio: mockMinisterio,
-  fechaCreacion: '2024-01-01',
-  representantes: []
-};
-
-const mockContrato: Contrato = {
-  id: 1,
-  vigencia_id: 1,
-  proveedor_id: 1,
-  tipo_contrato_id: 1,
-  no_contrato: 123,
-  fecha_entrada: new Date('2024-01-01'),
-  fecha_firmado: new Date('2024-01-01'),
-  valor_cup: 10000,
-  monto_vencimiento_cup: 10000,
-  monto_vencimiento_cl: 100,
-  valor_usd: 100,
-  monto_vencimiento_usd: 100,
-  observaciones: 'Contrato de prueba',
-  no_contrato_contratacion: 123,
-  fecha_comite_contratacion: new Date('2024-01-01'),
-  no_comite_contratacion: 1,
-  no_acuerdo_comite_contratacion: 1,
-  fecha_comite_administracion: new Date('2024-01-01'),
-  no_comite_administracion: 1,
-  no_acuerdo_comite_administracion: 1,
-  departamento_id: 1,
-  fecha_vencido: new Date('2024-12-31'),
-  valor_monto_restante: 10000,
-  entidad: ['Entidad 1'],
-  vigencia: mockVigencia,
-  proveedor: mockProveedor,
-  tipo_contrato: mockTipoContrato,
-  departamento: mockDepartamento,
-  estado: 'activo',
-  fecha_creacion: new Date('2024-01-01'),
-  fecha_actualizacion: new Date('2024-01-01'),
-  usuario_creacion: 'system',
-  usuario_actualizacion: 'system'
-} as Contrato;
-
-const mockSuplemento: Suplemento = {
-  id: 1,
-  vigencia_id: 1,
-  proveedor_id: 1,
-  tipo_contrato_id: 1,
-  no_contrato_id: 1,
-  departamento_id: 1,
-  fecha_entrada: new Date('2024-01-01'),
-  fecha_firmado: new Date('2024-01-01'),
-  valor_cup: 5000,
-  monto_vencimiento_cup: 5000,
-  monto_vencimiento_cl: 50,
-  valor_usd: 50,
-  monto_vencimiento_usd: 50,
-  observaciones: 'Suplemento de prueba',
-  no_contrato_contratacion: 123,
-  fecha_comite_contratacion: new Date('2024-01-01'),
-  no_comite_contratacion: 1,
-  no_acuerdo_comite_contratacion: 1,
-  fecha_comite_administracion: new Date('2024-01-01'),
-  no_comite_administracion: 1,
-  no_acuerdo_comite_administracion: 1,
-  fecha_vencido: new Date('2024-12-31'),
-  valor_monto_restante: 5000,
-  vigencia: mockVigencia,
-  proveedor: mockProveedor,
-  tipo_contrato: mockTipoContrato,
-  departamento: mockDepartamento,
-  fecha_creacion: new Date('2024-01-01'),
-  fecha_actualizacion: new Date('2024-01-01'),
-  usuario_creacion: 'system',
-  usuario_actualizacion: 'system',
-  estado: 'activo',
-  no_suplemento: 1,
-  no_contrato: 123
-} as Suplemento;
-
-const mockEjecucionSuplemento: EjecucionSuplementoMock[] = [
-  {
-    id: 1,
-    no_suplemento_id: 1,
-    no_contrato_id: 1,
-    proveedor_id: 1,
-    trabajo_ejecutado: 'Trabajo de prueba',
-    costo_cup: 1000,
-    costo_cl: 10,
-    fecha_ejecucion: new Date('2024-01-01'),
-    proveedor: mockProveedor,
-    contrato: mockContrato,
-    suplemento: mockSuplemento,
-    fecha_creacion: new Date('2024-01-01'),
-    fecha_actualizacion: new Date('2024-01-01'),
-    usuario_creacion: 'system',
-    usuario_actualizacion: 'system',
-    estado: 'activo'
-  },
-  {
-    id: 2,
-    no_suplemento_id: 1,
-    no_contrato_id: 1,
-    proveedor_id: 1,
-    trabajo_ejecutado: 'Trabajo de prueba 2',
-    costo_cup: 2000,
-    costo_cl: 20,
-    fecha_ejecucion: new Date('2024-02-01'),
-    proveedor: mockProveedor,
-    contrato: mockContrato,
-    suplemento: mockSuplemento,
-    fecha_creacion: new Date('2024-01-01'),
-    fecha_actualizacion: new Date('2024-01-01'),
-    usuario_creacion: 'system',
-    usuario_actualizacion: 'system',
-    estado: 'activo'
-  }
-];
+import { TipoContratoService } from 'app/modules/contratos/services/tipo-contrato.service';
+import { DepartamentoService } from 'app/modules/organizacion/departamento.service';
+import { ProveedorService } from 'app/modules/proveedores/services/proveedor.service';
+import { SuplementoService } from '../services/suplemento.service';
 
 @Component({
   selector: 'app-ejecucion-suplemento',
@@ -278,6 +101,10 @@ export class EjecucionSuplementoComponent implements AfterViewInit, OnDestroy {
   filterForm: FormGroup;
 
   constructor(
+          private tipocontratoervice: TipoContratoService,
+          private departamentoService: DepartamentoService,
+            private proveedorService:ProveedorService,
+            private suplementoService:SuplementoService,
     private _matDialog: MatDialog,
     private _snackBar: MatSnackBar,
     private _formBuilder: FormBuilder
@@ -289,25 +116,67 @@ export class EjecucionSuplementoComponent implements AfterViewInit, OnDestroy {
     // Load mock data (replace with actual API call in production)
     this.loadEjecuciones();
   }
-  
   private loadEjecuciones(): void {
-    // Simulate API call
     this.isLoadingResults = true;
-    setTimeout(() => {
-      this.dataSource = new MatTableDataSource<Partial<EjecucionSuplemento>>(mockEjecucionSuplemento);
-      this.dataSource.paginator = this._paginator;
-      this.dataSource.sort = this._sort;
-      this.resultsLength = mockEjecucionSuplemento.length;
-      this.isLoadingResults = false;
-    }, 500);
+    this.suplementoService.getEjecucionSuplementos().subscribe({
+      next: (data: any) => {
+         console.log('Data received:', data);
+         console.log('Data type:', typeof data);
+         console.log('Is array:', Array.isArray(data));
+         
+         // Handle different data structures
+         let dataArray: any[] = [];
+         
+         if (Array.isArray(data)) {
+           dataArray = data;
+         } else if (data && data.data && Array.isArray(data.data)) {
+           dataArray = data.data;
+         } else if (data && data.results && Array.isArray(data.results)) {
+           dataArray = data.results;
+         } else if (data && typeof data === 'object') {
+           // If it's a single object, wrap it in an array
+           dataArray = [data];
+         } else {
+           console.error('Unexpected data structure:', data);
+           dataArray = [];
+         }
+         
+        // Filter out mock data if any
+        const filteredData = dataArray.filter(item => item && !item['mock'] && item.id > 0);
+        
+        console.log('Filtered data:', filteredData);
+        
+        // Map the data to match the expected structure
+        const mappedData = filteredData.map((item: any) => ({
+          ...item,
+          proveedor: item.Proveedor || item.proveedor || null,
+          suplemento: item.Suplemento || item.suplemento || null
+        }));
+        
+        console.log('Mapped data:', mappedData);
+        
+        this.dataSource = new MatTableDataSource<Partial<EjecucionSuplemento>>(mappedData);
+        this.dataSource.paginator = this._paginator;
+        this.dataSource.sort = this._sort;
+        this.resultsLength = mappedData.length;
+        this.isLoadingResults = false;
+      },
+      error: (error) => {
+        console.error('Error loading data:', error);
+        this.isLoadingResults = false;
+        this.showMessage('Error al cargar ejecuciones de suplementos');
+      }
+    });
   }
-
+  
   private initFilterForm(): void {
     this.filterForm = this._formBuilder.group({
       no_suplemento_id_filter: [''],
       proveedor_filter: [''],
       contrato_filter: [''],
       trabajo_ejecutado_filter: [''],
+      suplemento_fecha_filter:[''],
+      costo_usd_filter:[''],
       costo_cup_filter: [''],
       costo_cl_filter: [''],
       fecha_ejecucion_filter: [''],
@@ -329,8 +198,15 @@ export class EjecucionSuplementoComponent implements AfterViewInit, OnDestroy {
       this.dataSource.paginator = this._paginator;
       this.dataSource.sort = this._sort;
     }
+  
+    // Set up search functionality
+    this.searchInputControl.valueChanges
+      .pipe(takeUntil(this._unsubscribeAll))
+      .subscribe(value => {
+        this.dataSource.filter = value?.trim().toLowerCase() || '';
+      });
   }
-
+  
 
   openAddEjecucionDialog(): void {
     const dialogRef = this._matDialog.open(EjecucionSuplementoFormComponent, {
@@ -368,12 +244,15 @@ export class EjecucionSuplementoComponent implements AfterViewInit, OnDestroy {
 
   deleteEjecucion(ejecucion: EjecucionSuplemento): void {
     if (confirm(`¿Está seguro de eliminar la ejecución del suplemento ${ejecucion.no_suplemento_id}?`)) {
-      // Call your service to delete the ejecucion
-      // this.yourService.deleteEjecucion(ejecucion.id).subscribe(() => {
-      //   this.showMessage('Ejecución de suplemento eliminada exitosamente');
-      //   // Refresh the table or update the data source here
-      // });
-      this.showMessage('Ejecución de suplemento eliminada exitosamente');
+      this.suplementoService.deleteEjecucionSuplemento(ejecucion.id).subscribe({
+        next: () => {
+          this.showMessage('Ejecución de suplemento eliminada exitosamente');
+          this.loadEjecuciones();
+        },
+        error: () => {
+          this.showMessage('Error al eliminar la ejecución');
+        }
+      });
     }
   }
 
@@ -385,17 +264,18 @@ export class EjecucionSuplementoComponent implements AfterViewInit, OnDestroy {
     });
   }
   applyFilters(): void {
-    // Implementar la lógica de filtrado aquí
+    // TODO: Implement filter logic using filterForm values and update dataSource accordingly
     this.showMessage('Filtros aplicados');
   }
   
   clearFilters(): void {
-    this.searchInputControl.setValue('');
+    this.filterForm.reset();
+    this.loadEjecuciones();
     this.showMessage('Filtros limpiados');
   }
   
   exportToCSV(): void {
-    // Implementar la lógica de exportación aquí
+    // TODO: Implement export to CSV using current filtered data
     this.showMessage('Exportar a CSV no implementado');
   }
 
@@ -407,7 +287,6 @@ export class EjecucionSuplementoComponent implements AfterViewInit, OnDestroy {
     // this.pageSize = event.pageSize;
     // this.loadEjecuciones();
   }
-
   toggleDetails(id: number): void {
     if (this.selectedEjecucion?.id === id) {
       this.selectedEjecucion = null;
@@ -415,6 +294,7 @@ export class EjecucionSuplementoComponent implements AfterViewInit, OnDestroy {
       const ejecucion = this.dataSource.data.find(e => e.id === id);
       this.selectedEjecucion = ejecucion || null;
       if (ejecucion) {
+        const ejecucionAny = ejecucion as any; // Cast to any to access backend properties
         this.selectedEjecucionForm.patchValue({
           id: ejecucion.id,
           no_suplemento_id: ejecucion.no_suplemento_id,
@@ -431,7 +311,7 @@ export class EjecucionSuplementoComponent implements AfterViewInit, OnDestroy {
       }
     }
   }
-
+  
   onSaveEjecucion(): void {
     if (this.selectedEjecucionForm.invalid) {
       this.showMessage('Por favor complete todos los campos requeridos');
@@ -439,27 +319,37 @@ export class EjecucionSuplementoComponent implements AfterViewInit, OnDestroy {
     }
 
     const formValue = this.selectedEjecucionForm.getRawValue();
-    const updatedEjecucion: Partial<EjecucionSuplemento> = {
+    const updatedEjecucion: any = {
       ...this.selectedEjecucion,
       ...formValue,
-      // Ensure dates are properly formatted
       fecha_ejecucion: formValue.fecha_ejecucion ? new Date(formValue.fecha_ejecucion) : null,
-      // Preserve related objects
       proveedor: this.selectedEjecucion?.proveedor,
       contrato: this.selectedEjecucion?.contrato,
       suplemento: this.selectedEjecucion?.suplemento
     };
 
-    // Here you would typically call a service to update the ejecucion
-    console.log('Updating ejecucion:', updatedEjecucion);
-    
-    // For now, we'll just update the local data
-    const index = this.dataSource.data.findIndex(e => e.id === updatedEjecucion.id);
-    if (index > -1) {
-      this.dataSource.data[index] = updatedEjecucion;
-      this.dataSource._updateChangeSubscription();
-      this.showMessage('Ejecución actualizada correctamente');
-      this.selectedEjecucion = null; // Close the form after saving
+    if (updatedEjecucion.id) {
+      this.suplementoService.updateEjecucionSuplemento(updatedEjecucion.id, updatedEjecucion).subscribe({
+        next: (res) => {
+          this.showMessage('Ejecución actualizada correctamente');
+          this.loadEjecuciones();
+          this.selectedEjecucion = null;
+        },
+        error: (err) => {
+          this.showMessage('Error al actualizar la ejecución');
+        }
+      });
+    } else {
+      this.suplementoService.createEjecucionSuplemento(updatedEjecucion).subscribe({
+        next: (res) => {
+          this.showMessage('Ejecución creada correctamente');
+          this.loadEjecuciones();
+          this.selectedEjecucion = null;
+        },
+        error: (err) => {
+          this.showMessage('Error al crear la ejecución');
+        }
+      });
     }
   }
 

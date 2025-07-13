@@ -1,0 +1,25 @@
+/* Trabajador Form Component Styles */
+.trabajador-form-dialog {
+  min-width: 500px;
+  
+  h2 {
+    margin-bottom: 1rem;
+    
+    mat-icon {
+      margin-right: 0.5rem;
+    }
+  }
+  
+  mat-dialog-content {
+    padding: 1rem 0;
+    
+    form {
+      min-width: 400px;
+    }
+  }
+  
+  mat-dialog-actions {
+    padding: 1rem 0;
+    gap: 0.5rem;
+  }
+}

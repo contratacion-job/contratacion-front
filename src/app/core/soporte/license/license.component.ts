@@ -4,7 +4,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { LicenseService } from './license.service';
-import { Licencia ,Entidad} from 'app/models/Type';
+import { EntidadService } from 'app/modules/organizacion/entidad-list/entidad.service';
+import { Licencia, Entidad } from 'app/models/Type';
 
 // Interfaces
 export interface HistorialActivacion {
@@ -12,6 +13,7 @@ export interface HistorialActivacion {
   fecha: string;
   usuario: string;
 }
+
 @Component({
   selector: 'app-license',
   standalone: true,
@@ -22,46 +24,17 @@ export interface HistorialActivacion {
 })
 export class LicenseComponent implements OnInit {
   activeTab: string = 'estado';
-  licenseData: Licencia;
+  licenseData: Licencia | null = null;
   historialActivaciones: HistorialActivacion[];
   daysRemaining: number = 0;
+  isLoading: boolean = true;
+  error: string = '';
 
-  constructor() {
-    // Datos de ejemplo
-    this.licenseData = {
-      id: 1,
-      entidad_id: 123,
-      numero_licencia: "ABC123-XYZ456",
-      tipo_licencia: "Empresarial Pro",
-      fecha_emision: new Date("2025-06-01"),
-      fecha_vencimiento: new Date("2025-07-01"),
-      estado: "Activa",
-      observaciones: "Licencia renovada automáticamente",
-      entidad: {
-        id: 123,
-        municipio_id: 1,
-        nombre_entidad: "Mi Sistema ERP",
-        codigo_entidad: "ERP001",
-        domicilio_legal: "Av. Principal 123, Centro",
-        telefonos: "555-0123, 555-0124",
-        logo: "assets/logo.jpg",
-        tipo_empresa: "PRIVADA",
-        provincia: {
-          id: 1,
-          nombre_provincia: "Provincia Central"
-        },
-        municipio: {
-          id: 1,
-          provincia_id: 1,
-          nombre_municipio: "Ciudad Capital",
-          provincia: {
-            id: 1,
-            nombre_provincia: "Provincia Central"
-          }
-        }
-      }
-    };
-
+  constructor(
+    private licenseService: LicenseService,
+    private entidadService: EntidadService
+  ) {
+    // Datos de ejemplo para historial
     this.historialActivaciones = [
       {
         serie: "SN987654320",
@@ -77,7 +50,86 @@ export class LicenseComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.calculateDaysRemaining();
+    this.loadLicenseData();
+  }
+
+  loadLicenseData(): void {
+    this.isLoading = true;
+    this.error = '';
+
+    // Cargar datos de entidad desde el servicio
+    this.entidadService.getLogs().subscribe({
+      next: (response: any) => {
+        console.log('Respuesta de entidades:', response);
+        
+        try {
+          let entidadesData = [];
+          
+          if (response && response.data && Array.isArray(response.data)) {
+            entidadesData = response.data;
+          } else if (Array.isArray(response)) {
+            entidadesData = response;
+          }
+
+          if (entidadesData.length > 0) {
+            // Usar la primera entidad como ejemplo
+            const primeraEntidad = entidadesData[0];
+            
+            // Crear la licencia con datos reales de la entidad
+            this.licenseData = {
+              id: 1,
+              entidad_id: primeraEntidad.id,
+              numero_licencia: "ABC123-XYZ456",
+              tipo_licencia: "Empresarial Pro",
+              fecha_emision: new Date("2025-06-01"),
+              fecha_vencimiento: new Date("2025-07-01"),
+              estado: "Activa",
+              observaciones: "Licencia renovada automáticamente",
+              entidad: {
+                id: primeraEntidad.id,
+                municipio_id: 1,
+                nombre_entidad: primeraEntidad.nombre,
+                codigo_entidad: primeraEntidad.codigo,
+                domicilio_legal: primeraEntidad.domicilio_legal,
+                telefonos: primeraEntidad.telefonos,
+                logo: primeraEntidad.logo,
+                tipo_empresa: primeraEntidad.tipo_empresa,
+                ministerio: primeraEntidad.ministerio,
+                activo: primeraEntidad.activo,
+                director_id: primeraEntidad.director_id,
+                provincia: {
+                  id: 1,
+                  nombre_provincia: primeraEntidad.provincia
+                },
+                municipio: {
+                  id: 1,
+                  provincia_id: 1,
+                  nombre_municipio: primeraEntidad.municipio,
+                  provincia: {
+                    id: 1,
+                    nombre_provincia: primeraEntidad.provincia
+                  }
+                }
+              }
+            };
+
+            this.calculateDaysRemaining();
+          } else {
+            this.error = 'No se encontraron entidades';
+          }
+        } catch (error) {
+          console.error('Error procesando datos de entidad:', error);
+          this.error = 'Error procesando los datos de la entidad';
+        }
+
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar datos de entidad:', error);
+        this.error = 'Error al cargar los datos de la entidad';
+        this.isLoading = false;
+      }
+    });
   }
 
   setActiveTab(tab: string): void {
@@ -85,6 +137,8 @@ export class LicenseComponent implements OnInit {
   }
 
   calculateDaysRemaining(): void {
+    if (!this.licenseData) return;
+    
     const today = new Date();
     const expiry = new Date(this.licenseData.fecha_vencimiento);
     const diffTime = expiry.getTime() - today.getTime();
@@ -92,9 +146,9 @@ export class LicenseComponent implements OnInit {
   }
 
   getStatusColor(): string {
-    if (this.daysRemaining > 15) return 'status-active';    // Green for more than 15 days
-    if (this.daysRemaining > 7) return 'status-warning';    // Orange for 8-15 days
-    return 'status-danger';                                 // Red for 7 or fewer days
+    if (this.daysRemaining > 15) return 'status-active';
+    if (this.daysRemaining > 7) return 'status-warning';
+    return 'status-danger';
   }
 
   getStatusIcon(): string {
