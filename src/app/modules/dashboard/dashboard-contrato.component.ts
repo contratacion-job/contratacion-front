@@ -60,6 +60,14 @@ export class ContratoDashboardComponent implements OnInit {
   isLoading = true;
   chartsInitialized = false;
 
+ 
+  contratosActivos: number = 0;
+  contratosVencidos: number = 0;
+
+  totalSuplementos: number = 0;
+  montoTotalContratos: number = 0;
+  montoTotalSuplementos: number = 0;
+
   @ViewChild('topMontoMayorChart') topMontoMayorChart!: ChartComponent;
   @ViewChild('topMontoMenorChart') topMontoMenorChart!: ChartComponent;
   @ViewChild('topVigenciaMayorChart') topVigenciaMayorChart!: ChartComponent;
@@ -91,25 +99,70 @@ export class ContratoDashboardComponent implements OnInit {
   public duracionBucketsChartOptions: Partial<ChartOptions> = {};
   public evolucionMensualChartOptions: Partial<ChartOptions> = {};
 
+
   constructor(private contratoService: ContratoService) {}
 
   ngOnInit(): void {
     this.initializeDefaultCharts();
-    this.fetchContratos();
-     this.contratoService
+    this.contratoService.getDashboardcontrato().subscribe({
+      next: (data) => {
+        console.log('Datos recibidos del servicio:', data);
+        this.contratos = data.map(contrato => ({
+          ...contrato,
+          monto_total: (contrato.valor_cup || 0) + (contrato.valor_usd || 0) + (contrato.monto_vencimiento_cup || 0) + (contrato.monto_vencimiento_usd || 0) + (contrato.monto_vencimiento_cl || 0)
+        }));
+        this.initializeCharts();
+        console.log('Opciones topMontoMayorChart:', this.topMontoMayorChartOptions);
+        console.log('Opciones topMontoMenorChart:', this.topMontoMenorChartOptions);
+        console.log('Opciones topVigenciaMayorChart:', this.topVigenciaMayorChartOptions);
+        console.log('Opciones topVigenciaMenorChart:', this.topVigenciaMenorChartOptions);
+        console.log('Opciones tiposContratosChart:', this.tiposContratosChartOptions);
+        console.log('Opciones departamentosChart:', this.departamentosChartOptions);
+        console.log('Opciones duracionBucketsChart:', this.duracionBucketsChartOptions);
+        console.log('Opciones evolucionMensualChart:', this.evolucionMensualChartOptions);
+        this.isLoading = false;
+        this.chartsInitialized = true;
+      },
+      error: (error) => {
+        console.error('Error fetching dashboard contratos:', error);
+        this.isLoading = false;
+        this.initializeEmptyCharts();
+      }
+    }); 
+    this.contratoService.getDashboard().subscribe({
+      next: (data) => {
+        console.log('Datos recibidos del servicio:', data);
+        this.contratos = data.map(contrato => ({
+          ...contrato,
+          monto_total: (contrato.valor_cup || 0) + (contrato.valor_usd || 0) + (contrato.monto_vencimiento_cup || 0) + (contrato.monto_vencimiento_usd || 0) + (contrato.monto_vencimiento_cl || 0)
+        }));
+   
+        this.isLoading = false;
+        this.chartsInitialized = true;
+      },
+      error: (error) => {
+        console.error('Error fetching dashboard contratos:', error);
+        this.isLoading = false;
+        this.initializeEmptyCharts();
+      }
+    });
   }
+  
 
   // Computed properties for dashboard statistics
   get totalContratos(): number {
+    if (!this.contratos) return 0;
     return this.contratos.length;
   }
 
   get valorTotal(): number {
+    if (!this.contratos) return 0;
     const total = this.contratos.reduce((sum, contrato) => sum + (contrato.monto_total || 0), 0);
     return Math.round(total / 1000000 * 100) / 100; // Convert to millions and round to 2 decimals
   }
 
   get totalProveedores(): number {
+    if (!this.contratos) return 0;
     const proveedoresUnicos = new Set();
     this.contratos.forEach(contrato => {
       if (contrato.proveedor?.id) {
@@ -120,6 +173,7 @@ export class ContratoDashboardComponent implements OnInit {
   }
 
   get totalDepartamentos(): number {
+    if (!this.contratos) return 0;
     const departamentosUnicos = new Set();
     this.contratos.forEach(contrato => {
       if (contrato.departamento?.id) {
@@ -287,27 +341,7 @@ export class ContratoDashboardComponent implements OnInit {
   }
 
   private fetchContratos(): void {
-    this.isLoading = true;
-    this.contratoService.getContratos().subscribe({
-      next: (data) => {
-        this.contratos = data.map(contrato => ({
-          ...contrato,
-          monto_total: (contrato.valor_cup || 0) + (contrato.valor_usd || 0)
-        })) as ExtendedContrato[];
-
-        // Esperar un poco para que el DOM se actualice
-        setTimeout(() => {
-          this.initializeCharts();
-          this.isLoading = false;
-          this.chartsInitialized = true;
-        }, 100);
-      },
-      error: (error) => {
-        console.error('Error fetching contratos:', error);
-        this.isLoading = false;
-        this.initializeEmptyCharts();
-      }
-    });
+    // Método obsoleto, ya no se usa
   }
 
   private initializeEmptyCharts(): void {
@@ -327,9 +361,14 @@ export class ContratoDashboardComponent implements OnInit {
     this.createTiposRadarChart();
     this.createDepartamentosChart();
     this.createDuracionHeatmapChart();
+    this.createTopVigenciaMenorChart();
   }
 
   private createTopMontoChart(): void {
+    if (!this.contratos || this.contratos.length === 0) {
+      this.topMontoMayorChartOptions = {};
+      return;
+    }
     const sortedByMonto = [...this.contratos].sort((a, b) => (b.monto_total || 0) - (a.monto_total || 0));
     const top10 = sortedByMonto.slice(0, 10);
 
@@ -392,8 +431,6 @@ export class ContratoDashboardComponent implements OnInit {
         this.colorPalette[3], // gris azulado
         this.colorPalette[4], // gris oscuro
         this.colorPalette[0], // gris muy claro
-        this.colorPalette[8], // azul casi blanco
-        this.colorPalette[5]  // azul primario (repetido)
       ],
       grid: {
         show: true,
@@ -415,6 +452,11 @@ export class ContratoDashboardComponent implements OnInit {
   }
 
   private createTopMontoPieChart(): void {
+    if (!this.contratos || this.contratos.length === 0) {
+      this.topMontoMenorChartOptions = {};
+      return;
+    }
+    
     const sortedByMonto = [...this.contratos].sort((a, b) => (b.monto_total || 0) - (a.monto_total || 0));
     const top6 = sortedByMonto.slice(0, 6);
 
@@ -933,7 +975,6 @@ export class ContratoDashboardComponent implements OnInit {
     };
   }
 
-  // Función adicional para crear un gráfico de líneas con múltiples series
   private createTopVigenciaMenorChart(): void {
     const calcularDuracion = (contrato: ExtendedContrato): number => {
       if (!contrato.fecha_firmado || !contrato.fecha_vencido) return 0;
@@ -999,7 +1040,8 @@ export class ContratoDashboardComponent implements OnInit {
           title: {
             text: 'Duración (Meses)',
             style: {
-              color: '#64748B'
+              color: '#64748B',
+              fontSize: '12px'
             }
           },
           labels: {
@@ -1013,7 +1055,8 @@ export class ContratoDashboardComponent implements OnInit {
           title: {
             text: 'Monto (M$)',
             style: {
-              color: '#64748B'
+              color: '#64748B',
+              fontSize: '12px'
             }
           },
           labels: {
@@ -1043,7 +1086,4 @@ export class ContratoDashboardComponent implements OnInit {
       }
     };
   }
-
-
-
 }

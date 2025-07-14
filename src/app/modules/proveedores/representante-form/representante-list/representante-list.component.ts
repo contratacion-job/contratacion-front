@@ -18,6 +18,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatMenuTrigger } from '@angular/material/menu';
 
 import { RepresentanteService } from '../../services/representante.service';
 import { ProveedorService } from '../../services/proveedor.service';
@@ -105,7 +106,7 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
 
   @ViewChild('sort') sort: MatSort;
   @ViewChild('paginator') paginator: MatPaginator;
-
+  @ViewChild('columnMenu', { read: MatMenuTrigger }) columnMenuTrigger!: MatMenuTrigger;
   pagination = {
     length: 0,
     page: 0,
@@ -137,6 +138,9 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
     });
   }
 
+  closeColumnMenu(): void {
+    this.columnMenuTrigger.closeMenu();
+  }
   loadRepresentantes(): void {
     this.isLoading = true;
     this.representanteService.getRepresentantes().subscribe({

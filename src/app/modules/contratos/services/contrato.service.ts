@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, catchError, of } from 'rxjs';
-import { Contrato } from 'app/models/Type';
+import { Contrato, EjecucionContrato } from 'app/models/Type';
 import { mockContrato, expiredContracts, mockDepartamento } from 'app/mock-api/contrato-fake/fake';
 import { API_ENDPOINTS } from 'app/core/constants/api-endpoints';
 import { tap } from 'rxjs/operators';
@@ -208,10 +208,55 @@ getContratos(): Observable<Contrato[]> {
         })
       );
   }
+
+  getDashboardSummary(): Observable<{
+    total_contratos: number;
+    contratos_activos: number;
+    contratos_vencidos: number;
+    total_proveedores: number;
+    total_suplementos: number;
+    monto_total_contratos: number;
+    monto_total_suplementos: number;
+  }> {
+    return this.http.get<{
+      total_contratos: number;
+      contratos_activos: number;
+      contratos_vencidos: number;
+      total_proveedores: number;
+      total_suplementos: number;
+      monto_total_contratos: number;
+      monto_total_suplementos: number;
+    }>(API_ENDPOINTS.ESTADISTICAS.DASHBOARD)
+    .pipe(
+      tap(data => console.log('Dashboard summary fetched:', data)),
+      catchError(error => {
+        console.error('Error fetching dashboard summary:', error);
+        return of({
+          total_contratos: 0,
+          contratos_activos: 0,
+          contratos_vencidos: 0,
+          total_proveedores: 0,
+          total_suplementos: 0,
+          monto_total_contratos: 0,
+          monto_total_suplementos: 0
+        });
+      })
+    );
+  }
   getDashboardcontrato(): Observable<Contrato[]> {
     return this.http.get<Contrato[]>(API_ENDPOINTS.ESTADISTICAS.CONTRATOS)
       .pipe(
         tap(data => console.log('Contratos fetched:', data)),
+        catchError(error => {
+          console.error('Error fetching contratos:', error);
+          return of([...this.contratos]);
+        })
+      );
+  }   
+  getDashboardEjecucion(): Observable<EjecucionContrato[] | Contrato[]> {
+    return this.http.get<EjecucionContrato[] | Contrato[]>(API_ENDPOINTS.ESTADISTICAS.EJECUCION)
+      .pipe(
+        tap(data => console.log('ejecucion dash fetched:', data)),
         catchError(error => {
           console.error('Error fetching contratos:', error);
           return of([...this.contratos]);

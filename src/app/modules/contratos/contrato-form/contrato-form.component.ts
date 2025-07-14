@@ -206,7 +206,7 @@ export class ContratoFormComponent implements OnInit {
       height: isMobile ? '100vh' : '90vh',
       maxHeight: '100vh',
       panelClass: 'full-screen-dialog',
-      disableClose: false,
+      disableClose: true,
       autoFocus: false,
       hasBackdrop: !isMobile,
       position: isMobile ? { top: '0' } : {}

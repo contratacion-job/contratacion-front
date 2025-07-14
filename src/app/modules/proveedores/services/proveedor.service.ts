@@ -41,7 +41,7 @@ export class ProveedorService {
 
 
     getDashboardproveedor(): Observable<Proveedor[]> {
-      return this.http.get<Proveedor[]>(API_ENDPOINTS.ESTADISTICAS.CONTRATOS)
+      return this.http.get<Proveedor[]>(API_ENDPOINTS.ESTADISTICAS.PROVEEDORES)
         .pipe(
           tap(data => console.log('proveedor dash fetched:', data)),
           catchError(error => {

@@ -39,11 +39,11 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 icon: 'heroicons_outline:document-duplicate',
                 children: [
                     {
-                        id: 'suplementos-tablero',
+                        id: 'ejecucion-tablero',
                         title: 'Tablero',
                         type: 'basic',
                         icon: 'heroicons_outline:archive-box',
-                        link: '/dashboard/dashboard-suplimento',
+                        link: '/dashboard/dashboard-ejecucion',
                     },
                     {
                         id: 'ejecucion-contrato',

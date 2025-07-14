@@ -57,7 +57,7 @@ export class SuplementoFormComponent implements OnInit {
     const dialogRef = this.dialog.open(ProveedorFormComponent, {
       width: '40%',
       height: '60%',
-      disableClose: false
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -71,7 +71,7 @@ export class SuplementoFormComponent implements OnInit {
     const dialogRef = this.dialog.open(ContratoFormComponent, {
       width: '40%',
       height: '90%',
-      disableClose: false
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(result => {
