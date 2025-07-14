@@ -91,17 +91,71 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
 
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-  columns = [
-    { key: 'no_contrato', label: 'No. Contrato', sortable: true },
-    { key: 'proveedor', label: 'Proveedor', sortable: true },
-    { key: 'tipo_contrato', label: 'Tipo de Contrato', sortable: true },
-    { key: 'departamento', label: 'Departamento', sortable: true },
-    { key: 'valor_cup', label: 'Valor (CUP)', sortable: true },
-    { key: 'valor_usd', label: 'Valor (USD)', sortable: true },
-    { key: 'fecha_entrada', label: 'Fecha Entrada', sortable: true },
-    { key: 'fecha_firmado', label: 'Fecha Firmado', sortable: true },
-    { key: 'vigencia', label: 'Vigencia', sortable: true }
+  columnSettings = [
+    { key: 'estado', label: 'Estado', visible: true, tooltip: 'Estado del contrato' },
+    { key: 'no_contrato', label: 'No. Contrato', visible: true, tooltip: 'Número del contrato' },
+    { key: 'proveedor', label: 'Proveedor', visible: true, tooltip: 'Nombre del proveedor' },
+    { key: 'tipo_contrato', label: 'Tipo de Contrato', visible: true, tooltip: 'Tipo de contrato' },
+    { key: 'departamento', label: 'Departamento', visible: true, tooltip: 'Departamento asociado' },
+    { key: 'valor_cup', label: 'Valor (CUP)', visible: true, tooltip: 'Valor en CUP' },
+    { key: 'valor_usd', label: 'Valor (USD)', visible: true, tooltip: 'Valor en USD' },
+    { key: 'fecha_entrada', label: 'Fecha Entrada', visible: true, tooltip: 'Fecha de entrada' },
+    { key: 'fecha_firmado', label: 'Fecha Firmado', visible: true, tooltip: 'Fecha de firmado' },
+    { key: 'vigencia', label: 'Vigencia', visible: true, tooltip: 'Vigencia del contrato' },
+    { key: 'tiempoRestante', label: 'Tiempo Restante', visible: true, tooltip: 'Tiempo restante del contrato' }
   ];
+
+  // Remove old columns array
+  // columns = [
+  //   { key: 'no_contrato', label: 'No. Contrato', sortable: true },
+  //   { key: 'proveedor', label: 'Proveedor', sortable: true },
+  //   { key: 'tipo_contrato', label: 'Tipo de Contrato', sortable: true },
+  //   { key: 'departamento', label: 'Departamento', sortable: true },
+  //   { key: 'valor_cup', label: 'Valor (CUP)', sortable: true },
+  //   { key: 'valor_usd', label: 'Valor (USD)', sortable: true },
+  //   { key: 'fecha_entrada', label: 'Fecha Entrada', sortable: true },
+  //   { key: 'fecha_firmado', label: 'Fecha Firmado', sortable: true },
+  //   { key: 'vigencia', label: 'Vigencia', sortable: true }
+  // ];
+
+  getVisibleColumns() {
+    return this.columnSettings.filter(column => column.visible);
+  }
+
+  getGridColumns(): string {
+    const visibleColumns = this.getVisibleColumns();
+    const columnSizes = visibleColumns.map(() => 'minmax(120px, 1fr)');
+    return `${columnSizes.join(' ')} 100px`; // 100px for details button column
+  }
+
+  getColumnValue(row: Contrato, columnKey: string): string | number {
+    switch (columnKey) {
+      case 'estado':
+        return row.estado || '';
+      case 'no_contrato':
+        return row.no_contrato || '';
+      case 'proveedor':
+        return row.proveedor?.nombre || '';
+      case 'tipo_contrato':
+        return row.tipo_contrato?.nombre_tipo_contrato || '';
+      case 'departamento':
+        return row.departamento?.nombre_departamento || '';
+      case 'valor_cup':
+        return row.valor_cup !== undefined && row.valor_cup !== null ? `${row.valor_cup}` : '';
+      case 'valor_usd':
+        return row.valor_usd !== undefined && row.valor_usd !== null ? `${row.valor_usd}` : '';
+      case 'fecha_entrada':
+        return row.fecha_entrada ? new Date(row.fecha_entrada).toLocaleDateString() : '';
+      case 'fecha_firmado':
+        return row.fecha_firmado ? new Date(row.fecha_firmado).toLocaleDateString() : '';
+      case 'vigencia':
+        return row.vigencia?.vigencia ? row.vigencia.vigencia.toString() : '';
+      case 'tiempoRestante':
+        return (row as any).tiempoRestante || '';
+      default:
+        return '';
+    }
+  }
 
   showAddForm: boolean = false;
   isAdding: boolean = false;
