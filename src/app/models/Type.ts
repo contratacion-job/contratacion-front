@@ -249,15 +249,39 @@ export interface Licencia {
 // Table: representantes (Agregada)
 export interface Representante {
   id: number;
-  entidad_id: number;
   nombre: string;
   apellido: string;
   cargo: string;
   telefono?: string;
   email?: string;
-  activo: boolean;
-  estado?: string;
-  entidad: Entidad;
+  estado: string;
+  es_legal: boolean;
+  fecha_inicio: string;
+  fecha_fin?: string;
+  numero_documento: string;
+  tipo_documento: string;
+  observaciones?: string;
+  proveedor_id: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
+  
+  // Relación con Proveedor
+  Proveedor?: {
+    id: number;
+    nombre: string;
+    codigo: string;
+    tipo_empresa: string;
+    ministerio: string;
+    provincia: string;
+    municipio: string;
+    telefonos: string;
+    prefijo_provincia: string;
+    estado: string;
+    representante_legal_id?: number;
+    createdAt: string;
+    updatedAt: string;
+  };
 }
 
 // Table: contratos_entidad (Tabla de relación agregada)

@@ -56,11 +56,23 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
   suplementosDataSource: MatTableDataSource<Suplemento> = new MatTableDataSource();
 
   // Columnas para la tabla de representantes
-  displayedColumns: string[] = ['select', 'nombre', 'apellido', 'cargo', 'telefono', 'email', 'activo', 'acciones'];
-
+  displayedColumns: string[] = [
+    'proveedor_nombre', 
+    'proveedor_codigo', 
+    'representante', 
+    'cargo', 
+    'telefono', 
+    'email', 
+    'estado', 
+    'tipo_empresa', 
+    'ministerio',
+    'provincia',
+    'municipio',
+    'numero_documento',
+    'acciones'
+  ];
   // Columnas para la tabla de suplementos
   displayedSuplementosColumns: string[] = ['no_suplemento', 'fecha_firmado', 'valor_cup', 'valor_usd', 'estado', 'acciones'];
-
   selection = new Set<number>();
   suplementoSelection = new Set<number>();
 
@@ -117,7 +129,7 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
     this.loadRepresentantes();
     this.loadSuplementos();
     this.setupFilter();
-    this.dataSource.filterPredicate = (data: any, filter: string) => {
+    this.dataSource.filterPredicate = (data: Representante, filter: string) => {
       const searchStr = [
         data.Proveedor?.nombre || '',
         data.Proveedor?.codigo || '',
@@ -128,9 +140,13 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
         data.email || '',
         data.estado || '',
         data.Proveedor?.tipo_empresa || '',
-        data.numero_documento || ''
+        data.Proveedor?.ministerio || '',
+        data.Proveedor?.provincia || '',
+        data.Proveedor?.municipio || '',
+        data.numero_documento || '',
+        data.tipo_documento || ''
       ].join(' ').toLowerCase();
-      
+            
       return searchStr.includes(filter);
     };
   }

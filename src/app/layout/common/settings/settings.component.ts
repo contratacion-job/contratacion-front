@@ -57,8 +57,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
     showSaveNotification: boolean = false;
 
     customization: ThemeCustomization = {
-        primaryColor: '#2196F3',
-        sidebarColor: localStorage.getItem('sidebarColor') || '#1e3a8a',
+        primaryColor: '#9C27B0',
+        sidebarColor: localStorage.getItem('sidebarColor') || '#9C27B0',
         logo: 'assets/logo.jpg',
         companyName: 'Sistema de Contratación'
     };
@@ -97,10 +97,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
     // Mapeo de colores a temas
     private colorToThemeMap: Record<string, string> = {
-        '#2196F3': 'theme-default',
+        '#9C27B0': 'theme-purple',
         '#4CAF50': 'theme-green',
         '#FF9800': 'theme-amber',
-        '#9C27B0': 'theme-purple',
         '#F44336': 'theme-red',
         '#009688': 'theme-teal',
         '#3F51B5': 'theme-indigo',
