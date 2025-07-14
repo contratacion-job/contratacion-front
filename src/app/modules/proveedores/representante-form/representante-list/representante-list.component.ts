@@ -20,6 +20,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { RepresentanteService } from '../../services/representante.service';
+import { ProveedorService } from '../../services/proveedor.service';
 import { Representante, Suplemento } from 'app/models/Type';
 import { Contrato } from 'app/models/Type';
 import { ContratoService } from 'app/modules/contratos/services/contrato.service';
@@ -54,7 +55,23 @@ import { RepresentanteFormComponent } from '../representante-form.component';
 export class RepresentanteListComponent implements OnInit, AfterViewInit {
   dataSource: MatTableDataSource<Representante> = new MatTableDataSource();
   suplementosDataSource: MatTableDataSource<Suplemento> = new MatTableDataSource();
-
+  
+  columnSettings = [
+    { key: 'nombre', label: 'Nombre', visible: true, tooltip: 'Nombre completo del representante' },
+    { key: 'apellido', label: 'Apellido', visible: true, tooltip: 'Apellido completo del representante' },
+    { key: 'cargo', label: 'Cargo', visible: true, tooltip: 'Cargo del representante' },
+    { key: 'telefono', label: 'Teléfono', visible: true, tooltip: 'Teléfono del representante' },
+    { key: 'email', label: 'Email', visible: true, tooltip: 'Email del representante' },
+    { key: 'estado', label: 'Estado', visible: true, tooltip: 'Estado del representante' },
+    { key: 'proveedor_nombre', label: 'Proveedor', visible: true, tooltip: 'Nombre del proveedor' },
+    { key: 'proveedor_codigo', label: 'Código Proveedor', visible: false, tooltip: 'Código del proveedor' },
+    { key: 'tipo_empresa', label: 'Tipo Empresa', visible: false, tooltip: 'Tipo de empresa' },
+    { key: 'ministerio', label: 'Ministerio', visible: true, tooltip: 'Ministerio del proveedor' },
+    { key: 'provincia', label: 'Provincia', visible: false, tooltip: 'Provincia del proveedor' },
+    { key: 'municipio', label: 'Municipio', visible: false, tooltip: 'Municipio del proveedor' },
+    { key: 'numero_documento', label: 'Número Documento', visible: false, tooltip: 'Número de documento' },
+    { key: 'tipo_documento', label: 'Tipo Documento', visible: false, tooltip: 'Tipo de documento' }
+  ];
   // Columnas para la tabla de representantes
   displayedColumns: string[] = [
     'proveedor_nombre', 
@@ -86,9 +103,8 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
   searchControl = new FormControl('');
   selectedRowForm: FormGroup;
 
-@ViewChild('sort') sort: MatSort;
-@ViewChild('paginator') paginator: MatPaginator;
-
+  @ViewChild('sort') sort: MatSort;
+  @ViewChild('paginator') paginator: MatPaginator;
 
   pagination = {
     length: 0,
@@ -100,6 +116,7 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
 
   constructor(
     private representanteService: RepresentanteService,
+    private proveedorService: ProveedorService,
     private contratoService: ContratoService,
     private suplementoService: SuplementoService,
     private dialog: MatDialog,
@@ -120,15 +137,91 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+  loadRepresentantes(): void {
+    this.isLoading = true;
+    this.representanteService.getRepresentantes().subscribe({
+      next: (response: any) => {
+        console.log('Raw representantes response:', response);
+        const representantes = Array.isArray(response) ? response : response.data || [];
+        this.proveedorService.getProveedores().subscribe({
+          next: (proveedores) => {
+            // Mapear el objeto completo del proveedor con propiedades correctas
+            representantes.forEach((rep: any) => {
+              const proveedor = proveedores.find((p: any) => p.id === rep.proveedor_id);
+              if (proveedor) {
+                rep.Proveedor = {
+                  id: proveedor.id,
+                  nombre: proveedor.nombre || '',
+                  codigo: proveedor.codigo || '',
+                  tipo_empresa: '', // No existe en Proveedor, asignar vacío
+                  ministerio: typeof proveedor.ministerio === 'string' ? proveedor.ministerio : (proveedor.ministerio?.nombre_ministerio || ''),
+                  provincia: proveedor.provincia || '',
+                  municipio: typeof proveedor.municipio === 'string' ? proveedor.municipio : (proveedor.municipio?.nombre_municipio || ''),
+                  telefonos: proveedor.telefonos || '',
+                  prefijo_provincia: proveedor.prefijo_provincia || '',
+                  estado: proveedor.estado || '',
+                  representante_legal_id: proveedor.representante_legal_id,
+                  createdAt: proveedor.createdAt || '',
+                  updatedAt: proveedor.updatedAt || ''
+                };
+              } else {
+                rep.Proveedor = null;
+              }
+            });
+            
+            console.log('Representantes con Proveedor completo:', representantes);
+            this.dataSource.data = representantes;
+            this.pagination.length = representantes.length;
+            
+            // Configurar la tabla después de cargar los datos
+            if (this.paginator) {
+              this.dataSource.paginator = this.paginator;
+            }
+            if (this.sort) {
+              this.dataSource.sort = this.sort;
+            }
+            
+            if (this.selectedContratoId) {
+              this.applyContratoFilter();
+            }
+            this.isLoading = false;
+          },
+          error: (error) => {
+            console.error('Error al cargar los proveedores', error);
+            this.showMessage('Error al cargar los proveedores', 'error');
+            this.isLoading = false;
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error al cargar los representantes', error);
+        this.showMessage('Error al cargar los representantes', 'error');
+        this.isLoading = false;
+      }
+    });
   }
-
+  
+  ngAfterViewInit(): void {
+    // Configurar paginator y sort después de que la vista esté lista
+    if (this.dataSource.data.length > 0) {
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    }
+    
+    // También configurar cuando los datos cambien
+    this.dataSource.connect().subscribe(() => {
+      if (this.paginator && this.sort) {
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      }
+    });
+  }
+  
   ngOnInit(): void {
+    this.setupFilter();
     this.loadRepresentantes();
     this.loadSuplementos();
-    this.setupFilter();
+    
     this.dataSource.filterPredicate = (data: Representante, filter: string) => {
       const searchStr = [
         data.Proveedor?.nombre || '',
@@ -149,30 +242,6 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
             
       return searchStr.includes(filter);
     };
-  }
-
-  loadRepresentantes(): void {
-    this.isLoading = true;
-    this.representanteService.getRepresentantes().subscribe({
-      next: (representantes) => {
-        console.log('Representantes cargados:', representantes);
-        console.log('=== DEBUG: Datos recibidos ===');
-      console.log('Total representantes:', representantes.length);
-      console.log('Primer representante:', representantes[0]);
-      console.log('Estructura del primer representante:', Object.keys(representantes[0] || {}));
-        this.dataSource.data = representantes;
-        this.pagination.length = representantes.length;
-        if (this.selectedContratoId) {
-          this.applyContratoFilter();
-        }
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error al cargar los representantes', error);
-        this.showMessage('Error al cargar los representantes', 'error');
-        this.isLoading = false;
-      }
-    });
   }
 
   setupFilter(): void {
@@ -239,7 +308,6 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
       this.selectedRow = found ? found : null;
       
       if (this.selectedRow) {
-        // Poblar el formulario con los datos del representante seleccionado
         this.selectedRowForm.patchValue({
           nombre: this.selectedRow.nombre,
           apellido: this.selectedRow.apellido,
@@ -356,4 +424,65 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
   trackByFn(index: number, item: any): any {
     return item.id || index;
   }
+
+getVisibleColumns() {
+  return this.columnSettings.filter(column => column.visible);
+}
+
+// Método para generar las columnas del grid
+getGridColumns(): string {
+  const visibleColumns = this.getVisibleColumns();
+  const columnSizes = visibleColumns.map(() => 'minmax(120px, 1fr)');
+  return `${columnSizes.join(' ')} 200px`; // 200px para la columna de acciones
+}
+
+// Método para obtener el valor de una columna
+getColumnValue(representante: any, columnKey: string): string {
+  switch (columnKey) {
+    case 'nombre':
+      return representante.nombre || '';
+    case 'apellido':
+      return representante.apellido || '';
+    case 'cargo':
+      return representante.cargo || '';
+    case 'telefono':
+      return representante.telefono || '';
+    case 'email':
+      return representante.email || '';
+    case 'estado':
+      return representante.estado || '';
+    case 'proveedor_nombre':
+      return representante.Proveedor?.nombre || '';
+    case 'proveedor_codigo':
+      return representante.Proveedor?.codigo || '';
+    case 'tipo_empresa':
+      return representante.Proveedor?.tipo_empresa || '';
+    case 'ministerio':
+      return representante.Proveedor?.ministerio || '';
+    case 'provincia':
+      return representante.Proveedor?.provincia || '';
+    case 'municipio':
+      return representante.Proveedor?.municipio || '';
+    case 'numero_documento':
+      return representante.numero_documento || '';
+    case 'tipo_documento':
+      return representante.tipo_documento || '';
+    default:
+      return '';
+  }
+}
+
+// Método para alternar visibilidad de columnas
+toggleColumn(columnKey: string): void {
+  const column = this.columnSettings.find(col => col.key === columnKey);
+  if (column) {
+    column.visible = !column.visible;
+  }
+}
+exportToCSV(){
+
+}
+exportToPDF(){
+  
+}
 }

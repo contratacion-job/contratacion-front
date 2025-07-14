@@ -97,9 +97,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
     // Mapeo de colores a temas
     private colorToThemeMap: Record<string, string> = {
-        '#9C27B0': 'theme-purple',
+        '#9C27B1': 'theme-default',
         '#4CAF50': 'theme-green',
         '#FF9800': 'theme-amber',
+        '#9C27B0': 'theme-purple',
         '#F44336': 'theme-red',
         '#009688': 'theme-teal',
         '#3F51B5': 'theme-indigo',

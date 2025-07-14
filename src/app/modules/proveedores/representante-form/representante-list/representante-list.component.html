@@ -6,7 +6,7 @@
         class="icon-size-24 opacity-25 text-green-500 dark:text-green-400"
         [svgIcon]="'heroicons_outline:users'"></mat-icon>
     </div>
-    
+
     <!-- Representantes Table -->
     <div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
       <!-- Header -->
@@ -15,16 +15,16 @@
         <div class="absolute inset-x-0 bottom-0" *ngIf="isLoading">
           <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
         </div>
-        
+
         <!-- Title -->
         <div class="flex-1 min-w-0">
           <div class="mt-2">
             <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
-             Representantes
+              Representantes
             </h2>
           </div>
         </div>
-        
+
         <!-- Actions -->
         <div class="flex flex-col sm:flex-row shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
           <!-- Search -->
@@ -41,143 +41,211 @@
               [autocomplete]="'off'"
               [placeholder]="'Buscar representantes'">
           </mat-form-field>
-          
-          <!-- Add representante button -->
+
+          <!-- Column Selector -->
           <button
-            class="ml-4 mt-4 sm:mt-0 w-55 text-lg"
-            mat-flat-button
-            [color]="'primary'"
-            (click)="openAddDialog()">
-            <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-            <span class="ml-2 hidden sm:inline">Agregar Representante</span>
-            <span class="ml-2 sm:hidden">Agregar</span>
+            class="ml-4 mt-4 sm:mt-0"
+            mat-stroked-button
+            [matMenuTriggerFor]="columnMenu">
+            <mat-icon [svgIcon]="'heroicons_outline:view-columns'"></mat-icon>
+            <span class="ml-2">Columnas</span>
           </button>
-        </div>
+
+        <!-- Add representante button -->
+        <button
+          class="ml-4 mt-4 sm:mt-0 w-55 text-lg"
+          mat-flat-button
+          [color]="'primary'"
+          (click)="openAddDialog()">
+          <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+          <span class="ml-2 hidden sm:inline">Agregar Representante</span>
+          <span class="ml-2 sm:hidden">Agregar</span>
+        </button>
+
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="exportMenu"
+          [color]="'primary'"
+          matTooltip="Exportar tabla"
+          aria-label="Exportar tabla"
+          class="ml-4 mt-4 sm:mt-0">
+          <mat-icon [svgIcon]="'heroicons_outline:arrow-up-tray'"></mat-icon>
+        </button>
+
+        <!-- Export menu -->
+        <mat-menu #exportMenu="matMenu">
+          <button mat-menu-item (click)="exportToCSV()">
+            <mat-icon>description</mat-icon>
+            <span>Exportar a CSV</span>
+          </button>
+          <button mat-menu-item (click)="exportToPDF()">
+            <mat-icon>picture_as_pdf</mat-icon>
+            <span>Exportar a PDF</span>
+          </button>
+        </mat-menu>
       </div>
-      
+      </div>
+
+      <!-- Column Menu -->
+      <mat-menu #columnMenu="matMenu" class="column-menu">
+        <div class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border-b">
+          Mostrar Columnas
+        </div>
+        <div class="p-2">
+          <div *ngFor="let column of columnSettings" class="flex items-center py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+            <mat-checkbox 
+              [checked]="column.visible" 
+              (change)="toggleColumn(column.key)"
+              [color]="'primary'">
+              {{column.label}}
+            </mat-checkbox>
+          </div>
+        </div>
+      </mat-menu>
+
       <!-- Main -->
       <div class="flex flex-auto overflow-hidden">
         <!-- Representantes list -->
         <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden">
           <ng-container *ngIf="dataSource?.data?.length > 0; else noRepresentantes">
-            
+
             <!-- Desktop Table View -->
             <div class="hidden lg:block w-full">
-              <table mat-table [dataSource]="dataSource" matSort class="w-full">
-                
-                <!-- Proveedor Nombre Column -->
-                <ng-container matColumnDef="proveedor_nombre">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre Proveedor</th>
-                  <td mat-cell *matCellDef="let element" class="truncate" [matTooltip]="element.Proveedor?.nombre">
-                    {{element.Proveedor?.nombre || 'N/A'}}
-                  </td>
-                </ng-container>
+              <!-- Table Container with proper overflow -->
+              <div class="relative overflow-x-auto overflow-y-hidden max-w-full">
+                <div class="min-w-max">
+                  <!-- Header -->
+                  <div
+                    class="sticky top-0 z-20 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 border-b"
+                    [style.grid-template-columns]="getGridColumns()">
+                    
+                    <!-- Dynamic columns -->
+                    <div 
+                      *ngFor="let column of getVisibleColumns()" 
+                      class="truncate flex items-center" 
+                      [matTooltip]="column.tooltip" 
+                      matTooltipPosition="above">
+                      <span>{{column.label}}</span>
+                    </div>
+                    
+                    <!-- Actions column - Always sticky -->
+                    <div class="sticky right-0 bg-gray-50 dark:bg-black dark:bg-opacity-5 z-30 flex items-center justify-center border-l">
+                      <span>Acciones</span>
+                    </div>
+                  </div>
 
-                <!-- Proveedor Código Column -->
-                <ng-container matColumnDef="proveedor_codigo">
-                  <th mat-header-cell *matHeaderCellDef>Código</th>
-                  <td mat-cell *matCellDef="let element" class="truncate" [matTooltip]="element.Proveedor?.codigo">
-                    {{element.Proveedor?.codigo || 'N/A'}}
-                  </td>
-                </ng-container>
+                  <!-- Rows -->
+                  <ng-container *ngFor="let representante of dataSource.data; trackBy: trackByFn">
+                    <div
+                      class="grid items-center gap-4 py-3 px-6 md:px-8 border-b hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                      [style.grid-template-columns]="getGridColumns()">
+                      
+                      <!-- Dynamic columns data -->
+                      <div 
+                        *ngFor="let column of getVisibleColumns()" 
+                        class="truncate" 
+                        [matTooltip]="getColumnValue(representante, column.key)" 
+                        matTooltipPosition="above">
+                        
+                        <!-- Estado column with special styling -->
+                        <ng-container *ngIf="column.key === 'estado'; else normalColumn">
+                          <span class="px-2 py-1 rounded-full text-xs font-medium"
+                                [ngClass]="getColumnValue(representante, column.key) === 'activo' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                            {{getColumnValue(representante, column.key) || 'N/A'}}
+                          </span>
+                        </ng-container>
+                        
+                        <ng-template #normalColumn>
+                          {{getColumnValue(representante, column.key) || 'N/A'}}
+                        </ng-template>
+                      </div>
+                      
+                      <!-- Actions column - Always sticky -->
+                      <div class="sticky right-0 bg-white dark:bg-gray-900 z-30 flex items-center justify-center gap-2 border-l pl-4">
+                        <button
+                          class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                          mat-stroked-button
+                          [color]="'primary'"
+                          (click)="toggleDetails(representante.id)"
+                          [matTooltip]="'Ver detalles'">
+                          <mat-icon
+                            class="icon-size-5"
+                            [svgIcon]="selectedRow?.id === representante.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                        </button>
+                        
+                        <button
+                          class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                          mat-stroked-button
+                          [color]="'warn'"
+                          (click)="deleteRepresentante(representante.id)"
+                          [matTooltip]="'Eliminar'">
+                          <mat-icon
+                            class="icon-size-5"
+                            [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                        </button>
+                      </div>
+                    </div>
 
-                <!-- Representante Column -->
-                <ng-container matColumnDef="representante">
-                  <th mat-header-cell *matHeaderCellDef>Representante</th>
-                  <td mat-cell *matCellDef="let element" class="truncate" [matTooltip]="element.nombre + ' ' + element.apellido">
-                    {{element.nombre}} {{element.apellido}}
-                  </td>
-                </ng-container>
-
-                <!-- Cargo Column -->
-                <ng-container matColumnDef="cargo">
-                  <th mat-header-cell *matHeaderCellDef>Cargo</th>
-                  <td mat-cell *matCellDef="let element" class="truncate" [matTooltip]="element.cargo">
-                    {{element.cargo || 'N/A'}}
-                  </td>
-                </ng-container>
-
-                <!-- Teléfono Column -->
-                <ng-container matColumnDef="telefono">
-                  <th mat-header-cell *matHeaderCellDef>Teléfono</th>
-                  <td mat-cell *matCellDef="let element" class="truncate" [matTooltip]="element.telefono">
-                    {{element.telefono || 'N/A'}}
-                  </td>
-                </ng-container>
-
-                <!-- Email Column -->
-                <ng-container matColumnDef="email">
-                  <th mat-header-cell *matHeaderCellDef>Email</th>
-                  <td mat-cell *matCellDef="let element" class="truncate" [matTooltip]="element.email">
-                    {{element.email || 'N/A'}}
-                  </td>
-                </ng-container>
-
-                <!-- Estado Column -->
-                <ng-container matColumnDef="estado">
-                  <th mat-header-cell *matHeaderCellDef>Estado</th>
-                  <td mat-cell *matCellDef="let element" class="truncate" [matTooltip]="element.estado">
-                    <span class="px-2 py-1 rounded-full text-xs font-medium"
-                          [ngClass]="element.estado === 'activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                      {{element.estado || 'N/A'}}
-                    </span>
-                  </td>
-                </ng-container>
-
-                <!-- Tipo Empresa Column -->
-                <ng-container matColumnDef="tipo_empresa">
-                  <th mat-header-cell *matHeaderCellDef>Tipo Empresa</th>
-                  <td mat-cell *matCellDef="let element" class="truncate" [matTooltip]="element.Proveedor?.tipo_empresa">
-                    {{element.Proveedor?.tipo_empresa || 'N/A'}}
-                  </td>
-                </ng-container>
-
-                <!-- Ministerio Column -->
-                <ng-container matColumnDef="ministerio">
-                  <th mat-header-cell *matHeaderCellDef>Ministerio</th>
-                  <td mat-cell *matCellDef="let element" class="truncate" [matTooltip]="element.Proveedor?.ministerio">
-                    {{element.Proveedor?.ministerio || 'N/A'}}
-                  </td>
-                </ng-container>
-
-                <!-- Acciones Column -->
-                <ng-container matColumnDef="acciones">
-                  <th mat-header-cell *matHeaderCellDef>Detalles</th>
-                  <td mat-cell *matCellDef="let element">
-                    <button
-                      class="min-w-10 min-h-7 h-7 px-2 leading-6"
-                      mat-stroked-button
-                      (click)="toggleDetails(element.id)">
-                      <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="selectedRow?.id === element.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
-                    </button>
-                  </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                
-                <!-- Expanded Content -->
-                <tr mat-row *matRowDef="let row; columns: ['expandedDetail']; when: shouldRenderExpandedRow" [@detailExpand]="row == selectedRow ? 'expanded' : 'collapsed'">
-                  <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
-                    <ng-container *ngIf="selectedRow?.id === element.id">
-                      <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: element}"></ng-container>
-                    </ng-container>
-                  </td>
-                </tr>
-              </table>
+                    <!-- Details Row -->
+                    <div class="w-full bg-gray-50 dark:bg-gray-800 border-b" *ngIf="selectedRow?.id === representante.id">
+                      <div class="p-6">
+                        <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: representante}"></ng-container>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
             </div>
-            
-            <!-- Mobile/Tablet Card View permanece igual -->
+
+            <!-- Mobile/Tablet Card View -->
             <div class="lg:hidden">
               <ng-container *ngFor="let item of dataSource.data; trackBy: trackByFn">
-                <!-- El código de las cards permanece igual -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                      {{item.nombre}} {{item.apellido}}
+                    </h3>
+                    <span class="px-2 py-1 rounded-full text-xs font-medium"
+                          [ngClass]="item.estado === 'activo' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                      {{item.estado || '--'}}
+                    </span>
+                  </div>
+                  
+                  <div class="grid grid-cols-1 gap-2 text-sm">
+                    <div><span class="font-medium">Cargo:</span> {{item.cargo || '--'}}</div>
+                    <div><span class="font-medium">Teléfono:</span> {{item.telefono || '--'}}</div>
+                    <div><span class="font-medium">Email:</span> {{item.email || '--'}}</div>
+                    <div><span class="font-medium">Proveedor:</span> {{item.Proveedor?.nombre || '--'}}</div>
+                    <div><span class="font-medium">Ministerio:</span> {{item.Proveedor?.ministerio || '--'}}</div>
+                  </div>
+                  
+                  <div class="flex justify-end mt-4 gap-2">
+                    <button
+                      mat-stroked-button
+                      [color]="'primary'"
+                      (click)="toggleDetails(item.id)">
+                      <mat-icon [svgIcon]="selectedRow?.id === item.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                      Detalles
+                    </button>
+                    
+                    <button
+                      mat-stroked-button
+                      [color]="'warn'"
+                      (click)="deleteRepresentante(item.id)">
+                      <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                      Eliminar
+                    </button>
+                  </div>
+                  
+                  <!-- Mobile details -->
+                  <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700" *ngIf="selectedRow?.id === item.id">
+                    <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: item}"></ng-container>
+                  </div>
+                </div>
               </ng-container>
             </div>
 
             <mat-paginator
-              #paginator
               class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
               [ngClass]="{'pointer-events-none': isLoading}"
               [length]="pagination.length"
@@ -186,12 +254,7 @@
               [pageSizeOptions]="[5, 10, 25, 100]"
               [showFirstLastButtons]="true"></mat-paginator>
           </ng-container>
-          
-          <!-- Template para detalles de fila permanece igual -->
-          <ng-template #rowDetailsTemplate let-representante>
-            <!-- El código del template permanece igual -->
-          </ng-template>
-          
+
           <ng-template #noRepresentantes>
             <div class="p-8 sm:p-16 border-b text-4xl font-semibold tracking-tight text-center">¡No hay representantes!</div>
           </ng-template>
@@ -200,3 +263,71 @@
     </div>
   </div>
 </div>
+
+<!-- Row Details Template -->
+<ng-template #rowDetailsTemplate let-representante>
+  <div class="max-w-4xl mx-auto">
+    <form [formGroup]="selectedRowForm" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="nombre" placeholder="Nombre del representante">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Apellido</mat-label>
+          <input matInput formControlName="apellido" placeholder="Apellido del representante">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Cargo</mat-label>
+          <input matInput formControlName="cargo" placeholder="Cargo del representante">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Teléfono</mat-label>
+          <input matInput formControlName="telefono" placeholder="Teléfono del representante">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" placeholder="Email del representante">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="estado">
+            <mat-option value="activo">Activo</mat-option>
+            <mat-option value="inactivo">Inactivo</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="flex justify-end gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="selectedRow = null">
+          Cancelar
+        </button>
+        
+        <button
+          mat-flat-button
+          [color]="'primary'"
+          type="button"
+          (click)="updateSelectedRecord()"
+          [disabled]="selectedRowForm.invalid">
+          Guardar Cambios
+        </button>
+        
+        <button
+          mat-stroked-button
+          [color]="'warn'"
+          type="button"
+          (click)="deleteSelectedRecord()">
+          Eliminar
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
