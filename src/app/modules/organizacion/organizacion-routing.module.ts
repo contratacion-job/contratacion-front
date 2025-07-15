@@ -4,9 +4,10 @@ import { RouterModule, Routes } from '@angular/router';
 import { DepartamentoFormComponent } from './departamento-list/departamento-list.component';
 import { LicenseComponent } from 'app/core/soporte/license/license.component';
 import { BDComponent } from 'app/core/soporte/bd/bd.component';
-import { DepartamentoComponent } from './municipio-list/municipio-list.component';
+
 import { EntidadListComponent } from './entidad-list/entidad-list.component';
 import { SystemComponent } from './system/system.component';
+import { DepartamentoComponent } from './municipio-list/municipio-list.component';
 
 const routes: Routes = [
 

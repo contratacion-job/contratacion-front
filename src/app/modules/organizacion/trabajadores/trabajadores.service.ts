@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, catchError, tap } from 'rxjs';
+import { Observable, of, catchError, tap ,map} from 'rxjs';
 import { Trabajador, TrabajadorDialogData } from '../../../models/Type';
 import { API_ENDPOINTS } from 'app/core/constants/api-endpoints';
 // Interfaz local para departamentos simplificada
@@ -22,13 +22,15 @@ export class TrabajadoresService {
    * Obtener todos los trabajadores
    */
   getTrabajadores(): Observable<Trabajador[]> {
-    return this.http.get<Trabajador[]>(`${API_ENDPOINTS.TRABAJADORES}`)
+    return this.http.get<any>(`${API_ENDPOINTS.TRABAJADORES}`)
       .pipe(
-        tap(data => console.log('Trabajadores obtenidos:', data)),
+        tap(response => console.log('Trabajadores obtenidos:', response)),
         catchError(error => {
           console.error('Error al obtener trabajadores:', error);
           return of(this.getMockTrabajadores());
-        })
+        }),
+        // Map the response to the array of trabajadores
+        map(response => response.data || [])
       );
   }
 
@@ -41,7 +43,7 @@ export class TrabajadoresService {
     }
 
     const params = new HttpParams().set('search', searchTerm);
-    return this.http.get<Trabajador[]>(`${API_ENDPOINTS.TRABAJADORES}`, { params })
+    return this.http.get<any>(`${API_ENDPOINTS.TRABAJADORES}`, { params })
       .pipe(
         catchError(error => {
           console.error('Error en búsqueda de trabajadores:', error);
@@ -51,7 +53,9 @@ export class TrabajadoresService {
             t.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
             t.email.toLowerCase().includes(searchTerm.toLowerCase())
           ));
-        })
+        }),
+        // Map the response to the array of trabajadores
+        map(response => response.data || [])
       );
   }
 

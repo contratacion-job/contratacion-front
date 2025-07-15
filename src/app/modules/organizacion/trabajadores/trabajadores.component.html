@@ -1,169 +1,248 @@
-<div class="flex flex-col flex-auto min-w-0">
-  <!-- Header -->
-  <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
-    <!-- Loader -->
-    <div class="absolute inset-x-0 bottom-0" *ngIf="isLoading">
-      <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
+<div class="flex flex-col min-h-screen p-6 w-full">
+  <!-- Card -->
+  <div class="relative flex flex-col flex-auto p-6 pr-3 pb-3 bg-card rounded-2xl shadow overflow-hidden mb-6 w-full">
+    <div class="absolute bottom-0 right-0 w-24 h-24 -m-6">
+      <mat-icon class="icon-size-24 opacity-25 text-blue-500 dark:text-blue-400" [svgIcon]="'heroicons_outline:users'"></mat-icon>
     </div>
     
-    <!-- Title -->
-    <div class="text-4xl font-extrabold tracking-tight">Trabajadores</div>
-    
-    <!-- Actions -->
-    <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
-      <!-- Search -->
-      <mat-form-field class="search-field" appearance="outline">
-        <mat-label>Buscar</mat-label>
-        <mat-icon matPrefix>search</mat-icon>
-        <input
-          matInput
-          [formControl]="searchInputControl"
-          placeholder="Buscar trabajadores..."
-          [maxLength]="50">
-      </mat-form-field>
-      
-      <!-- Add button -->
-      <button
-        class="ml-4"
-        mat-flat-button
-        color="primary"
-        (click)="openNewTrabajadorDialog()">
-        <mat-icon>add</mat-icon>
-        <span class="ml-2 mr-1">Agregar</span>
-      </button>
-      
-      <!-- Export buttons -->
-      <button
-        class="ml-2"
-        mat-stroked-button
-        (click)="exportToExcel()">
-        <mat-icon>download</mat-icon>
-        <span class="ml-1">Excel</span>
-      </button>
-      
-      <button
-        class="ml-2"
-        mat-stroked-button
-        (click)="exportToCSV()">
-        <mat-icon>download</mat-icon>
-        <span class="ml-1">CSV</span>
-      </button>
-      
-      <button
-        class="ml-2"
-        mat-stroked-button
-        (click)="exportToPdf()">
-        <mat-icon>picture_as_pdf</mat-icon>
-        <span class="ml-1">PDF</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- Main Content -->
-  <div class="flex flex-auto overflow-hidden">
-    <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
-      
-      <!-- Table Container -->
-      <div *ngIf="dataSource.data.length > 0; else emptyState" class="overflow-auto">
-        <table mat-table [dataSource]="dataSource" class="trabajadores-table" matSort>
-          
-          <!-- Nombre Column -->
-          <ng-container matColumnDef="nombre">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-            <td mat-cell *matCellDef="let trabajador">{{ trabajador.nombre }}</td>
-          </ng-container>
-
-          <!-- Apellido Column -->
-          <ng-container matColumnDef="apellido">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Apellido</th>
-            <td mat-cell *matCellDef="let trabajador">{{ trabajador.apellido }}</td>
-          </ng-container>
-
-          <!-- Email Column -->
-          <ng-container matColumnDef="email">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
-            <td mat-cell *matCellDef="let trabajador">{{ trabajador.email }}</td>
-          </ng-container>
-
-          <!-- Cargo Column -->
-          <ng-container matColumnDef="cargo">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Cargo</th>
-            <td mat-cell *matCellDef="let trabajador">{{ trabajador.cargo }}</td>
-          </ng-container>
-
-          <!-- Departamento Column -->
-          <ng-container matColumnDef="departamento">
-            <th mat-header-cell *matHeaderCellDef>Departamento</th>
-            <td mat-cell *matCellDef="let trabajador">
-              {{ getDepartamentoNombre(trabajador.departamento_id) }}
-            </td>
-          </ng-container>
-
-          <!-- Rol Column -->
-          <ng-container matColumnDef="rol">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Rol</th>
-            <td mat-cell *matCellDef="let trabajador">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                    [ngClass]="{
-                      'bg-green-100 text-green-800': trabajador.rol === 'admin',
-                      'bg-blue-100 text-blue-800': trabajador.rol === 'user',
-                      'bg-yellow-100 text-yellow-800': trabajador.rol === 'supervisor',
-                      'bg-gray-100 text-gray-800': trabajador.rol === 'empleado'
-                    }">
-                {{ trabajador.rol }}
-              </span>
-            </td>
-          </ng-container>
-
-          <!-- Actions Column -->
-          <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let trabajador">
-              <div class="action-buttons">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  (click)="onEdit(trabajador)"
-                  matTooltip="Editar">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="warn"
-                  (click)="onDelete(trabajador)"
-                  matTooltip="Eliminar">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-            </td>
-          </ng-container>
-
-          <!-- Header and Row Declarations -->
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-        
-        <!-- Pagination -->
-        <mat-paginator
-          [pageSizeOptions]="[5, 10, 25, 100]"
-          [pageSize]="10"
-          [showFirstLastButtons]="true">
-        </mat-paginator>
-      </div>
-
-      <!-- Empty State Template -->
-      <ng-template #emptyState>
-        <div class="flex flex-col items-center justify-center h-full p-8">
-          <mat-icon class="text-6xl text-gray-400 mb-4">people_outline</mat-icon>
-          <h2 class="text-2xl font-semibold text-gray-600 mb-2">
-            No hay trabajadores
-          </h2>
-          <p class="text-gray-500 mb-6 text-center">
-            Comienza agregando tu primer trabajador al sistema
-          </p>
-         
+    <!-- Trabajadores Table -->
+    <div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
+      <!-- Header -->
+      <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b">
+        <!-- Loader -->
+        <div class="absolute inset-x-0 bottom-0" *ngIf="isLoading">
+          <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
         </div>
-      </ng-template>
+        
+        <!-- Title -->
+        <div class="flex-1 min-w-0">
+          <div class="mt-2">
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+              Trabajadores
+            </h2>
+          </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+          <!-- Search -->
+          <mat-form-field class="fuse-mat-dense fuse-mat-rounded min-w-64" [subscriptSizing]="'dynamic'">
+            <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:magnifying-glass'"></mat-icon>
+            <input matInput [formControl]="searchInputControl" [autocomplete]="'off'" [placeholder]="'Buscar trabajadores'">
+          </mat-form-field>
+          
+       
+          
+          <!-- Add trabajador button -->
+          <button class="ml-4 mt-4 sm:mt-0 w-55 text-lg" mat-flat-button [color]="'primary'" (click)="openNewTrabajadorDialog()">
+            <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+            <span class="ml-2 hidden sm:inline">Agregar Trabajador</span>
+            <span class="ml-2 sm:hidden">Agregar</span>
+          </button>
+          <button class="ml-2 mt-4 sm:mt-0"
+          mat-icon-button
+          [matMenuTriggerFor]="columnMenu"
+          #columnMenuTrigger="matMenuTrigger"
+          matTooltip="Configurar columnas"
+          [color]="'primary'">
+    <mat-icon [svgIcon]="'heroicons_outline:view-columns'"></mat-icon>
+  </button>
+  
+  <!-- Column Menu - Permite seleccionar varios pero se cierra al click afuera -->
+  <mat-menu #columnMenu="matMenu" class="column-menu">
+    <div class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border-b">
+      Mostrar Columnas
+    </div>
+    <div class="p-2" (click)="$event.stopPropagation()">
+      <div *ngFor="let column of columnSettings" 
+           class="flex items-center py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+           (click)="$event.stopPropagation()">
+        <mat-checkbox [checked]="column.visible"
+                     (change)="toggleColumn(column.key)"
+                     (click)="$event.stopPropagation()"
+                     [color]="'primary'">
+          {{column.label}}
+        </mat-checkbox>
+      </div>
+    </div>
+  </mat-menu>
+  
+          <!-- Export buttons -->
+          <button mat-icon-button [matMenuTriggerFor]="exportMenu" [color]="'primary'" matTooltip="Exportar tabla" aria-label="Exportar tabla" class="ml-4 mt-4 sm:mt-0">
+            <mat-icon [svgIcon]="'heroicons_outline:arrow-up-tray'"></mat-icon>
+          </button>
+          
+          <!-- Export menu -->
+          <mat-menu #exportMenu="matMenu">
+            <button mat-menu-item (click)="exportToCSV()">
+              <mat-icon>description</mat-icon>
+              <span>Exportar a CSV</span>
+            </button>
+            <button mat-menu-item (click)="exportToPdf()">
+              <mat-icon>picture_as_pdf</mat-icon>
+              <span>Exportar a PDF</span>
+            </button>
+            <button mat-menu-item (click)="exportToExcel()">
+              <mat-icon>table_chart</mat-icon>
+              <span>Exportar a Excel</span>
+            </button>
+          </mat-menu>
+          
+          <!-- Print button -->
+          <button mat-icon-button color="primary" (click)="print()" matTooltip="Imprimir" aria-label="Imprimir" class="ml-2 mt-4 sm:mt-0">
+            <mat-icon>print</mat-icon>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Column Menu -->
+      <mat-menu #columnMenu="matMenu" class="column-menu" [hasBackdrop]="false">
+        <div class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border-b">
+          Mostrar Columnas
+        </div>
+        <div class="p-2" (click)="$event.stopPropagation()">
+          <div *ngFor="let column of columnSettings" 
+               class="flex items-center py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+               (click)="$event.stopPropagation()">
+            <mat-checkbox [checked]="column.visible"
+                         (change)="toggleColumn(column.key)"
+                         (click)="$event.stopPropagation()"
+                         [color]="'primary'">
+              {{column.label}}
+            </mat-checkbox>
+          </div>
+        </div>
+        <!-- Botón para cerrar el menú manualmente -->
+        <div class="px-4 py-2 border-t">
+          <button mat-stroked-button color="primary" class="w-full" (click)="closeColumnMenu()">
+            Cerrar
+          </button>
+        </div>
+      </mat-menu>
+      
+      <!-- Main -->
+      <div class="flex flex-auto overflow-hidden">
+        <!-- Trabajadores list -->
+        <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden">
+          <ng-container *ngIf="dataSource?.data?.length > 0; else noTrabajadores">
+            <!-- Desktop Table View -->
+            <div class="hidden lg:block w-full">
+              <!-- Table Container with proper overflow -->
+              <div class="relative overflow-x-auto overflow-y-hidden max-w-full">
+                <div class="min-w-max">
+                  <!-- Header -->
+                  <div class="sticky top-0 z-20 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5 border-b"
+                       [style.grid-template-columns]="getGridColumns()">
+                    <!-- Dynamic columns -->
+                    <div *ngFor="let column of getVisibleColumns()"
+                         class="truncate flex items-center"
+                         [matTooltip]="column.tooltip"
+                         matTooltipPosition="above">
+                      <span>{{column.label}}</span>
+                    </div>
+                    <!-- Actions column - Always sticky -->
+                    <div class="sticky right-0 bg-gray-50 dark:bg-black dark:bg-opacity-5 z-30 flex items-center justify-center border-l">
+                      <span>Acciones</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Rows -->
+                  <ng-container *ngFor="let trabajador of dataSource.data; trackBy: trackByFn">
+                    <div class="grid items-center gap-4 py-3 px-6 md:px-8 border-b hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                         [style.grid-template-columns]="getGridColumns()">
+                      <!-- Dynamic columns data -->
+                      <div *ngFor="let column of getVisibleColumns()"
+                           class="truncate"
+                           [matTooltip]="getColumnValue(trabajador, column.key)"
+                           matTooltipPosition="above">
+                        <!-- Rol column with special styling -->
+                        <ng-container *ngIf="column.key === 'rol'; else normalColumn">
+                          <span class="px-2 py-1 rounded-full text-xs font-medium"
+                                [ngClass]="getColumnValue(trabajador, column.key) === 'admin' ? 
+                                          'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' : 
+                                          'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'">
+                            {{getColumnValue(trabajador, column.key) || 'N/A'}}
+                          </span>
+                        </ng-container>
+                        <ng-template #normalColumn>
+                          {{getColumnValue(trabajador, column.key) || 'N/A'}}
+                        </ng-template>
+                      </div>
+                      
+                      <!-- Actions column - Always sticky -->
+                      <div class="sticky right-0 bg-white dark:bg-gray-900 z-30 flex items-center justify-center gap-2 border-l pl-4">
+                        <button class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                                mat-stroked-button
+                                [color]="'primary'"
+                                (click)="onEdit(trabajador)"
+                                [matTooltip]="'Editar'">
+                          <mat-icon class="icon-size-5" [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                        </button>
+                        <button class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                                mat-stroked-button
+                                [color]="'warn'"
+                                (click)="onDelete(trabajador)"
+                                [matTooltip]="'Eliminar'">
+                          <mat-icon class="icon-size-5" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Mobile/Tablet Card View -->
+            <div class="lg:hidden">
+              <ng-container *ngFor="let trabajador of dataSource.data; trackBy: trackByFn">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                      {{trabajador.nombre}} {{trabajador.apellido}}
+                    </h3>
+                    <span class="px-2 py-1 rounded-full text-xs font-medium"
+                          [ngClass]="trabajador.rol === 'admin' ? 
+                                    'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' : 
+                                    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'">
+                      {{trabajador.rol || '--'}}
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-1 gap-2 text-sm">
+                    <div><span class="font-medium">Cargo:</span> {{trabajador.cargo || '--'}}</div>
+                    <div><span class="font-medium">Email:</span> {{trabajador.email || '--'}}</div>
+                    <div><span class="font-medium">Departamento:</span> {{getDepartamentoNombre(trabajador.departamento) || '--'}}</div>
+                    <div><span class="font-medium">Teléfono:</span> {{trabajador.telefono || '--'}}</div>
+                  </div>
+                  <div class="flex justify-end mt-4 gap-2">
+                    <button mat-stroked-button [color]="'primary'" (click)="onEdit(trabajador)">
+                      <mat-icon [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                      Editar
+                    </button>
+                    <button mat-stroked-button [color]="'warn'" (click)="onDelete(trabajador)">
+                      <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+            
+            <mat-paginator class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                          [ngClass]="{'pointer-events-none': isLoading}"
+                          [length]="dataSource.data.length"
+                          [pageSize]="10"
+                          [pageSizeOptions]="[5, 10, 25, 100]"
+                          [showFirstLastButtons]="true">
+            </mat-paginator>
+          </ng-container>
+          
+          <ng-template #noTrabajadores>
+            <div class="p-8 sm:p-16 border-b text-4xl font-semibold tracking-tight text-center">
+              ¡No hay trabajadores!
+            </div>
+          </ng-template>
+        </div>
+      </div>
     </div>
   </div>
 </div>

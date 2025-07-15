@@ -99,8 +99,31 @@
           <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
           <span class="ml-2 mr-1">Agregar</span>
         </button>
-
-
+        <button class="ml-2 mt-4 sm:mt-0"
+        mat-icon-button
+        [matMenuTriggerFor]="columnMenu"
+        #columnMenuTrigger="matMenuTrigger"
+        matTooltip="Configurar columnas"
+        [color]="'primary'">
+  <mat-icon [svgIcon]="'heroicons_outline:view-columns'"></mat-icon>
+</button>
+        <mat-menu #columnMenu="matMenu" class="column-menu">
+          <div class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border-b">
+            Mostrar Columnas
+          </div>
+          <div class="p-2" (click)="$event.stopPropagation()">
+            <div *ngFor="let column of columnSettings" 
+                 class="flex items-center py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                 (click)="$event.stopPropagation()">
+              <mat-checkbox [checked]="column.visible"
+                           (change)="toggleColumn(column.key)"
+                           (click)="$event.stopPropagation()"
+                           [color]="'primary'">
+                {{column.label}}
+              </mat-checkbox>
+            </div>
+          </div>
+        </mat-menu>
 
         <!-- Export button with menu -->
         <button
@@ -142,151 +165,89 @@
     <!-- Main -->
     <div class="flex flex-auto overflow-hidden">
       <!-- Contratos list -->
-      <div class="flex flex-col flex-auto sm:mb-18 overflow-x-auto" (contextmenu)="onRightClick($event)" style="cursor: context-menu;">
-        <ng-container *ngIf="dataSource.data.length > 0; else noContracts">
-          <div class="flex flex-col h-full overflow-y-auto">
-            <!-- Header -->
-            <div class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
-              matSort
-              matSortDisableClear
-              style="grid-template-columns: 40px repeat(10, minmax(100px, 1fr)) 100px;">
-              <div></div>
-              <div [mat-sort-header]="'no_contrato'">No. Contrato</div>
-              <div [mat-sort-header]="'proveedor'">Proveedor</div>
-              <div [mat-sort-header]="'tipo_contrato'">Tipo de Contrato</div>
-              <div [mat-sort-header]="'departamento'">Departamento</div>
-              <div [mat-sort-header]="'valor_cup'">Valor (CUP)</div>
-              <div [mat-sort-header]="'valor_usd'">Valor (USD)</div>
-              <div [mat-sort-header]="'fecha_entrada'">Fecha Entrada</div>
-              <div [mat-sort-header]="'fecha_firmado'">Fecha Firmado</div>
-              <div [mat-sort-header]="'vigencia'">Vigencia</div>
-              <div [mat-sort-header]="'tiempoRestante'">Tiempo Restante</div>
-              <div class="sticky-end">Detalles</div>
+    <div class="flex flex-col flex-auto sm:mb-18 overflow-x-auto" (contextmenu)="onRightClick($event)" style="cursor: context-menu;">
+      <ng-container *ngIf="dataSource.data.length > 0; else noContracts">
+        <div class="flex flex-col h-full overflow-y-auto">
+          <!-- Header -->
+          <div class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+            matSort
+            matSortDisableClear
+            [style.grid-template-columns]="getGridColumns()">
+            <div></div>
+            <div *ngFor="let column of getVisibleColumns()" [mat-sort-header]="column.key" [matTooltip]="column.tooltip" sticky>
+              {{ column.label }}
             </div>
-
-            <!-- Filters Row dentro de la tabla -->
-            <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b bg-gray-50 dark:bg-gray-800"
-                 style="grid-template-columns: 40px repeat(10, minmax(100px, 1fr)) 100px;"
-                 [formGroup]="filterForm">
-              <!-- Estado Filter -->
-              <div></div>
-
-              <!-- No. Contrato Filter -->
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <input matInput placeholder="No. Contrato" formControlName="no_contrato_filter">
-                </mat-form-field>
-              </div>
-
-              <!-- Proveedor Filter -->
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <mat-select formControlName="proveedor_id" placeholder="Proveedor">
-                    <mat-option value="">Todos</mat-option>
-                    <mat-option *ngFor="let prov of proveedores" [value]="prov.id">{{ prov.nombre }}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-
-              <!-- Tipo de Contrato Filter -->
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <mat-select formControlName="tipo_contrato_id" placeholder="Tipo">
-                    <mat-option value="">Todos</mat-option>
-                    <mat-option *ngFor="let tipo of tiposContrato" [value]="tipo.id">{{ tipo.nombre_tipo_contrato }}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-
-              <!-- Departamento Filter -->
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <mat-select formControlName="departamento_id" placeholder="Departamento">
-                    <mat-option value="">Todos</mat-option>
-                    <mat-option *ngFor="let dept of departamentos" [value]="dept.id">{{ dept.nombre_departamento }}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-
-              <!-- Valor CUP Filter -->
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <input matInput type="number" placeholder="Valor CUP" formControlName="valor_cup_filter">
-                </mat-form-field>
-              </div>
-
-              <!-- Valor USD Filter -->
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <input matInput type="number" placeholder="Valor USD" formControlName="valor_usd_filter">
-                </mat-form-field>
-              </div>
-
-              <!-- Fecha Entrada Filter -->
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <input matInput type="date" formControlName="fecha_entrada_filter">
-                </mat-form-field>
-              </div>
-
-              <!-- Fecha Firmado Filter -->
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <input matInput type="date" formControlName="fecha_firmado_filter">
-                </mat-form-field>
-              </div>
-
-              <!-- Vigencia Filter -->
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <mat-select formControlName="vigencia_id" placeholder="Vigencia">
-                    <mat-option value="">Todos</mat-option>
-                    <mat-option *ngFor="let vig of vigencias" [value]="vig.id">{{ vig.vigencia }}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-
-              <!-- Estado Filter -->
-              <div>
-                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
-                  <mat-select formControlName="estado" placeholder="Estado">
-                    <mat-option value="">Todos</mat-option>
-                    <mat-option value="Activo">Activo</mat-option>
-                    <mat-option value="Casi a vencer">Casi a vencer</mat-option>
-                    <mat-option value="Vencido">Vencido</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-
-              <!-- Action Buttons -->
-              <div class="flex gap-1 sticky-end">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  (click)="applyFilters()"
-                  type="button"
-                  matTooltip="Aplicar filtros"
-                  class="!w-8 !h-8 !min-w-8">
-                  <mat-icon class="!text-sm">search</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="warn"
-                  (click)="clearFilters()"
-                  type="button"
-                  matTooltip="Limpiar filtros"
-                  class="!w-8 !h-8 !min-w-8">
-                  <mat-icon class="!text-sm">clear</mat-icon>
-                </button>
-              </div>
+            <div sticky style="position: sticky; right: 0; background: inherit; z-index: 10; min-width: 100px; max-width: 100px;">
+              Detalles
             </div>
+          </div>
 
+    <!-- Filters Row dentro de la tabla -->
+    <div *ngIf="showFilters" class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b bg-gray-50 dark:bg-gray-800"
+         [style.grid-template-columns]="getGridColumns()"
+         [formGroup]="filterForm">
+      <div></div>
+      <div *ngFor="let column of getVisibleColumns()">
+        <ng-container [ngSwitch]="column.key">
+          <mat-form-field *ngSwitchCase="'no_contrato'" appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <input matInput placeholder="No. Contrato" formControlName="no_contrato_filter" />
+          </mat-form-field>
+          <mat-form-field *ngSwitchCase="'proveedor'" appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <mat-select formControlName="proveedor_id" placeholder="Proveedor">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let prov of proveedores" [value]="prov.id">{{ prov.nombre }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field *ngSwitchCase="'tipo_contrato'" appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <mat-select formControlName="tipo_contrato_id" placeholder="Tipo">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let tipo of tiposContrato" [value]="tipo.id">{{ tipo.nombre_tipo_contrato }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field *ngSwitchCase="'departamento'" appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <mat-select formControlName="departamento_id" placeholder="Departamento">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let dept of departamentos" [value]="dept.id">{{ dept.nombre_departamento }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field *ngSwitchCase="'valor_cup'" appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <input matInput type="number" placeholder="Valor CUP" formControlName="valor_cup_filter" />
+          </mat-form-field>
+          <mat-form-field *ngSwitchCase="'valor_usd'" appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <input matInput type="number" placeholder="Valor USD" formControlName="valor_usd_filter" />
+          </mat-form-field>
+          <mat-form-field *ngSwitchCase="'fecha_entrada'" appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <input matInput type="date" formControlName="fecha_entrada_filter" />
+          </mat-form-field>
+          <mat-form-field *ngSwitchCase="'fecha_firmado'" appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <input matInput type="date" formControlName="fecha_firmado_filter" />
+          </mat-form-field>
+          <mat-form-field *ngSwitchCase="'vigencia'" appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <mat-select formControlName="vigencia_id" placeholder="Vigencia">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let vig of vigencias" [value]="vig.id">{{ vig.vigencia }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field *ngSwitchCase="'estado'" appearance="outline" class="w-full" subscriptSizing="dynamic">
+            <mat-select formControlName="estado" placeholder="Estado">
+              <mat-option value="">Todos</mat-option>
+              <mat-option value="Activo">Activo</mat-option>
+              <mat-option value="Casi a vencer">Casi a vencer</mat-option>
+              <mat-option value="Vencido">Vencido</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div *ngSwitchDefault></div>
+        </ng-container>
+      </div>
+    </div>
+ 
             <!-- Rows -->
             <ng-container *ngFor="let contract of dataSource.filteredData; trackBy: trackByFn">
               <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b items-center text-m"
-                style="grid-template-columns: 40px repeat(10, minmax(100px, 1fr)) 100px;">
+                   [style.grid-template-columns]="getGridColumns()">
+                
                 <!-- Estado with colored dot -->
-                <div>
+                <div *ngIf="isColumnVisible('estado')">
                   <span
                     class="w-3 h-3 rounded-full inline-block"
                     [ngClass]="{
@@ -295,44 +256,67 @@
                       'bg-red-500': contract.estado === 'vencido'
                     }"></span>
                 </div>
+                
                 <!-- No. Contrato -->
-                <div class="truncate">{{ contract.no_contrato }}</div>
+                <div class="truncate" *ngIf="isColumnVisible('no_contrato')">
+                  {{ contract.no_contrato }}
+                </div>
+                
                 <!-- Provider -->
-                <div class="truncate" [matTooltip]="contract.proveedor?.nombre" matTooltipPosition="above">
+                <div class="truncate" 
+                     *ngIf="isColumnVisible('proveedor')"
+                     [matTooltip]="contract.proveedor?.nombre" 
+                     matTooltipPosition="above">
                   {{ contract.proveedor?.nombre || 'N/A' }}
                 </div>
+                
                 <!-- Contract Type -->
-                <div class="truncate" [matTooltip]="contract.tipo_contrato?.nombre_tipo_contrato" matTooltipPosition="above">
+                <div class="truncate" 
+                     *ngIf="isColumnVisible('tipo_contrato')"
+                     [matTooltip]="contract.tipo_contrato?.nombre_tipo_contrato" 
+                     matTooltipPosition="above">
                   {{ contract.tipo_contrato?.nombre_tipo_contrato || 'N/A' }}
                 </div>
+                
                 <!-- Departamento -->
-                <div class="truncate" [matTooltip]="contract.departamento?.nombre_departamento" matTooltipPosition="above">
+                <div class="truncate" 
+                     *ngIf="isColumnVisible('departamento')"
+                     [matTooltip]="contract.departamento?.nombre_departamento" 
+                     matTooltipPosition="above">
                   {{ contract.departamento?.nombre_departamento || 'N/A' }}
                 </div>
+                
                 <!-- Value (CUP) -->
-                <div class="truncate">
-                  {{ contract.valor_cup | currency : "CUP" : "symbol" : "1.0-0" }}
+                <div class="truncate" *ngIf="isColumnVisible('valor_cup')">
+                  {{ contract.valor_cup | currency : 'CUP' : 'symbol' : '1.0-0' }}
                 </div>
+                
                 <!-- Value (USD) -->
-                <div class="truncate">
-                  {{ contract.valor_usd | currency : "USD" : "symbol" : "1.0-0" }}
+                <div class="truncate" *ngIf="isColumnVisible('valor_usd')">
+                  {{ contract.valor_usd | currency : 'USD' : 'symbol' : '1.0-0' }}
                 </div>
+                
                 <!-- Fecha Entrada -->
-                <div class="truncate">
-                  {{ contract.fecha_inicio | date : "d/M/yy" }}
+                <div class="truncate" *ngIf="isColumnVisible('fecha_inicio')">
+                  {{ contract.fecha_inicio | date : 'd/M/yy' }}
                 </div>
-                <!-- Signed Date -->
-                <div class="truncate">
-                  {{ contract.fecha_fin | date : "d/M/yy" }}
+                
+                <!-- Fecha Fin -->
+                <div class="truncate" *ngIf="isColumnVisible('fecha_fin')">
+                  {{ contract.fecha_fin | date : 'd/M/yy' }}
                 </div>
+                
                 <!-- Vigencia -->
-                <div class="truncate">
-                  {{ contract.vigencia.vigencia }}
+                <div class="truncate" *ngIf="isColumnVisible('vigencia')">
+                  {{ contract.vigencia?.vigencia }}
                 </div>
+                
                 <!-- Tiempo Restante -->
-                <div class="truncate text-red-600 dark:text-sky-400">
+                <div class="truncate text-red-600 dark:text-sky-400" 
+                     *ngIf="isColumnVisible('tiempo_restante')">
                   {{ contract.tiempoRestante }}
                 </div>
+                
                 <!-- Details button -->
                 <div class="flex items-center justify-center sticky-end">
                   <button
@@ -341,17 +325,19 @@
                     (click)="toggleDetails(contract.id)">
                     <mat-icon
                       class="icon-size-5"
-                      [svgIcon]="selectedContrato?.id === contract.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                      [svgIcon]="selectedContrato?.id === contract.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                    </mat-icon>
                   </button>
                 </div>
               </div>
-
+              
               <!-- Details Row -->
               <div class="grid" *ngIf="selectedContrato?.id === contract.id">
-                  <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: { $implicit: contract }">
-                  </ng-container>
+                <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: { $implicit: contract }">
+                </ng-container>
               </div>
             </ng-container>
+            
           </div>
 
           <mat-paginator

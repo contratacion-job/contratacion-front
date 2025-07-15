@@ -34,6 +34,8 @@ import autoTable from 'jspdf-autotable';
 import { TipoContratoService } from '../services/tipo-contrato.service';
 import { DepartamentoService } from 'app/modules/organizacion/services/departamento.service';
 import { ProveedorService } from 'app/modules/proveedores/services/proveedor.service';
+import { MatMenuTrigger } from '@angular/material/menu'; // Agregado MatMenuTrigger
+import { MatCheckboxModule } from '@angular/material/checkbox'; // Agregado
 declare module 'jspdf' {
   interface jsPDF {
     autoTable: (options: any) => jsPDF;
@@ -61,6 +63,7 @@ declare module 'jspdf' {
     MatMenuModule,
     MatTooltipModule,
     MatDividerModule,
+    MatCheckboxModule
   ],
   templateUrl: './contrato-list.component.html',
   styleUrls: ['./contrato-list.component.scss']
@@ -71,6 +74,18 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
   tiposContrato: TipoContrato[] = [];
   vigencias: VigenciaContrato[] = [];
   departamentos: any[] = [];
+
+  showFilters: boolean = false;
+
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
+    this.cdr.detectChanges();
+  }
+
+  isColumnVisible(columnKey: string): boolean {
+    const column = this.columnSettings.find(col => col.key === columnKey);
+    return column ? column.visible : false;
+  }
 
   // Add a flag to check if departamentos is loaded as array
   isDepartamentosArray(): boolean {
@@ -89,7 +104,7 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
   montoInicialUsd: string = '-';
   totalEjecutadoUsd: string = '-';
   montoRestanteUsd: string = '-';
-
+  @ViewChild('columnMenuTrigger', { read: MatMenuTrigger }) columnMenuTrigger!: MatMenuTrigger;
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
   columnSettings = [
@@ -123,11 +138,19 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
     return this.columnSettings.filter(column => column.visible);
   }
 
+  private updateDisplayedColumns(): void {
+    this.displayedColumns = [
+      ...this.columnSettings.filter(col => col.visible).map(col => col.key),
+      'details' // Mantener la columna de detalles al final
+    ];
+  }
+
   getGridColumns(): string {
     const visibleColumns = this.getVisibleColumns();
     const columnSizes = visibleColumns.map(() => 'minmax(120px, 1fr)');
     return `${columnSizes.join(' ')} 100px`; // 100px for details button column
   }
+
 
   getColumnValue(row: Contrato, columnKey: string): string | number {
     switch (columnKey) {
@@ -529,7 +552,15 @@ print(): void {
     this.filterForm.reset();
     this.dataSource.filteredData = this.dataSource.data;
   }
-
+  toggleColumn(columnKey: string): void {
+    const column = this.columnSettings.find(col => col.key === columnKey);
+    if (column) {
+      column.visible = !column.visible;
+      this.updateDisplayedColumns();
+      this.cdr.detectChanges();
+    }
+  }
+  
   initSelectedContratoForm(): void {
     this.selectedContratoForm = this.fb.group({
       no_contrato: ['', Validators.required],

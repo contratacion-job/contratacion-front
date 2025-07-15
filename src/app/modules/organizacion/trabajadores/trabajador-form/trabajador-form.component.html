@@ -10,7 +10,7 @@
       <!-- Nombre -->
       <mat-form-field appearance="outline">
         <mat-label>Nombre</mat-label>
-        <input matInput formControlName="nombre" placeholder="Ingrese el nombre">
+        <input matInput formControlName="nombre" placeholder="Ingrese el nombre" appCapitalizeInput>
         <mat-error *ngIf="nombre?.invalid && nombre?.touched">
           <span *ngIf="nombre?.errors?.['required']">El nombre es requerido</span>
           <span *ngIf="nombre?.errors?.['minlength']">El nombre debe tener al menos 2 caracteres</span>
@@ -20,7 +20,7 @@
       <!-- Apellido (corregido) -->
       <mat-form-field appearance="outline">
         <mat-label>Apellido</mat-label>
-        <input matInput formControlName="apellido" placeholder="Ingrese el apellido">
+        <input matInput formControlName="apellido" placeholder="Ingrese el apellido" appCapitalizeInput>
         <mat-error *ngIf="apellido?.invalid && apellido?.touched">
           <span *ngIf="apellido?.errors?.['required']">El apellido es requerido</span>
           <span *ngIf="apellido?.errors?.['minlength']">El apellido debe tener al menos 2 caracteres</span>
@@ -30,7 +30,7 @@
       <!-- Usuario -->
       <mat-form-field appearance="outline">
         <mat-label>Usuario</mat-label>
-        <input matInput formControlName="usuario" placeholder="Ingrese el nombre de usuario">
+        <input matInput formControlName="usuario" placeholder="Ingrese el nombre de usuario" appCapitalizeInput>
         <mat-error *ngIf="usuario?.invalid && usuario?.touched">
           <span *ngIf="usuario?.errors?.['required']">El usuario es requerido</span>
           <span *ngIf="usuario?.errors?.['minlength']">El usuario debe tener al menos 3 caracteres</span>
@@ -50,19 +50,19 @@
       <!-- Teléfono -->
       <mat-form-field appearance="outline">
         <mat-label>Teléfono</mat-label>
-        <input matInput formControlName="telefono" placeholder="Ingrese el teléfono">
+        <input matInput formControlName="telefono" placeholder="Ingrese el teléfono" appRestrictInput="[0-9]">
       </mat-form-field>
 
       <!-- Teléfono Móvil -->
       <mat-form-field appearance="outline">
         <mat-label>Teléfono Móvil</mat-label>
-        <input matInput formControlName="telefono_movil" placeholder="Ingrese el teléfono móvil">
+        <input matInput formControlName="telefono_movil" placeholder="Ingrese el teléfono móvil" appRestrictInput="[+0-9]">
       </mat-form-field>
 
       <!-- Cargo -->
       <mat-form-field appearance="outline">
         <mat-label>Cargo</mat-label>
-        <input matInput formControlName="cargo" placeholder="Ingrese el cargo">
+        <input matInput formControlName="cargo" placeholder="Ingrese el cargo" appCapitalizeInput>
         <mat-error *ngIf="cargo?.invalid && cargo?.touched">
           <span *ngIf="cargo?.errors?.['required']">El cargo es requerido</span>
         </mat-error>

@@ -56,4 +56,47 @@ export class FuseValidators
             return errors;
         };
     }
+
+    /**
+     * Validador para teléfono móvil con prefijo +53 y 8 dígitos después
+     */
+    static telefonoMovilValidator(): ValidatorFn
+    {
+        return (control: AbstractControl): ValidationErrors | null =>
+        {
+            const value = control.value;
+            if (this.isEmptyInputValue(value))
+            {
+                return null; // No validar si está vacío
+            }
+            // Validar que empiece con +53 y luego 8 dígitos, sin letras
+            const regex = /^\+53[0-9]{8}$/;
+            const valid = regex.test(value);
+            return valid ? null : { telefonoMovilInvalido: true };
+        };
+    }
+    static telefonoValidator(): ValidatorFn
+    {
+        return (control: AbstractControl): ValidationErrors | null =>
+        {
+            const value = control.value;
+            if (this.isEmptyInputValue(value))
+            {
+                return null; // No validar si está vacío
+            }
+            // Validar que empiece con +53 y luego 8 dígitos, sin letras
+            const regex = /^\+22[0-9]{6}$/;
+            const valid = regex.test(value);
+            return valid ? null : { telefonoMovilInvalido: true };
+        };
+    }
+
+    /**
+     * Función para capitalizar la primera letra de cada palabra en un texto
+     */
+    static capitalizarTexto(texto: string): string
+    {
+        if (!texto) return texto;
+        return texto.replace(/\b\w/g, (letra) => letra.toUpperCase());
+    }
 }
