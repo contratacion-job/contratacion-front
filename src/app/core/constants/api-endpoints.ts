@@ -2,7 +2,16 @@ import { environment } from 'environments/environment';
 
 export const API_ENDPOINTS = {
   BASE_URL: environment.apiUrl,
-
+  USERS: {
+    BASE: '/api/users',
+    PROFILE: '/api/auth/profile',
+    CHANGE_PASSWORD: '/api/auth/change-password'
+  },
+  AUTH: {
+    LOGIN: '/api/auth/login',
+    LOGOUT: '/api/auth/logout',
+    REFRESH: '/api/auth/refresh'
+  },
   // Contratos
   CONTRATOS: `${environment.apiUrl}/contratos`,
   CONTRATOS_VENCIDOS: `${environment.apiUrl}/contratos/vencidos`,

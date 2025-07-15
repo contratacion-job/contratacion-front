@@ -12,13 +12,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ReactiveFormsModule, FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
-import { MatMenuModule } from '@angular/material/menu';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatMenuTrigger } from '@angular/material/menu';
 
 import { RepresentanteService } from '../../services/representante.service';
 import { ProveedorService } from '../../services/proveedor.service';
@@ -27,6 +26,7 @@ import { Contrato } from 'app/models/Type';
 import { ContratoService } from 'app/modules/contratos/services/contrato.service';
 import { SuplementoService } from 'app/modules/suplementos/services/suplemento.service';
 import { RepresentanteFormComponent } from '../representante-form.component';
+import { ExportService } from 'app/services/export.service';
 
 @Component({
   selector: 'app-representante-list',
@@ -56,7 +56,7 @@ import { RepresentanteFormComponent } from '../representante-form.component';
 export class RepresentanteListComponent implements OnInit, AfterViewInit {
   dataSource: MatTableDataSource<Representante> = new MatTableDataSource();
   suplementosDataSource: MatTableDataSource<Suplemento> = new MatTableDataSource();
-  
+
   columnSettings = [
     { key: 'nombre', label: 'Nombre', visible: true, tooltip: 'Nombre completo del representante' },
     { key: 'apellido', label: 'Apellido', visible: true, tooltip: 'Apellido completo del representante' },
@@ -73,23 +73,23 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
     { key: 'numero_documento', label: 'Número Documento', visible: false, tooltip: 'Número de documento' },
     { key: 'tipo_documento', label: 'Tipo Documento', visible: false, tooltip: 'Tipo de documento' }
   ];
-  // Columnas para la tabla de representantes
+
   displayedColumns: string[] = [
-    'proveedor_nombre', 
-    'proveedor_codigo', 
-    'representante', 
-    'cargo', 
-    'telefono', 
-    'email', 
-    'estado', 
-    'tipo_empresa', 
+    'proveedor_nombre',
+    'proveedor_codigo',
+    'representante',
+    'cargo',
+    'telefono',
+    'email',
+    'estado',
+    'tipo_empresa',
     'ministerio',
     'provincia',
     'municipio',
     'numero_documento',
     'acciones'
   ];
-  // Columnas para la tabla de suplementos
+
   displayedSuplementosColumns: string[] = ['no_suplemento', 'fecha_firmado', 'valor_cup', 'valor_usd', 'estado', 'acciones'];
   selection = new Set<number>();
   suplementoSelection = new Set<number>();
@@ -122,12 +122,12 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
     private suplementoService: SuplementoService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private exportService: ExportService
   ) {
     this.dataSource = new MatTableDataSource<Representante>([]);
     this.suplementosDataSource = new MatTableDataSource<Suplemento>([]);
-    
-    // Inicializar el formulario de edición
+
     this.selectedRowForm = this.fb.group({
       nombre: [''],
       apellido: [''],
@@ -138,18 +138,34 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  closeColumnMenu(): void {
-    this.columnMenuTrigger.closeMenu();
+  getGridColumns(): string {
+    const visibleColumnsCount = this.columnSettings.filter(col => col.visible).length;
+    // Assign a flexible width for each visible column
+    const columnWidths = this.columnSettings
+      .filter(col => col.visible)
+      .map(() => 'minmax(150px, 1fr)')
+      .join(' ');
+    // Add fixed width for the actions column
+    return `${columnWidths} minmax(100px, 100px)`;
   }
+
+  getVisibleColumns() {
+    return this.columnSettings.filter(col => col.visible);
+  }
+
+  closeColumnMenu(): void {
+    if (this.columnMenuTrigger) {
+      this.columnMenuTrigger.closeMenu();
+    }
+  }
+
   loadRepresentantes(): void {
     this.isLoading = true;
     this.representanteService.getRepresentantes().subscribe({
       next: (response: any) => {
-        console.log('Raw representantes response:', response);
         const representantes = Array.isArray(response) ? response : response.data || [];
         this.proveedorService.getProveedores().subscribe({
           next: (proveedores) => {
-            // Mapear el objeto completo del proveedor con propiedades correctas
             representantes.forEach((rep: any) => {
               const proveedor = proveedores.find((p: any) => p.id === rep.proveedor_id);
               if (proveedor) {
@@ -157,7 +173,7 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
                   id: proveedor.id,
                   nombre: proveedor.nombre || '',
                   codigo: proveedor.codigo || '',
-                  tipo_empresa: '', // No existe en Proveedor, asignar vacío
+                  tipo_empresa: '',
                   ministerio: typeof proveedor.ministerio === 'string' ? proveedor.ministerio : (proveedor.ministerio?.nombre_ministerio || ''),
                   provincia: proveedor.provincia || '',
                   municipio: typeof proveedor.municipio === 'string' ? proveedor.municipio : (proveedor.municipio?.nombre_municipio || ''),
@@ -172,47 +188,41 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
                 rep.Proveedor = null;
               }
             });
-            
-            console.log('Representantes con Proveedor completo:', representantes);
+
             this.dataSource.data = representantes;
             this.pagination.length = representantes.length;
-            
-            // Configurar la tabla después de cargar los datos
+
             if (this.paginator) {
               this.dataSource.paginator = this.paginator;
             }
             if (this.sort) {
               this.dataSource.sort = this.sort;
             }
-            
+
             if (this.selectedContratoId) {
               this.applyContratoFilter();
             }
             this.isLoading = false;
           },
           error: (error) => {
-            console.error('Error al cargar los proveedores', error);
             this.showMessage('Error al cargar los proveedores', 'error');
             this.isLoading = false;
           }
         });
       },
       error: (error) => {
-        console.error('Error al cargar los representantes', error);
         this.showMessage('Error al cargar los representantes', 'error');
         this.isLoading = false;
       }
     });
   }
-  
+
   ngAfterViewInit(): void {
-    // Configurar paginator y sort después de que la vista esté lista
     if (this.dataSource.data.length > 0) {
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
     }
-    
-    // También configurar cuando los datos cambien
+
     this.dataSource.connect().subscribe(() => {
       if (this.paginator && this.sort) {
         this.dataSource.paginator = this.paginator;
@@ -220,12 +230,12 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
       }
     });
   }
-  
+
   ngOnInit(): void {
     this.setupFilter();
     this.loadRepresentantes();
     this.loadSuplementos();
-    
+
     this.dataSource.filterPredicate = (data: Representante, filter: string) => {
       const searchStr = [
         data.Proveedor?.nombre || '',
@@ -243,7 +253,7 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
         data.numero_documento || '',
         data.tipo_documento || ''
       ].join(' ').toLowerCase();
-            
+
       return searchStr.includes(filter);
     };
   }
@@ -267,16 +277,22 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  loadContratos(): void {
-    this.contratoService.getContratos().subscribe({
-      next: (contratos) => {
-        this.contratos = contratos;
-      },
-      error: (error) => {
-        console.error('Error al cargar los contratos', error);
-        this.showMessage('Error al cargar los contratos', 'error');
-      }
+  showMessage(message: string, type: 'success' | 'error' = 'success'): void {
+    this.snackBar.open(message, 'Cerrar', {
+      duration: 5000,
+      panelClass: type === 'success' ? 'success-snackbar' : 'error-snackbar',
+      horizontalPosition: 'right',
+      verticalPosition: 'top'
     });
+  }
+
+  applyContratoFilter(): void {
+    if (this.selectedContratoId) {
+      const originalData = [...this.dataSource.data];
+      this.dataSource.data = originalData.filter(r => r['contrato_id'] === this.selectedContratoId);
+    } else {
+      this.loadRepresentantes();
+    }
   }
 
   loadSuplementos(): void {
@@ -290,66 +306,10 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
         this.isSuplementosLoading = false;
       },
       error: (error) => {
-        console.error('Error al cargar los suplementos', error);
         this.showMessage('Error al cargar los suplementos', 'error');
         this.isSuplementosLoading = false;
       }
     });
-  }
-
-  toggleSuplementos(): void {
-    this.showSuplementos = !this.showSuplementos;
-    if (this.showSuplementos && this.suplementos.length === 0) {
-      this.loadSuplementos();
-    }
-  }
-
-  toggleDetails(id: number): void {
-    if (this.selectedRow && this.selectedRow.id === id) {
-      this.selectedRow = null;
-    } else {
-      const found = this.dataSource.data.find(r => r.id === id);
-      this.selectedRow = found ? found : null;
-      
-      if (this.selectedRow) {
-        this.selectedRowForm.patchValue({
-          nombre: this.selectedRow.nombre,
-          apellido: this.selectedRow.apellido,
-          telefono: this.selectedRow.telefono,
-          email: this.selectedRow.email,
-          cargo: this.selectedRow.cargo,
-          estado: this.selectedRow.estado
-        });
-      }
-    }
-  }
-
-  updateSelectedRecord(): void {
-    if (this.selectedRow && this.selectedRowForm.valid) {
-      const updatedData = {
-        ...this.selectedRow,
-        ...this.selectedRowForm.value
-      };
-      
-      this.representanteService.updateRepresentante(this.selectedRow.id, updatedData).subscribe({
-        next: () => {
-          this.showMessage('Representante actualizado correctamente');
-          this.loadRepresentantes();
-          this.selectedRow = null;
-        },
-        error: (error) => {
-          console.error('Error al actualizar el representante', error);
-          this.showMessage('Error al actualizar el representante', 'error');
-        }
-      });
-    }
-  }
-
-  deleteSelectedRecord(): void {
-    if (this.selectedRow) {
-      this.deleteRepresentante(this.selectedRow.id);
-      this.selectedRow = null;
-    }
   }
 
   openAddDialog(): void {
@@ -365,128 +325,83 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  showMessage(message: string, type: 'success' | 'error' = 'success'): void {
-    this.snackBar.open(message, 'Cerrar', {
-      duration: 5000,
-      panelClass: type === 'success' ? 'success-snackbar' : 'error-snackbar',
-      horizontalPosition: 'right',
-      verticalPosition: 'top'
-    });
+  exportToPDF(): void {
+    const columns = [
+      { key: 'nombre', label: 'Nombre' },
+      { key: 'apellido', label: 'Apellido' },
+      { key: 'cargo', label: 'Cargo' },
+      { key: 'telefono', label: 'Teléfono' },
+      { key: 'email', label: 'Email' },
+      { key: 'estado', label: 'Estado' },
+      { key: 'proveedor_nombre', label: 'Proveedor' },
+      { key: 'proveedor_codigo', label: 'Código Proveedor' },
+      { key: 'tipo_empresa', label: 'Tipo Empresa' },
+      { key: 'ministerio', label: 'Ministerio' },
+      { key: 'provincia', label: 'Provincia' },
+      { key: 'municipio', label: 'Municipio' },
+      { key: 'numero_documento', label: 'Número Documento' },
+      { key: 'tipo_documento', label: 'Tipo Documento' }
+    ];
+
+    const data = this.dataSource.filteredData.map(rep => ({
+      nombre: rep.nombre || '',
+      apellido: rep.apellido || '',
+      cargo: rep.cargo || '',
+      telefono: rep.telefono || '',
+      email: rep.email || '',
+      estado: rep.estado || '',
+      proveedor_nombre: rep.Proveedor?.nombre || '',
+      proveedor_codigo: rep.Proveedor?.codigo || '',
+      tipo_empresa: rep.Proveedor?.tipo_empresa || '',
+      ministerio: rep.Proveedor?.ministerio || '',
+      provincia: rep.Proveedor?.provincia || '',
+      municipio: rep.Proveedor?.municipio || '',
+      numero_documento: rep.numero_documento || '',
+      tipo_documento: rep.tipo_documento || ''
+    }));
+
+    this.exportService.exportToPDF(data, columns, 'Reporte de Representantes', 'assets/images/logo/logo.jpg');
   }
-
-  deleteRepresentante(id: number): void {
-    if (confirm('¿Está seguro de eliminar este representante?')) {
-      this.isLoading = true;
-      this.representanteService.deleteRepresentante(id).subscribe({
-        next: () => {
-          this.loadRepresentantes();
-          this.showMessage('Representante eliminado correctamente');
-          this.isLoading = false;
-        },
-        error: (error) => {
-          console.error('Error al eliminar el representante', error);
-          this.showMessage('Error al eliminar el representante', 'error');
-          this.isLoading = false;
-        }
-      });
-    }
+  print(): void {
+    window.print();
   }
-
-  deleteSelected(): void {
-    if (confirm(`¿Está seguro de eliminar los ${this.selection.size} representantes seleccionados?`)) {
-      this.isLoading = true;
-      const deleteRequests = Array.from(this.selection).map(id =>
-        this.representanteService.deleteRepresentante(id).toPromise()
-      );
-
-      Promise.all(deleteRequests).then(() => {
-        this.selection.clear();
-        this.loadRepresentantes();
-        this.showMessage(`${this.selection.size} representantes eliminados correctamente`);
-        this.isLoading = false;
-      }).catch(error => {
-        console.error('Error al eliminar los representantes', error);
-        this.showMessage('Error al eliminar los representantes', 'error');
-        this.isLoading = false;
-      });
-    }
-  }
-
-  private applyContratoFilter(): void {
-    if (this.selectedContratoId) {
-      const originalData = [...this.dataSource.data];
-      this.dataSource.data = originalData.filter(r => r['contrato_id'] === this.selectedContratoId);
-    } else {
-      this.loadRepresentantes();
-    }
-  }
-
-  onContratoChange(): void {
-    this.applyContratoFilter();
-  }
-
-  trackByFn(index: number, item: any): any {
-    return item.id || index;
-  }
-
-getVisibleColumns() {
-  return this.columnSettings.filter(column => column.visible);
-}
-
-// Método para generar las columnas del grid
-getGridColumns(): string {
-  const visibleColumns = this.getVisibleColumns();
-  const columnSizes = visibleColumns.map(() => 'minmax(120px, 1fr)');
-  return `${columnSizes.join(' ')} 200px`; // 200px para la columna de acciones
-}
-
-// Método para obtener el valor de una columna
-getColumnValue(representante: any, columnKey: string): string {
-  switch (columnKey) {
-    case 'nombre':
-      return representante.nombre || '';
-    case 'apellido':
-      return representante.apellido || '';
-    case 'cargo':
-      return representante.cargo || '';
-    case 'telefono':
-      return representante.telefono || '';
-    case 'email':
-      return representante.email || '';
-    case 'estado':
-      return representante.estado || '';
-    case 'proveedor_nombre':
-      return representante.Proveedor?.nombre || '';
-    case 'proveedor_codigo':
-      return representante.Proveedor?.codigo || '';
-    case 'tipo_empresa':
-      return representante.Proveedor?.tipo_empresa || '';
-    case 'ministerio':
-      return representante.Proveedor?.ministerio || '';
-    case 'provincia':
-      return representante.Proveedor?.provincia || '';
-    case 'municipio':
-      return representante.Proveedor?.municipio || '';
-    case 'numero_documento':
-      return representante.numero_documento || '';
-    case 'tipo_documento':
-      return representante.tipo_documento || '';
-    default:
-      return '';
-  }
-}
-
-// Método para alternar visibilidad de columnas
-toggleColumn(columnKey: string): void {
-  const column = this.columnSettings.find(col => col.key === columnKey);
-  if (column) {
-    column.visible = !column.visible;
-  }
-}
-exportToCSV(){
-
-}
-exportToPDF(){
   
-}
+
+  exportToCSV(): void {
+    const columns = [
+      { key: 'nombre', label: 'Nombre' },
+      { key: 'apellido', label: 'Apellido' },
+      { key: 'cargo', label: 'Cargo' },
+      { key: 'telefono', label: 'Teléfono' },
+      { key: 'email', label: 'Email' },
+      { key: 'estado', label: 'Estado' },
+      { key: 'proveedor_nombre', label: 'Proveedor' },
+      { key: 'proveedor_codigo', label: 'Código Proveedor' },
+      { key: 'tipo_empresa', label: 'Tipo Empresa' },
+      { key: 'ministerio', label: 'Ministerio' },
+      { key: 'provincia', label: 'Provincia' },
+      { key: 'municipio', label: 'Municipio' },
+      { key: 'numero_documento', label: 'Número Documento' },
+      { key: 'tipo_documento', label: 'Tipo Documento' }
+    ];
+
+    const data = this.dataSource.filteredData.map(rep => ({
+      nombre: rep.nombre || '',
+      apellido: rep.apellido || '',
+      cargo: rep.cargo || '',
+      telefono: rep.telefono || '',
+      email: rep.email || '',
+      estado: rep.estado || '',
+      proveedor_nombre: rep.Proveedor?.nombre || '',
+      proveedor_codigo: rep.Proveedor?.codigo || '',
+      tipo_empresa: rep.Proveedor?.tipo_empresa || '',
+      ministerio: rep.Proveedor?.ministerio || '',
+      provincia: rep.Proveedor?.provincia || '',
+      municipio: rep.Proveedor?.municipio || '',
+      numero_documento: rep.numero_documento || '',
+      tipo_documento: rep.tipo_documento || ''
+    }));
+
+    this.exportService.exportToExcel(data, columns, 'representantes_export.csv');
+  }
 }

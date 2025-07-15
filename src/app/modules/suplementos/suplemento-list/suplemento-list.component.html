@@ -1,4 +1,5 @@
 <div class="flex flex-col min-h-screen p-6 w-full">
+  <div class="flex flex-col min-h-screen p-6 w-full">
   <!-- Card -->
   <div class="relative flex flex-col flex-auto p-6 pr-3 pb-3 bg-card rounded-2xl shadow overflow-hidden mb-6 w-full">
     <div class="absolute bottom-0 right-0 w-24 h-24 -m-6">
@@ -7,13 +8,10 @@
         [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
     </div>
 
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-      <h2 class="text-2xl font-semibold">Lista de Suplementos</h2>
-      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-
-
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h2 class="text-2xl font-semibold">Lista de Suplementos</h2>
+     
       </div>
-    </div>
 
   <div class="flex flex-row flex-wrap mt-4 -mx-6">
       <div class="flex flex-col mx-6 my-3">
@@ -102,6 +100,40 @@
           <mat-icon>add</mat-icon>
           <span>Agregar Suplemento</span>
         </button>
+        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+
+          <button
+            mat-icon-button
+            [matMenuTriggerFor]="exportMenu"
+            [color]="'primary'"
+            matTooltip="Exportar tabla"
+            aria-label="Exportar tabla"
+            class="ml-4 mt-4 sm:mt-0">
+            <mat-icon [svgIcon]="'heroicons_outline:arrow-up-tray'"></mat-icon>
+          </button>
+
+          <mat-menu #exportMenu="matMenu">
+            <button mat-menu-item (click)="exportToCSV()">
+              <mat-icon>description</mat-icon>
+              <span>Exportar a CSV</span>
+            </button>
+            <button mat-menu-item (click)="exportToPDF()">
+              <mat-icon>table_chart</mat-icon>
+              <span>Exportar a PDF</span>
+            </button>
+          </mat-menu>
+
+          <button
+            mat-icon-button
+            color="primary"
+            (click)="print()"
+            matTooltip="Imprimir"
+            aria-label="Imprimir"
+            class="ml-2 mt-4 sm:mt-0">
+            <mat-icon>print</mat-icon>
+          </button>
+
+        </div>
       </div>
     </div>
 

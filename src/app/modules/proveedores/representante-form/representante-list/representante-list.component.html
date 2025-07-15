@@ -62,6 +62,7 @@
           <span class="ml-2 sm:hidden">Agregar</span>
         </button>
 
+        <!-- Export buttons -->
         <button
           mat-icon-button
           [matMenuTriggerFor]="exportMenu"
@@ -83,6 +84,17 @@
             <span>Exportar a PDF</span>
           </button>
         </mat-menu>
+
+        <!-- Print button -->
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="print()"
+          matTooltip="Imprimir"
+          aria-label="Imprimir"
+          class="ml-2 mt-4 sm:mt-0">
+          <mat-icon>print</mat-icon>
+        </button>
       </div>
       </div>
 

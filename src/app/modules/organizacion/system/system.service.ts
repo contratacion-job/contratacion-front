@@ -37,4 +37,26 @@ logsdelete(): Observable<Log[]> {
       })
     );
 }
+
+  exportToExcel(): Observable<Blob> {
+    return this.http.post(API_ENDPOINTS.LOGS.EXPORT_EXCEL, {}, { responseType: 'blob' })
+      .pipe(
+        tap(data => console.log('Excel export initiated')),
+        catchError(error => {
+          console.error('Error exporting logs to Excel:', error);
+          return of(new Blob());
+        })
+      );
+  }
+
+  exportToPDF(): Observable<Blob> {
+    return this.http.post(API_ENDPOINTS.LOGS.EXPORT_PDF, {}, { responseType: 'blob' })
+      .pipe(
+        tap(data => console.log('PDF export initiated')),
+        catchError(error => {
+          console.error('Error exporting logs to PDF:', error);
+          return of(new Blob());
+        })
+      );
+  }
 }

@@ -165,7 +165,7 @@ export class DashboardProveedorComponent implements OnInit {
       }
     };
   }
-  
+
   private initializeProveedoresByTypeChart(): void {
     this.proveedoresByTypeChartOptions = {
       series: [],
@@ -229,23 +229,7 @@ export class DashboardProveedorComponent implements OnInit {
     console.log('Opciones proveedoresByStatusChart:', this.proveedoresByStatusChartOptions);
   }
 
-  private initializeProveedoresByTipoEmpresaChart(): void {
-    this.proveedoresByTipoEmpresaChartOptions = {
-      series: [],
-      chart: {
-        type: 'bar',
-        height: 320,
-        toolbar: { show: false },
-        animations: { enabled: true, easing: 'easeinout', speed: 800 }
-      },
-      xaxis: { categories: [] },
-      colors: [this.colorPalette[2]],
-      plotOptions: { bar: { horizontal: false, columnWidth: '70%', borderRadius: 4 } },
-      dataLabels: { enabled: false },
-      tooltip: { theme: 'light' }
-    };
-  }
-
+ 
   private updateProveedoresByTipoEmpresaChart(): void {
     const counts = this.countByProperty('tipo_empresa', 'nombre_tipo_empresa', this.proveedores);
     this.proveedoresByTipoEmpresaChartOptions = {
@@ -256,22 +240,6 @@ export class DashboardProveedorComponent implements OnInit {
     console.log('Opciones proveedoresByTipoEmpresaChart:', this.proveedoresByTipoEmpresaChartOptions);
   }
 
-  private initializeProveedoresByMinisterioChart(): void {
-    this.proveedoresByMinisterioChartOptions = {
-      series: [],
-      chart: {
-        type: 'bar',
-        height: 320,
-        toolbar: { show: false },
-        animations: { enabled: true, easing: 'easeinout', speed: 800 }
-      },
-      xaxis: { categories: [] },
-      colors: [this.colorPalette[3]],
-      plotOptions: { bar: { horizontal: false, columnWidth: '70%', borderRadius: 4 } },
-      dataLabels: { enabled: false },
-      tooltip: { theme: 'light' }
-    };
-  }
 
   private updateProveedoresByMinisterioChart(): void {
     const counts = this.countByProperty('ministerio', 'nombre_ministerio', this.proveedores);
@@ -283,22 +251,7 @@ export class DashboardProveedorComponent implements OnInit {
     console.log('Opciones proveedoresByMinisterioChart:', this.proveedoresByMinisterioChartOptions);
   }
 
-  private initializeProveedoresByProvinciaChart(): void {
-    this.proveedoresByProvinciaChartOptions = {
-      series: [],
-      chart: {
-        type: 'bar',
-        height: 320,
-        toolbar: { show: false },
-        animations: { enabled: true, easing: 'easeinout', speed: 800 }
-      },
-      xaxis: { categories: [] },
-      colors: [this.colorPalette[4]],
-      plotOptions: { bar: { horizontal: false, columnWidth: '70%', borderRadius: 4 } },
-      dataLabels: { enabled: false },
-      tooltip: { theme: 'light' }
-    };
-  }
+
 
   private updateProveedoresByProvinciaChart(): void {
     const counts = this.countByProperty('provincia', 'nombre_provincia', this.proveedores);
@@ -310,22 +263,7 @@ export class DashboardProveedorComponent implements OnInit {
     console.log('Opciones proveedoresByProvinciaChart:', this.proveedoresByProvinciaChartOptions);
   }
 
-  private initializeProveedoresByMunicipioChart(): void {
-    this.proveedoresByMunicipioChartOptions = {
-      series: [],
-      chart: {
-        type: 'bar',
-        height: 320,
-        toolbar: { show: false },
-        animations: { enabled: true, easing: 'easeinout', speed: 800 }
-      },
-      xaxis: { categories: [] },
-      colors: [this.colorPalette[5]],
-      plotOptions: { bar: { horizontal: false, columnWidth: '70%', borderRadius: 4 } },
-      dataLabels: { enabled: false },
-      tooltip: { theme: 'light' }
-    };
-  }
+
 
   private updateProveedoresByMunicipioChart(): void {
     const counts = this.countByProperty('municipio', 'nombre_municipio', this.proveedores);
@@ -382,4 +320,540 @@ export class DashboardProveedorComponent implements OnInit {
     });
     return { keys: Object.keys(counts), values: Object.values(counts) };
   }
+
+private initializeProveedoresByTipoEmpresaChart(): void {
+  this.proveedoresByTipoEmpresaChartOptions = {
+    series: [],
+    chart: {
+      type: 'bar',
+      height: 380,
+      toolbar: { show: false },
+      animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 800,
+        animateGradually: {
+          enabled: true,
+          delay: 150
+        }
+      },
+      background: 'transparent',
+      dropShadow: {
+        enabled: true,
+        color: '#000',
+        top: 3,
+        left: 2,
+        blur: 4,
+        opacity: 0.1
+      }
+    },
+    xaxis: {
+      categories: [],
+      labels: {
+        style: {
+          colors: '#64748B',
+          fontSize: '12px',
+          fontWeight: 500
+        },
+        rotate: -45,
+        rotateAlways: false
+      },
+      axisBorder: {
+        show: false
+      },
+      axisTicks: {
+        show: false
+      }
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: '#64748B',
+          fontSize: '12px'
+        }
+      }
+    },
+    colors: ['#3B82F6'],
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '65%',
+        borderRadius: 8,
+        borderRadiusApplication: 'end',
+        borderRadiusWhenStacked: 'last',
+        dataLabels: {
+          position: 'top'
+        }
+      }
+    },
+    dataLabels: {
+      enabled: true,
+      formatter: function (val) {
+        return val.toString();
+      },
+      offsetY: -20,
+      style: {
+        fontSize: '12px',
+        colors: ['#304758'],
+        fontWeight: 'bold'
+      }
+    },
+    tooltip: {
+      theme: 'light',
+      style: {
+        fontSize: '12px'
+      },
+      y: {
+        formatter: function (val) {
+          return val + " proveedores"
+        }
+      }
+    },
+    grid: {
+      show: true,
+      borderColor: '#E2E8F0',
+      strokeDashArray: 4,
+      position: 'back',
+      xaxis: {
+        lines: {
+          show: false
+        }
+      },
+      yaxis: {
+        lines: {
+          show: true
+        }
+      }
+    },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shade: 'light',
+        type: 'vertical',
+        shadeIntensity: 0.25,
+        gradientToColors: ['#60A5FA'],
+        inverseColors: false,
+        opacityFrom: 0.85,
+        opacityTo: 0.55,
+        stops: [50, 0, 100]
+      }
+    },
+    stroke: {
+      show: true,
+      width: 2,
+      colors: ['transparent']
+    },
+    title: {
+      text: 'Proveedores por Tipo de Empresa',
+      align: 'left',
+      style: {
+        fontSize: '16px',
+        fontWeight: 'bold',
+        color: '#1E293B'
+      }
+    }
+  };
+}
+
+private initializeProveedoresByMinisterioChart(): void {
+  this.proveedoresByMinisterioChartOptions = {
+    series: [],
+    chart: {
+      type: 'bar',
+      height: 380,
+      toolbar: { show: false },
+      animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 800,
+        animateGradually: {
+          enabled: true,
+          delay: 150
+        }
+      },
+      background: 'transparent',
+      dropShadow: {
+        enabled: true,
+        color: '#000',
+        top: 3,
+        left: 2,
+        blur: 4,
+        opacity: 0.1
+      }
+    },
+    xaxis: {
+      categories: [],
+      labels: {
+        style: {
+          colors: '#64748B',
+          fontSize: '12px',
+          fontWeight: 500
+        },
+        rotate: -45,
+        rotateAlways: false
+      },
+      axisBorder: {
+        show: false
+      },
+      axisTicks: {
+        show: false
+      }
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: '#64748B',
+          fontSize: '12px'
+        }
+      }
+    },
+    colors: ['#10B981'],
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '65%',
+        borderRadius: 8,
+        borderRadiusApplication: 'end',
+        borderRadiusWhenStacked: 'last',
+        dataLabels: {
+          position: 'top'
+        }
+      }
+    },
+    dataLabels: {
+      enabled: true,
+      formatter: function (val) {
+        return val.toString();
+      },
+      offsetY: -20,
+      style: {
+        fontSize: '12px',
+        colors: ['#304758'],
+        fontWeight: 'bold'
+      }
+    },
+    tooltip: {
+      theme: 'light',
+      style: {
+        fontSize: '12px'
+      },
+      y: {
+        formatter: function (val) {
+          return val + " proveedores"
+        }
+      }
+    },
+    grid: {
+      show: true,
+      borderColor: '#E2E8F0',
+      strokeDashArray: 4,
+      position: 'back',
+      xaxis: {
+        lines: {
+          show: false
+        }
+      },
+      yaxis: {
+        lines: {
+          show: true
+        }
+      }
+    },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shade: 'light',
+        type: 'vertical',
+        shadeIntensity: 0.25,
+        gradientToColors: ['#34D399'],
+        inverseColors: false,
+        opacityFrom: 0.85,
+        opacityTo: 0.55,
+        stops: [50, 0, 100]
+      }
+    },
+    stroke: {
+      show: true,
+      width: 2,
+      colors: ['transparent']
+    },
+    title: {
+      text: 'Proveedores por Ministerio',
+      align: 'left',
+      style: {
+        fontSize: '16px',
+        fontWeight: 'bold',
+        color: '#1E293B'
+      }
+    }
+  };
+}
+
+private initializeProveedoresByProvinciaChart(): void {
+  this.proveedoresByProvinciaChartOptions = {
+    series: [],
+    chart: {
+      type: 'bar',
+      height: 380,
+      toolbar: { show: false },
+      animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 800,
+        animateGradually: {
+          enabled: true,
+          delay: 150
+        }
+      },
+      background: 'transparent',
+      dropShadow: {
+        enabled: true,
+        color: '#000',
+        top: 3,
+        left: 2,
+        blur: 4,
+        opacity: 0.1
+      }
+    },
+    xaxis: {
+      categories: [],
+      labels: {
+        style: {
+          colors: '#64748B',
+          fontSize: '12px',
+          fontWeight: 500
+        },
+        rotate: -45,
+        rotateAlways: false
+      },
+      axisBorder: {
+        show: false
+      },
+      axisTicks: {
+        show: false
+      }
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: '#64748B',
+          fontSize: '12px'
+        }
+      }
+    },
+    colors: ['#8B5CF6'],
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '65%',
+        borderRadius: 8,
+        borderRadiusApplication: 'end',
+        borderRadiusWhenStacked: 'last',
+        dataLabels: {
+          position: 'top'
+        }
+      }
+    },
+    dataLabels: {
+      enabled: true,
+      formatter: function (val) {
+        return val.toString();
+      },
+      offsetY: -20,
+      style: {
+        fontSize: '12px',
+        colors: ['#304758'],
+        fontWeight: 'bold'
+      }
+    },
+    tooltip: {
+      theme: 'light',
+      style: {
+        fontSize: '12px'
+      },
+      y: {
+        formatter: function (val) {
+          return val + " proveedores"
+        }
+      }
+    },
+    grid: {
+      show: true,
+      borderColor: '#E2E8F0',
+      strokeDashArray: 4,
+      position: 'back',
+      xaxis: {
+        lines: {
+          show: false
+        }
+      },
+      yaxis: {
+        lines: {
+          show: true
+        }
+      }
+    },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shade: 'light',
+        type: 'vertical',
+        shadeIntensity: 0.25,
+        gradientToColors: ['#A78BFA'],
+        inverseColors: false,
+        opacityFrom: 0.85,
+        opacityTo: 0.55,
+        stops: [50, 0, 100]
+      }
+    },
+    stroke: {
+      show: true,
+      width: 2,
+      colors: ['transparent']
+    },
+    title: {
+      text: 'Proveedores por Provincia',
+      align: 'left',
+      style: {
+        fontSize: '16px',
+        fontWeight: 'bold',
+        color: '#1E293B'
+      }
+    }
+  };
+}
+
+private initializeProveedoresByMunicipioChart(): void {
+  this.proveedoresByMunicipioChartOptions = {
+    series: [],
+    chart: {
+      type: 'bar',
+      height: 380,
+      toolbar: { show: false },
+      animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 800,
+        animateGradually: {
+          enabled: true,
+          delay: 150
+        }
+      },
+      background: 'transparent',
+      dropShadow: {
+        enabled: true,
+        color: '#000',
+        top: 3,
+        left: 2,
+        blur: 4,
+        opacity: 0.1
+      }
+    },
+    xaxis: {
+      categories: [],
+      labels: {
+        style: {
+          colors: '#64748B',
+          fontSize: '12px',
+          fontWeight: 500
+        },
+        rotate: -45,
+        rotateAlways: false
+      },
+      axisBorder: {
+        show: false
+      },
+      axisTicks: {
+        show: false
+      }
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: '#64748B',
+          fontSize: '12px'
+        }
+      }
+    },
+    colors: ['#F59E0B'],
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '65%',
+        borderRadius: 8,
+        borderRadiusApplication: 'end',
+        borderRadiusWhenStacked: 'last',
+        dataLabels: {
+          position: 'top'
+        }
+      }
+    },
+    dataLabels: {
+      enabled: true,
+      formatter: function (val) {
+        return val.toString();
+      },
+      offsetY: -20,
+      style: {
+        fontSize: '12px',
+        colors: ['#304758'],
+        fontWeight: 'bold'
+      }
+    },
+    tooltip: {
+      theme: 'light',
+      style: {
+        fontSize: '12px'
+      },
+      y: {
+        formatter: function (val) {
+          return val + " proveedores"
+        }
+      }
+    },
+    grid: {
+      show: true,
+      borderColor: '#E2E8F0',
+      strokeDashArray: 4,
+      position: 'back',
+      xaxis: {
+        lines: {
+          show: false
+        }
+      },
+      yaxis: {
+        lines: {
+          show: true
+        }
+      }
+    },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shade: 'light',
+        type: 'vertical',
+        shadeIntensity: 0.25,
+        gradientToColors: ['#FCD34D'],
+        inverseColors: false,
+        opacityFrom: 0.85,
+        opacityTo: 0.55,
+        stops: [50, 0, 100]
+      }
+    },
+    stroke: {
+      show: true,
+      width: 2,
+      colors: ['transparent']
+    },
+    title: {
+      text: 'Proveedores por Municipio',
+      align: 'left',
+      style: {
+        fontSize: '16px',
+        fontWeight: 'bold',
+        color: '#1E293B'
+      }
+    }
+  };
+}
 }

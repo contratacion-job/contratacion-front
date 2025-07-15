@@ -11,25 +11,33 @@
           <i class="icon-refresh"></i>
           Actualizar
         </button>
-        <button class="btn btn-success" (click)="export()" [disabled]="loading">
-          <i class="icon-download"></i>
-          Exportar
-        </button>
+       <button class="btn btn-success" (click)="exportToExcel()" [disabled]="loading">
+      <i class="icon-download"></i>
+      Exportar a Excel
+    </button>
+    <button class="btn btn-success" (click)="exportToPDF()" [disabled]="loading">
+      <i class="icon-download"></i>
+      Exportar a PDF
+    </button>
+    <button class="btn btn-danger" (click)="deleteLogs()" [disabled]="loading">
+      <i class="icon-trash"></i>
+      Eliminar logs
+    </button>
       </div>
     </div>
-          
+
     <div class="search-filters-section" *ngIf="!loading">
       <div class="search-and-filter">
         <div class="search-container">
           <i class="icon-search"></i>
-          <input 
+          <input
             type="text"
             placeholder="Buscar logs..."
             [(ngModel)]="searchTerm"
             (input)="onSearchChange()"
             class="search-input">
         </div>
-        <button 
+        <button
           class="btn-filter"
           [class.active]="showFilters"
           (click)="toggleFilters()">
@@ -37,13 +45,13 @@
           Filtros
         </button>
       </div>
-              
+
       <div class="results-count">
         Mostrando {{filteredLogs.length}} de {{logs.length}} registros locales
         <span class="server-info">({{serverPagination.total}} total en servidor)</span>
       </div>
     </div>
-      
+
     <!-- Filtros -->
     <div class="filters-section" *ngIf="showFilters && !loading">
       <div class="filters-grid">
@@ -54,7 +62,7 @@
             <option *ngFor="let user of uniqueUsers" [value]="user">{{user}}</option>
           </select>
         </div>
-                  
+
         <div class="filter-group">
           <label>Tabla</label>
           <select [(ngModel)]="filterTable" (change)="onFilterChange()">
@@ -62,7 +70,7 @@
             <option *ngFor="let table of uniqueTables" [value]="table">{{table}}</option>
           </select>
         </div>
-                  
+
         <div class="filter-group">
           <label>Acción</label>
           <select [(ngModel)]="filterAction" (change)="onFilterChange()">
@@ -70,7 +78,7 @@
             <option *ngFor="let action of uniqueActions" [value]="action">{{action}}</option>
           </select>
         </div>
-                  
+
         <div class="filter-group">
           <button class="btn btn-secondary full-width" (click)="clearFilters()">
             Limpiar filtros
@@ -79,7 +87,7 @@
       </div>
     </div>
   </div>
-    
+
   <!-- Loading State -->
   <div class="loading-state" *ngIf="loading">
     <div class="spinner"></div>
@@ -143,7 +151,7 @@
         </tr>
       </tbody>
     </table>
-      
+
     <!-- Paginación Local -->
     <div class="pagination-container" *ngIf="localTotalPages > 1">
       <div class="pagination-info">
@@ -152,16 +160,16 @@
         </span>
       </div>
       <div class="pagination-controls">
-        <button 
+        <button
           class="btn-pagination"
           [disabled]="localCurrentPage === 1"
           (click)="changePage(localCurrentPage - 1)">
           <i class="icon-chevron-left"></i>
           Anterior
         </button>
-                  
+
         <div class="page-numbers">
-          <button 
+          <button
             *ngFor="let page of getPagesArray()"
             class="btn-page"
             [class.active]="localCurrentPage === page"
@@ -169,8 +177,8 @@
             {{page}}
           </button>
         </div>
-                  
-        <button 
+
+        <button
           class="btn-pagination"
           [disabled]="localCurrentPage === localTotalPages"
           (click)="changePage(localCurrentPage + 1)">
@@ -189,19 +197,19 @@
         </span>
       </div>
       <div class="server-pagination-controls">
-        <button 
+        <button
           class="btn-pagination server-btn"
           [disabled]="serverPagination.currentPage === 1"
           (click)="changeServerPage(serverPagination.currentPage - 1)">
           <i class="icon-chevron-left"></i>
           Página Anterior
         </button>
-                  
+
         <div class="server-page-info">
           <span>{{serverPagination.currentPage}} / {{serverPagination.totalPages}}</span>
         </div>
-                  
-        <button 
+
+        <button
           class="btn-pagination server-btn"
           [disabled]="serverPagination.currentPage === serverPagination.totalPages"
           (click)="changeServerPage(serverPagination.currentPage + 1)">
@@ -211,7 +219,7 @@
       </div>
     </div>
   </div>
-    
+
   <!-- Estado vacío -->
   <div class="empty-state" *ngIf="filteredLogs.length === 0 && !loading && !error">
     <i class="icon-activity"></i>
@@ -222,9 +230,9 @@
     <ng-template #noLogs>
       <p>No hay logs disponibles en esta página.</p>
     </ng-template>
-    <button 
+    <button
       *ngIf="searchTerm || filterUser || filterTable || filterAction"
-      class="btn btn-primary" 
+      class="btn btn-primary"
       (click)="clearFilters()">
       Limpiar filtros
     </button>

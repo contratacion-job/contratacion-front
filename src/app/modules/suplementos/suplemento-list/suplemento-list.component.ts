@@ -30,6 +30,7 @@ import { SuplementoService } from '../services/suplemento.service';
 import { TipoContratoService } from 'app/modules/contratos/services/tipo-contrato.service';
 import { DepartamentoService } from 'app/modules/organizacion/departamento.service';
 import { ProveedorService } from 'app/modules/proveedores/services/proveedor.service';
+import { ExportService } from 'app/services/export.service';
 
 @Component({
   selector: 'app-suplemento-list',
@@ -105,7 +106,8 @@ export class SuplementoListComponent implements OnInit, AfterViewInit {
         private proveedorService:ProveedorService,
     private fb: FormBuilder,
     private _matDialog: MatDialog,
-    private suplementoService :SuplementoService
+    private suplementoService :SuplementoService,
+    private exportService: ExportService
   ) {
     this.dataSource = new MatTableDataSource<Suplemento>([]);
     this.initSelectedSuplementoForm();
@@ -494,69 +496,138 @@ clearFilters(): void {
 }
 
 // 5. Corregir el método exportToCSV()
-exportToCSV(): void {
-  // Usar los datos filtrados del dataSource
-  const dataToExport = this.dataSource.filteredData || this.dataSource.data;
-
-  if (!dataToExport || dataToExport.length === 0) {
-    return;
-  }
-
-  const csvRows = [];
-  // Headers
-  const headers = [
-    'No. Contrato',
-    'Proveedor',
-    'Tipo de Contrato',
-    'Departamento',
-    'Valor (CUP)',
-    'Valor (USD)',
-    'Fecha Entrada',
-    'Fecha Firmado',
-    'Vigencia',
-    'Fecha Vencido',
-    'Observaciones'
-  ];
-  csvRows.push(headers.join(','));
-
-  // Data
-  dataToExport.forEach(item => {
-    const row = [
-      item.no_contrato_contratacion,
-      item.proveedor?.nombre || '',
-      item.tipo_contrato?.nombre_tipo_contrato || '',
-      item.departamento?.nombre_departamento || '',
-      item.valor_cup,
-      item.valor_usd,
-      item.fecha_entrada,
-      item.fecha_firmado,
-      item.vigencia?.vigencia,
-      item.fecha_vencido,
-      item.observaciones || ''
-    ];
-    // Escape commas and quotes in values
-    const escapedRow = row.map(value => {
-      if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-        return `"${value.replace(/"/g, '""')}"`;
-      }
-      return value;
-    });
-    csvRows.push(escapedRow.join(','));
-  });
-
-  const csvString = csvRows.join('\n');
-  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-  const url = window.URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'suplementos_export.csv';
-  a.click();
-  window.URL.revokeObjectURL(url);
-}
+  
   closeDetails(): void {
     this.selectedSuplemento = null;
   }
+
+  truncateText(text: string, maxLength: number): string {
+    if (!text) {
+      return '';
+    }
+    if (text.length <= maxLength) {
+      return text;
+    }
+    return text.substring(0, maxLength) + '...';
+  }
+
+  exportToCSV(): void {
+    const dataToExport = this.dataSource.filteredData || this.dataSource.data;
+
+    if (!dataToExport || dataToExport.length === 0) {
+      return;
+    }
+
+    const columns = [
+      { key: 'no_contrato_contratacion', label: 'No. Contrato' },
+      { key: 'proveedor', label: 'Proveedor' },
+      { key: 'tipo_contrato', label: 'Tipo de Contrato' },
+      { key: 'departamento', label: 'Departamento' },
+      { key: 'valor_cup', label: 'Valor (CUP)' },
+      { key: 'valor_usd', label: 'Valor (USD)' },
+      { key: 'fecha_entrada', label: 'Fecha Entrada' },
+      { key: 'fecha_firmado', label: 'Fecha Firmado' },
+      { key: 'vigencia', label: 'Vigencia' },
+      { key: 'fecha_vencido', label: 'Fecha Vencido' },
+      { key: 'observaciones', label: 'Observaciones' }
+    ];
+
+    const data = dataToExport.map(item => ({
+      no_contrato_contratacion: item.no_contrato_contratacion,
+      proveedor: item.proveedor?.nombre || '',
+      tipo_contrato: item.tipo_contrato?.nombre_tipo_contrato || '',
+      departamento: item.departamento?.nombre_departamento || '',
+      valor_cup: item.valor_cup,
+      valor_usd: item.valor_usd,
+      fecha_entrada: item.fecha_entrada,
+      fecha_firmado: item.fecha_firmado,
+      vigencia: item.vigencia?.vigencia,
+      fecha_vencido: item.fecha_vencido,
+      observaciones: item.observaciones || ''
+    }));
+
+    this.exportService.exportToExcel(data, columns, 'suplementos_export.csv');
+  }
+
+  exportToPDF(): void {
+    const columns = [
+      { key: 'no_contrato_contratacion', label: 'No. Contrato' },
+      { key: 'proveedor', label: 'Proveedor' },
+      { key: 'tipo_contrato', label: 'Tipo de Contrato' },
+      { key: 'departamento', label: 'Departamento' },
+      { key: 'valor_cup', label: 'Valor (CUP)' },
+      { key: 'valor_usd', label: 'Valor (USD)' },
+      { key: 'fecha_entrada', label: 'Fecha Entrada' },
+      { key: 'fecha_firmado', label: 'Fecha Firmado' },
+      { key: 'vigencia', label: 'Vigencia' },
+      { key: 'fecha_vencido', label: 'Fecha Vencido' },
+      { key: 'observaciones', label: 'Observaciones' }
+    ];
+
+    const dataToExport = this.dataSource.filteredData || this.dataSource.data;
+
+    if (!dataToExport || dataToExport.length === 0) {
+      return;
+    }
+
+    const data = dataToExport.map(item => ({
+      no_contrato_contratacion: item.no_contrato_contratacion,
+      proveedor: this.truncateText(item.proveedor?.nombre || '', 20),
+      tipo_contrato: this.truncateText(item.tipo_contrato?.nombre_tipo_contrato || '', 15),
+      departamento: this.truncateText(item.departamento?.nombre_departamento || '', 15),
+      valor_cup: this.formatNumber(item.valor_cup),
+      valor_usd: this.formatNumber(item.valor_usd),
+      fecha_entrada: this.formatDateForPDF(item.fecha_entrada),
+      fecha_firmado: this.formatDateForPDF(item.fecha_firmado),
+      vigencia: item.vigencia?.vigencia,
+      fecha_vencido: this.formatDateForPDF(item.fecha_vencido),
+      observaciones: item.observaciones || ''
+    }));
+
+    this.exportService.exportToPDF(data, columns, 'Reporte de Suplementos', 'assets/images/logo/logo.jpg');
+  }
+
+  print(): void {
+    window.print();
+  }
+
+  private formatNumber(value: number): string {
+    if (!value || value === 0) return '0';
+    return new Intl.NumberFormat('es-ES', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value);
+  }
+
+  private formatDateForPDF(date: Date | string | null | undefined): string {
+    if (!date) return '';
+
+    try {
+      let dateObj: Date;
+
+      if (date instanceof Date) {
+        dateObj = date;
+      } else if (typeof date === 'string') {
+        dateObj = new Date(date);
+      } else {
+        return '';
+      }
+
+      if (isNaN(dateObj.getTime())) {
+        return '';
+      }
+
+      return dateObj.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+      });
+    } catch {
+      return '';
+    }
+  }
+
+
 
 
 }

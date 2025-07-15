@@ -24,10 +24,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProveedorFormComponent } from '../proveedor-form/proveedor-form.component';
 import { ProveedorService } from '../services/proveedor.service';
 import { RepresentanteService } from '../services/representante.service';
+import { ExportService } from 'app/services/export.service';
 
 import { Proveedor, Representante } from 'app/models/Type';
-import autoTable from 'jspdf-autotable';
-import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-proveedor-list',
@@ -106,7 +105,8 @@ export class ProveedorListComponent implements OnInit {
 
     private CatalogService: CatalogService,
     private representanteService: RepresentanteService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private exportService: ExportService
   ) {
     this.dataSource = new MatTableDataSource([]);
     this.selectedRowForm = new FormGroup({});
@@ -344,187 +344,71 @@ export class ProveedorListComponent implements OnInit {
       return;
     }
 
-    const csvRows = [];
-    // Headers
-    const headers = [
-      'Nombre',
-      'Código',
-      'Estado',
-      'Representantes',
-      'Teléfonos',
-      'Prefijo Provincia',
-      'Provincia',
-      'Municipio',
-      'Ministerio',
-      'Creado',
-      'Actualizado'
+    const columns = [
+      { key: 'nombre', label: 'Nombre' },
+      { key: 'codigo', label: 'Código' },
+      { key: 'estado', label: 'Estado' },
+      { key: 'representantes', label: 'Representantes' },
+      { key: 'telefonos', label: 'Teléfonos' },
+      { key: 'prefijo_provincia', label: 'Prefijo Provincia' },
+      { key: 'provincia', label: 'Provincia' },
+      { key: 'municipio', label: 'Municipio' },
+      { key: 'ministerio', label: 'Ministerio' },
+      { key: 'createdAt', label: 'Creado' },
+      { key: 'updatedAt', label: 'Actualizado' }
     ];
-    csvRows.push(headers.join(','));
 
-    // Data
-    this.dataSource.filteredData.forEach(proveedor => {
-      const row = [
-        proveedor.nombre || '',
-        proveedor.codigo || '',
-        proveedor.estado || '',
-        this.getRepresentantesNames(proveedor),
-        proveedor.telefonos || '',
-        proveedor.prefijo_provincia || '',
-        proveedor.provincia || '',
-        proveedor.municipio || '',
-        proveedor.ministerio || '',
-        proveedor.createdAt || '',
-        proveedor.updatedAt || ''
-      ];
-      // Escape commas and quotes in values
-      const escapedRow = row.map(value => {
-        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-          return `"${value.replace(/"/g, '""')}"`;
-        }
-        return value;
-      });
-      csvRows.push(escapedRow.join(','));
-    });
+    const data = this.dataSource.filteredData.map(proveedor => ({
+      nombre: proveedor.nombre || '',
+      codigo: proveedor.codigo || '',
+      estado: proveedor.estado || '',
+      representantes: this.getRepresentantesNames(proveedor),
+      telefonos: proveedor.telefonos || '',
+      prefijo_provincia: proveedor.prefijo_provincia || '',
+      provincia: proveedor.provincia || '',
+      municipio: typeof proveedor.municipio === 'string' ? proveedor.municipio : proveedor.municipio?.nombre_municipio || '',
+      ministerio: typeof proveedor.ministerio === 'string' ? proveedor.ministerio : proveedor.ministerio?.nombre_ministerio || '',
+      createdAt: proveedor.createdAt || '',
+      updatedAt: proveedor.updatedAt || ''
+    }));
 
-    const csvString = csvRows.join('\n');
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'proveedores_export.csv';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    this.exportService.exportToExcel(data, columns, 'proveedores_export.csv');
   }
+
   exportToPDF(): void {
-    try {
-      if (!this.dataSource.filteredData || this.dataSource.filteredData.length === 0) {
-        console.warn('No hay datos para exportar');
-        alert('No hay datos para exportar');
-        return;
-      }
-
-      console.log('Iniciando exportación PDF...');
-
-      // Crear nuevo documento PDF
-      const doc = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      // Título del documento
-      doc.setFontSize(16);
-      doc.setTextColor(40, 40, 40);
-      doc.text('Reporte de Proveedores', 14, 20);
-
-      // Información adicional
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-ES')}`, 14, 30);
-      doc.text(`Total de proveedores: ${this.dataSource.filteredData.length}`, 14, 35);
-
-      // Preparar datos para la tabla
-      const tableHeaders = [
-        'Nombre',
-        'Código',
-        'Teléfonos',
-        'Domicilio',
-        'Municipio',
-        'Ministerio'
-      ];
-
-        const tableData = this.dataSource.filteredData.map(proveedor => [
-          this.truncateText(proveedor.nombre || '', 25),
-          proveedor.codigo || '',
-          this.truncateText(proveedor.telefonos || '', 20),
-          this.truncateText(proveedor.domicilio || '', 30),
-          this.truncateText(typeof proveedor.municipio === 'string' ? proveedor.municipio : proveedor.municipio?.nombre_municipio || '', 20),
-          this.truncateText(typeof proveedor.ministerio === 'string' ? proveedor.ministerio : proveedor.ministerio?.nombre_ministerio || '', 25)
-        ]);
-
-      console.log('Datos preparados para la tabla:', tableData.length, 'filas');
-
-      // Generar tabla usando autoTable
-      autoTable(doc, {
-        head: [tableHeaders],
-        body: tableData,
-        startY: 45,
-        theme: 'striped',
-        styles: {
-          fontSize: 8,
-          cellPadding: 3,
-          overflow: 'linebreak',
-          halign: 'left'
-        },
-        headStyles: {
-          fillColor: [41, 128, 185],
-          textColor: [255, 255, 255],
-          fontStyle: 'bold',
-          fontSize: 9
-        },
-        columnStyles: {
-          0: { cellWidth: 50 }, // Nombre
-          1: { cellWidth: 25 }, // Código
-          2: { cellWidth: 35 }, // Teléfonos
-          3: { cellWidth: 60 }, // Domicilio
-          4: { cellWidth: 35 }, // Municipio
-          5: { cellWidth: 50 }  // Ministerio
-        },
-        alternateRowStyles: {
-          fillColor: [245, 245, 245]
-        },
-        margin: { top: 45, left: 14, right: 14, bottom: 20 },
-        didDrawPage: (data) => {
-          // Pie de página
-          const pageCount = doc.getNumberOfPages();
-          const pageSize = doc.internal.pageSize;
-          const pageHeight = pageSize.height || pageSize.getHeight();
-
-          doc.setFontSize(8);
-          doc.setTextColor(100, 100, 100);
-
-          // Número de página
-          doc.text(
-            `Página ${data.pageNumber} de ${pageCount}`,
-            14,
-            pageHeight - 10
-          );
-
-          // Nombre del sistema
-          const systemText = 'Sistema de Gestión de Proveedores';
-          const textWidth = doc.getTextWidth(systemText);
-          const pageWidth = pageSize.width || pageSize.getWidth();
-          doc.text(
-            systemText,
-            pageWidth - 14 - textWidth,
-            pageHeight - 10
-          );
-        }
-      });
-
-      console.log('Tabla generada, guardando PDF...');
-
-      // Guardar el PDF
-      const fileName = `proveedores_export_${new Date().toISOString().split('T')[0]}.pdf`;
-      doc.save(fileName);
-
-      console.log('PDF guardado exitosamente');
-
-    } catch (error) {
-      console.error('Error al exportar PDF:', error);
-      alert('Error al generar el PDF. Por favor, intente nuevamente.');
+    if (!this.dataSource.filteredData || this.dataSource.filteredData.length === 0) {
+      alert('No hay datos para exportar');
+      return;
     }
+
+    const columns = [
+      { key: 'nombre', label: 'Nombre' },
+      { key: 'codigo', label: 'Código' },
+      { key: 'telefonos', label: 'Teléfonos' },
+      { key: 'domicilio', label: 'Domicilio' },
+      { key: 'municipio', label: 'Municipio' },
+      { key: 'ministerio', label: 'Ministerio' }
+    ];
+
+    const data = this.dataSource.filteredData.map(proveedor => ({
+      nombre: this.truncateText(proveedor.nombre || '', 25),
+      codigo: proveedor.codigo || '',
+      telefonos: this.truncateText(proveedor.telefonos || '', 20),
+      domicilio: this.truncateText(proveedor.domicilio || '', 30),
+      municipio: typeof proveedor.municipio === 'string' ? proveedor.municipio : proveedor.municipio?.nombre_municipio || '',
+      ministerio: typeof proveedor.ministerio === 'string' ? proveedor.ministerio : proveedor.ministerio?.nombre_ministerio || ''
+    }));
+
+    this.exportService.exportToPDF(data, columns, 'Reporte de Proveedores', 'assets/images/logo/logo.jpg');
   }
-// Agregar este método al final de la clase
 
-
-  /**
-   * Trunca texto para que quepa en las celdas del PDF
-   */
-  private truncateText(text: string, maxLength: number): string {
-    if (!text) return '';
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength - 3) + '...';
+  truncateText(text: string, maxLength: number): string {
+    if (!text) {
+      return '';
+    }
+    if (text.length <= maxLength) {
+      return text;
+    }
+    return text.substring(0, maxLength) + '...';
   }
 }

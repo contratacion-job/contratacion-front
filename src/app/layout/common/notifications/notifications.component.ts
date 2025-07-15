@@ -50,6 +50,9 @@ export class NotificationsComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+
+        this._notificationsService.getAlls();
+
         // Subscribe to notification changes
         this._notificationsService.notifications$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -195,7 +198,7 @@ export class NotificationsComponent implements OnInit, OnDestroy
             case 'Contrato': return '#ef4444';       // rojo
             case 'Suplemento': return '#f59e42';     // naranja
             case 'EjecucionContrato': return '#22c55e'; // verde
-            case 'Proveedor': return '#f59e42';  
+            case 'Proveedor': return '#f59e42';
                case 'Licencia': return '#f59e43';     // naranja
             default: return 'transparent';
         }
@@ -206,7 +209,7 @@ export class NotificationsComponent implements OnInit, OnDestroy
             case 'Contrato': return '#fee2e2';       // rojo claro
             case 'Suplemento': return '#fff7ed';     // naranja claro
             case 'EjecucionContrato': return '#dcfce7'; // verde claro
-            case 'Proveedor': return '#fff7ed'; 
+            case 'Proveedor': return '#fff7ed';
               case 'Licencia': return '#fff7es';      // naranja claro
             default: return 'transparent';
         }

@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Notification } from 'app/layout/common/notifications/notifications.types';
-import { map, Observable, ReplaySubject, switchMap, take, tap } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of, ReplaySubject, switchMap, take, tap } from 'rxjs';
+import { API_ENDPOINTS } from 'app/core/constants/api-endpoints';
 
 @Injectable({providedIn: 'root'})
 export class NotificationsService
@@ -125,9 +126,133 @@ export class NotificationsService
             )),
         );
     }
+    getAlls(): Observable<Notification[]> {
+        return this._httpClient.get<Notification[]>(API_ENDPOINTS.NOTIFICACIONES).pipe(
+            tap((notifications) => {
+                    console.log(notifications);
+                this._notifications.next(notifications);
+            }),
+            catchError(error => {
+                console.error('Error fetching notifications:', error);
+                return of([]);
+            })
+        );
+    }
 
+    /**
+     * Get notification by ID
+     */
+    getByIds(id: string): Observable<Notification> {
+        return this._httpClient.get<Notification>(`${API_ENDPOINTS.NOTIFICACIONES}/${id}`).pipe(
+            catchError(error => {
+                console.error(`Error fetching notification ${id}:`, error);
+                throw error;
+            })
+        );
+    }
+
+    /**
+     * Create a notification
+     */
+    creates(notification: Partial<Notification>): Observable<Notification> {
+        return this.notifications$.pipe(
+            take(1),
+            switchMap(notifications => this._httpClient.post<Notification>(API_ENDPOINTS.NOTIFICACIONES, notification).pipe(
+                map((newNotification) => {
+                    this._notifications.next([...notifications, newNotification]);
+                    return newNotification;
+                }),
+                catchError(error => {
+                    console.error('Error creating notification:', error);
+                    throw error;
+                })
+            ))
+        );
+    }
+
+    /**
+     * Update a notification
+     */
+    updates(id: string, notification: Partial<Notification>): Observable<Notification> {
+        return this.notifications$.pipe(
+            take(1),
+            switchMap(notifications => this._httpClient.put<Notification>(`${API_ENDPOINTS.NOTIFICACIONES}/${id}`, notification).pipe(
+                map((updatedNotification) => {
+                    const index = notifications.findIndex(item => item.id === id);
+                    notifications[index] = updatedNotification;
+                    this._notifications.next(notifications);
+                    return updatedNotification;
+                }),
+                catchError(error => {
+                    console.error(`Error updating notification ${id}:`, error);
+                    throw error;
+                })
+            ))
+        );
+    }
+
+    /**
+     * Delete a notification
+     */
+    deletes(id: string): Observable<boolean> {
+        return this.notifications$.pipe(
+            take(1),
+            switchMap(notifications => this._httpClient.delete<boolean>(`${API_ENDPOINTS.NOTIFICACIONES}/${id}`).pipe(
+                map((isDeleted) => {
+                    const index = notifications.findIndex(item => item.id === id);
+                    notifications.splice(index, 1);
+                    this._notifications.next(notifications);
+                    return isDeleted;
+                }),
+                catchError(error => {
+                    console.error(`Error deleting notification ${id}:`, error);
+                    throw error;
+                })
+            ))
+        );
+    }
+
+   
+  
+   /*  markAsReads(id: string): Observable<Notification> {
+        return this.notifications$.pipe(
+            take(1),
+            switchMap(notifications => this._httpClient.put<Notification>(`${API_ENDPOINTS.NOTIFICACIONES}/${id}/marcar-leida`, {}).pipe(
+                map((updatedNotification) => {
+                    const index = notifications.findIndex(item => item.id === id);
+                    notifications[index] = { ...notifications[index], read: true };
+                    this._notifications.next(notifications);
+                    return updatedNotification;
+                }),
+                catchError(error => {
+                    console.error(`Error marking notification ${id} as read:`, error);
+                    throw error;
+                })
+            ))
+        );
+    }
+   */
     /**
      * Mark all notifications as read
      */
+   /**   markAllAsReads(): Observable<boolean> {
+        return this.notifications$.pipe(
+            take(1),
+            switchMap(notifications => {
+                const unreadNotifications = notifications.filter(n => !n.read);
+                if (unreadNotifications.length === 0) {
+                    return of(true);
+                }
+                const markReadObservables = unreadNotifications.map(n => this.markAsReads(n.id));
+                return forkJoin(markReadObservables).pipe(
+                    map(() => true),
+                    catchError(error => {
+                        console.error('Error marking all notifications as read:', error);
+                        return of(false);
+                    })
+                );
+            })
+        );
+    }  */
   
 }

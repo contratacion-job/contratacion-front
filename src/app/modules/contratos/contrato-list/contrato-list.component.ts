@@ -27,6 +27,7 @@ import { mockProveedor, mockTipoContrato, mockVigenciaContrato, mockDepartamento
 import { Subject } from 'rxjs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+import { ExportService } from 'app/services/export.service';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
@@ -188,13 +189,14 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
     private departamentoService: DepartamentoService,
     private proveedorService:ProveedorService,
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef,
-    private fb: FormBuilder
-  ) {
-    this.dataSource = new MatTableDataSource<Contrato>([]);
+  private cdr: ChangeDetectorRef,
+  private fb: FormBuilder,
+  private exportService: ExportService
+) {
+  this.dataSource = new MatTableDataSource<Contrato>([]);
 
-    this.initSelectedContratoForm();
-    this.initNewContratoForm();
+  this.initSelectedContratoForm();
+  this.initNewContratoForm();
 
 this.filterForm = this.fb.group({
       vigencia_id: [''],
@@ -212,7 +214,7 @@ this.filterForm = this.fb.group({
       fecha_entrada_filter: [''],
       fecha_firmado_filter: ['']
     });
-  }
+}
 // Agregar esta propiedad a tu componente
 showAdvancedFilters = false;
 
@@ -453,6 +455,10 @@ private convertToArray(data: any): any[] {
 onRightClick(event: MouseEvent) {
   event.preventDefault();  // Evita que aparezca el menú contextual estándar
   window.print();          // Abre el diálogo de impresión
+}
+
+print(): void {
+  window.print();
 }
 
   applyFilters(): void {
@@ -827,130 +833,30 @@ onRightClick(event: MouseEvent) {
   }
 
   exportToPDF(): void {
-    try {
-      if (!this.dataSource.filteredData || this.dataSource.filteredData.length === 0) {
-        console.warn('No hay datos para exportar');
-        alert('No hay datos para exportar');
-        return;
-      }
+    const columns = [
+      { key: 'no_contrato', label: 'No. Contrato' },
+      { key: 'proveedor', label: 'Proveedor' },
+      { key: 'tipo_contrato', label: 'Tipo' },
+      { key: 'departamento', label: 'Departamento' },
+      { key: 'valor_cup', label: 'Valor CUP' },
+      { key: 'valor_usd', label: 'Valor USD' },
+      { key: 'fecha_entrada', label: 'F. Entrada' },
+      { key: 'estado', label: 'Estado' }
+    ];
 
-      console.log('Iniciando exportación PDF...');
+    // Preparar datos para exportar, mapeando valores anidados y formateando texto
+    const data = this.dataSource.filteredData.map(contract => ({
+      no_contrato: contract.no_contrato || '',
+      proveedor: this.truncateText(contract.proveedor?.nombre || '', 20),
+      tipo_contrato: this.truncateText(contract.tipo_contrato?.nombre_tipo_contrato || '', 15),
+      departamento: this.truncateText(contract.departamento?.nombre_departamento || '', 15),
+      valor_cup: this.formatNumber(contract.valor_cup || 0),
+      valor_usd: this.formatNumber(contract.valor_usd || 0),
+      fecha_entrada: this.formatDateForPDF(contract.fecha_entrada),
+      estado: contract.estado || ''
+    }));
 
-      // Crear nuevo documento PDF
-      const doc = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      // Título del documento
-      doc.setFontSize(16);
-      doc.setTextColor(40, 40, 40);
-      doc.text('Reporte de Contratos', 14, 20);
-
-      // Información adicional
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-ES')}`, 14, 30);
-      doc.text(`Total de contratos: ${this.dataSource.filteredData.length}`, 14, 35);
-
-      // Preparar datos para la tabla
-      const tableHeaders = [
-        'No. Contrato',
-        'Proveedor',
-        'Tipo',
-        'Departamento',
-        'Valor CUP',
-        'Valor USD',
-        'F. Entrada',
-        'Estado'
-      ];
-
-      const tableData = this.dataSource.filteredData.map(contract => [
-        contract.no_contrato || '',
-        this.truncateText(contract.proveedor?.nombre || '', 20),
-        this.truncateText(contract.tipo_contrato?.nombre_tipo_contrato || '', 15),
-        this.truncateText(contract.departamento?.nombre_departamento || '', 15),
-        this.formatNumber(contract.valor_cup || 0),
-        this.formatNumber(contract.valor_usd || 0),
-        this.formatDateForPDF(contract.fecha_entrada),
-        contract.estado || ''
-      ]);
-
-      console.log('Datos preparados para la tabla:', tableData.length, 'filas');
-
-      // Generar tabla usando autoTable
-      autoTable(doc, {
-        head: [tableHeaders],
-        body: tableData,
-        startY: 45,
-        theme: 'striped',
-        styles: {
-          fontSize: 8,
-          cellPadding: 3,
-          overflow: 'linebreak',
-          halign: 'left'
-        },
-        headStyles: {
-          fillColor: [41, 128, 185],
-          textColor: [255, 255, 255],
-          fontStyle: 'bold',
-          fontSize: 9
-        },
-        columnStyles: {
-          0: { cellWidth: 25 }, // No. Contrato
-          1: { cellWidth: 40 }, // Proveedor
-          2: { cellWidth: 30 }, // Tipo
-          3: { cellWidth: 30 }, // Departamento
-          4: { cellWidth: 25, halign: 'right' }, // Valor CUP
-          5: { cellWidth: 25, halign: 'right' }, // Valor USD
-          6: { cellWidth: 25, halign: 'center' }, // F. Entrada
-          7: { cellWidth: 20, halign: 'center' } // Estado
-        },
-        alternateRowStyles: {
-          fillColor: [245, 245, 245]
-        },
-        margin: { top: 45, left: 14, right: 14, bottom: 20 },
-        didDrawPage: (data) => {
-          // Pie de página
-          const pageCount = doc.getNumberOfPages();
-          const pageSize = doc.internal.pageSize;
-          const pageHeight = pageSize.height || pageSize.getHeight();
-
-          doc.setFontSize(8);
-          doc.setTextColor(100, 100, 100);
-
-          // Número de página
-          doc.text(
-            `Página ${data.pageNumber} de ${pageCount}`,
-            14,
-            pageHeight - 10
-          );
-
-          // Nombre del sistema
-          const systemText = 'Sistema de Gestión de Contratos';
-          const textWidth = doc.getTextWidth(systemText);
-          const pageWidth = pageSize.width || pageSize.getWidth();
-          doc.text(
-            systemText,
-            pageWidth - 14 - textWidth,
-            pageHeight - 10
-          );
-        }
-      });
-
-      console.log('Tabla generada, guardando PDF...');
-
-      // Guardar el PDF
-      const fileName = `contratos_export_${new Date().toISOString().split('T')[0]}.pdf`;
-      doc.save(fileName);
-
-      console.log('PDF guardado exitosamente');
-
-    } catch (error) {
-      console.error('Error al exportar PDF:', error);
-      alert('Error al generar el PDF. Por favor, intente nuevamente.');
-    }
+    this.exportService.exportToPDF(data, columns, 'Reporte de Contratos', 'assets/images/logo/logo.jpg');
   }
 
 
@@ -1047,63 +953,37 @@ onRightClick(event: MouseEvent) {
   }
 
   exportToCSV(): void {
-    if (!this.dataSource.filteredData || this.dataSource.filteredData.length === 0) {
-      return;
-    }
-
-    const csvRows = [];
-    // Headers
-    const headers = [
-      'No. Contrato',
-      'Proveedor',
-      'Tipo de Contrato',
-      'Departamento',
-      'Valor (CUP)',
-      'Valor (USD)',
-      'Fecha Entrada',
-      'Fecha Firmado',
-      'Vigencia',
-      'Tiempo Restante',
-      'Estado',
-      'Observaciones'
+    const columns = [
+      { key: 'no_contrato', label: 'No. Contrato' },
+      { key: 'proveedor', label: 'Proveedor' },
+      { key: 'tipo_contrato', label: 'Tipo de Contrato' },
+      { key: 'departamento', label: 'Departamento' },
+      { key: 'valor_cup', label: 'Valor (CUP)' },
+      { key: 'valor_usd', label: 'Valor (USD)' },
+      { key: 'fecha_entrada', label: 'Fecha Entrada' },
+      { key: 'fecha_firmado', label: 'Fecha Firmado' },
+      { key: 'vigencia', label: 'Vigencia' },
+      { key: 'tiempoRestante', label: 'Tiempo Restante' },
+      { key: 'estado', label: 'Estado' },
+      { key: 'observaciones', label: 'Observaciones' }
     ];
-    csvRows.push(headers.join(','));
 
-    // Data
-    this.dataSource.filteredData.forEach(contract => {
-      const row = [
-        contract.no_contrato,
-        contract.proveedor?.nombre || '',
-        contract.tipo_contrato?.nombre_tipo_contrato || '',
-        contract.departamento?.nombre_departamento || '',
-        contract.valor_cup,
-        contract.valor_usd,
-        contract.fecha_entrada,
-        contract.fecha_firmado,
-        contract.vigencia?.vigencia,
-        (contract as any).tiempoRestante || '',
-        contract.estado || '',
-        contract.observaciones || ''
-      ];
-      // Escape commas and quotes in values
-      const escapedRow = row.map(value => {
-        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-          return `"${value.replace(/"/g, '""')}"`;
-        }
-        return value;
-      });
-      csvRows.push(escapedRow.join(','));
-    });
+    const data = this.dataSource.filteredData.map(contract => ({
+      no_contrato: contract.no_contrato,
+      proveedor: contract.proveedor?.nombre || '',
+      tipo_contrato: contract.tipo_contrato?.nombre_tipo_contrato || '',
+      departamento: contract.departamento?.nombre_departamento || '',
+      valor_cup: contract.valor_cup,
+      valor_usd: contract.valor_usd,
+      fecha_entrada: contract.fecha_entrada,
+      fecha_firmado: contract.fecha_firmado,
+      vigencia: contract.vigencia?.vigencia,
+      tiempoRestante: (contract as any).tiempoRestante || '',
+      estado: contract.estado || '',
+      observaciones: contract.observaciones || ''
+    }));
 
-    const csvString = csvRows.join('\n');
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'contratos_export.csv';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    this.exportService.exportToExcel(data, columns, 'contratos_export.csv');
   }
 }
 

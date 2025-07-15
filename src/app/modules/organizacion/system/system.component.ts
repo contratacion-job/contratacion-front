@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Log } from 'app/models/Type';
 import { SystemService } from './system.service';
-
+import { saveAs } from 'file-saver';
 interface ApiLog {
   id: number;
   action: string;
@@ -77,14 +77,14 @@ export class SystemComponent implements OnInit {
   loadLogs(page: number = 1): void {
     this.loading = true;
     this.error = '';
-    
+
     this.logService.getLogs().subscribe({
       next: (response: any) => {
         console.log('Respuesta completa:', response);
-        
+
         if (response && response.data && Array.isArray(response.data)) {
           const apiResponse = response as ApiResponse;
-          
+
           // Actualizar información de paginación del servidor
           this.serverPagination = {
             total: apiResponse.pagination.total,
@@ -92,7 +92,7 @@ export class SystemComponent implements OnInit {
             totalPages: apiResponse.pagination.pages,
             limit: apiResponse.pagination.limit
           };
-          
+
           // Transformar los datos
           this.logs = this.transformApiData(apiResponse.data);
           this.calculateUniqueValues();
@@ -101,7 +101,7 @@ export class SystemComponent implements OnInit {
           console.error('Estructura de datos inesperada:', response);
           this.error = 'Estructura de datos inesperada del servidor';
         }
-        
+
         this.loading = false;
       },
       error: (error) => {
@@ -118,7 +118,7 @@ export class SystemComponent implements OnInit {
       if (!tabla) {
         tabla = this.extractTableFromDescription(item.description);
       }
-      
+
       return {
         id: item.id,
         usuario: `ID: ${item.user_id}`, // Por ahora mostramos el ID, después se cambiará por el nombre
@@ -270,8 +270,42 @@ export class SystemComponent implements OnInit {
     this.loadLogs(this.serverPagination.currentPage);
   }
 
-  export(): void {
-    // Implementar lógica de exportación
-    console.log('Exportando logs...');
+exportToExcel() {
+    this.loading = true;
+    this.logService.exportToExcel().subscribe({
+      next: (blob) => {
+        saveAs(blob, 'logs.xlsx');
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  exportToPDF() {
+    this.loading = true;
+    this.logService.exportToPDF().subscribe({
+      next: (blob) => {
+        saveAs(blob, 'logs.pdf');
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  deleteLogs() {
+    this.loading = true;
+    this.logService.logsdelete().subscribe({
+      next: () => {
+        this.loading = false;
+        // Optionally, refresh logs or update UI
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
   }
 }
