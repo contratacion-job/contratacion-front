@@ -10,6 +10,8 @@ import { debounceTime } from 'rxjs/operators';
 import { Departamento } from 'app/models/Type';
 import { DepartamentoService } from '../departamento.service';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
+import { DepartamentoFormComponent } from '../departamento-list/departamento-list.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ExportService } from 'app/services/export.service';
@@ -69,7 +71,8 @@ export class DepartamentoComponent implements OnInit, AfterViewInit {
   constructor(
     private departamentoService: DepartamentoService,
     private cdr: ChangeDetectorRef,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private dialog: MatDialog
   ) {
     this.selectedRowForm = new FormGroup({
       id: new FormControl(''),
@@ -102,7 +105,6 @@ export class DepartamentoComponent implements OnInit, AfterViewInit {
         data.nombre_departamento,
         data.codigo,
         data.descripcion,
-  
       ].join(' ').toLowerCase();
       return searchTerms.every(term => dataStr.includes(term));
     };
@@ -118,6 +120,10 @@ export class DepartamentoComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
     this.cdr.detectChanges();
   }
+
+  // Predicates for row definitions
+  isRegularRow = (index: number, item: any) => true;
+  isDetailRow = (index: number, item: any) => false;
 
   // Método para obtener columnas visibles
   getVisibleColumns() {
@@ -157,36 +163,61 @@ export class DepartamentoComponent implements OnInit, AfterViewInit {
       default:
         return element[columnKey] || '-';
     }
-  }// Método helper para verificar si una fila está seleccionada
-isRowSelected(element: any): boolean {
-  if (!this.selectedRow) return false;
-  
-  const selectedId = this.selectedRow.id || this.selectedRow.nombre_departamento;
-  const elementId = element.id || element.nombre_departamento;
-  
-  return selectedId === elementId;
-}
-
-// Actualizar el método toggleDetails para manejar mejor los identificadores
-toggleDetails(departamento: any): void {
-  // Usar nombre_departamento como identificador único si no hay id
-  const identifier = departamento.id || departamento.nombre_departamento;
-  const currentIdentifier = this.selectedRow?.id || this.selectedRow?.nombre_departamento;
-  
-  if (currentIdentifier === identifier) {
-    this.selectedRow = null;
-  } else {
-    this.selectedRow = departamento;
-    this.selectedRowForm.patchValue(departamento);
   }
-}
+
+  // Método helper para verificar si una fila está seleccionada
+  isRowSelected(element: any): boolean {
+    if (!this.selectedRow) return false;
+    
+    const selectedId = this.selectedRow.id || this.selectedRow.nombre_departamento;
+    const elementId = element.id || element.nombre_departamento;
+    
+    return selectedId === elementId;
+  }
+
+  // Actualizar el método toggleDetails para manejar mejor los identificadores
+  toggleDetails(departamento: any): void {
+    // Usar nombre_departamento como identificador único si no hay id
+    const identifier = departamento.id || departamento.nombre_departamento;
+    const currentIdentifier = this.selectedRow?.id || this.selectedRow?.nombre_departamento;
+    
+    if (currentIdentifier === identifier) {
+      this.selectedRow = null;
+    } else {
+      this.selectedRow = departamento;
+      this.selectedRowForm.patchValue(departamento);
+    }
+  }
 
   closeDetails(): void {
     this.selectedRow = null;
   }
 
   openNewDepartamentoDialog(): void {
-    console.log('Open new departamento dialog');
+    const dialogRef = this.dialog.open(DepartamentoFormComponent, {
+      width: '30%',
+      height: '90%',
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.departamentoService.createDepartamento(result).subscribe({
+          next: (createdDepartamento) => {
+            this.dataSource.data = [...this.dataSource.data, createdDepartamento];
+            this.departamentoService.getDepartamentos().subscribe((data) => {
+              this.dataSource.data = data.data;
+              this.isLoading = false;
+              this.cdr.detectChanges();
+            });
+            this.cdr.detectChanges();
+          },
+          error: (error) => {
+            console.error('Error creating departamento:', error);
+          }
+        });
+      }
+    });
   }
 
   updateSelectedRecord(): void {

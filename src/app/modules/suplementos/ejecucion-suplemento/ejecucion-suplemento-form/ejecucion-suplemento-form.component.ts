@@ -42,7 +42,7 @@ export class EjecucionSuplementoFormComponent implements OnInit {
   // Mock data - replace with actual service calls
   suplementos: Suplemento[] = [];
   proveedores: Proveedor[] = mockProveedor;
-  contratos: Contrato[] = mockContrato;
+
 
   constructor(
     private _formBuilder: FormBuilder,
@@ -97,7 +97,7 @@ export class EjecucionSuplementoFormComponent implements OnInit {
       ...formValue,
       id: this.isEditMode && this.data.ejecucion?.id ? this.data.ejecucion.id : undefined,
       proveedor: this.proveedores.find(p => p.id === formValue.proveedor_id),
-      contrato: this.contratos.find(c => c.id === formValue.no_contrato_id),
+    
       suplemento: this.suplementos.find(s => s.id === formValue.no_suplemento_id)
     };
 

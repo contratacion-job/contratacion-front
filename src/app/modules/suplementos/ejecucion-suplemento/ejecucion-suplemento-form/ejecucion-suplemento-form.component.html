@@ -40,9 +40,7 @@
       <mat-form-field appearance="outline" class="w-full">
         <mat-label>Contrato</mat-label>
         <mat-select formControlName="no_contrato_id" [compareWith]="compareWithId" required>
-          <mat-option *ngFor="let contrato of contratos" [value]="contrato.id">
-            {{ contrato.no_contrato_contratacion }} - {{ contrato.objeto }}
-          </mat-option>
+       
         </mat-select>
         <mat-error *ngIf="ejecucionForm.get('no_contrato_id')?.hasError('required')">
           El contrato es requerido

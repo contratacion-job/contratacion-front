@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit,ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -77,7 +77,8 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [
     'proveedor_nombre',
     'proveedor_codigo',
-    'representante',
+    'nombre',
+    'apellido',
     'cargo',
     'telefono',
     'email',
@@ -89,6 +90,41 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
     'numero_documento',
     'acciones'
   ];
+
+  getColumnValue(representante: any, key: string): any {
+    switch (key) {
+      case 'nombre':
+        return representante.nombre || '';
+      case 'apellido':
+        return representante.apellido || '';
+      case 'cargo':
+        return representante.cargo || '';
+      case 'telefono':
+        return representante.telefono || '';
+      case 'email':
+        return representante.email || '';
+      case 'estado':
+        return representante.estado || '';
+      case 'proveedor_nombre':
+        return representante.Proveedor?.nombre || '';
+      case 'proveedor_codigo':
+        return representante.Proveedor?.codigo || '';
+      case 'tipo_empresa':
+        return representante.Proveedor?.tipo_empresa || '';
+      case 'ministerio':
+        return representante.Proveedor?.ministerio || '';
+      case 'provincia':
+        return representante.Proveedor?.provincia || '';
+      case 'municipio':
+        return representante.Proveedor?.municipio || '';
+      case 'numero_documento':
+        return representante.numero_documento || '';
+      case 'tipo_documento':
+        return representante.tipo_documento || '';
+      default:
+        return '';
+    }
+  }
 
   displayedSuplementosColumns: string[] = ['no_suplemento', 'fecha_firmado', 'valor_cup', 'valor_usd', 'estado', 'acciones'];
   selection = new Set<number>();
@@ -113,7 +149,7 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
     size: 10
   };
 
-  selectedRow: Representante | null = null;
+  selectedRow: any = null;
 
   constructor(
     private representanteService: RepresentanteService,
@@ -123,18 +159,70 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private fb: FormBuilder,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private cdr:ChangeDetectorRef
   ) {
-    this.dataSource = new MatTableDataSource<Representante>([]);
-    this.suplementosDataSource = new MatTableDataSource<Suplemento>([]);
+    this.initSelectedRowForm();
+  }
 
+  initSelectedRowForm(): void {
     this.selectedRowForm = this.fb.group({
       nombre: [''],
       apellido: [''],
+      cargo: [''],
       telefono: [''],
       email: [''],
-      cargo: [''],
       estado: ['']
+    });
+  }
+
+  toggleColumn(columnKey: string): void {
+    const column = this.columnSettings.find(col => col.key === columnKey);
+    if (column) {
+      column.visible = !column.visible;
+      this.cdr.markForCheck(); // Usar markForCheck en lugar de detectChanges
+    }
+  }
+
+  updateSelectedRecord(): void {
+    if (this.selectedRow && this.selectedRowForm.valid) {
+      const updatedData = { ...this.selectedRow, ...this.selectedRowForm.value };
+      
+      // Aquí llamarías a tu servicio para actualizar
+      // this.representanteService.updateRepresentante(this.selectedRow.id, updatedData).subscribe({
+      //   next: () => {
+      //     this.loadRepresentantes();
+      //     this.selectedRow = null;
+      //   },
+      //   error: (error) => {
+      //     console.error('Error updating representante:', error);
+      //   }
+      // });
+    }
+  }
+
+  deleteSelectedRecord(): void {
+    if (this.selectedRow) {
+      // Aquí llamarías a tu servicio para eliminar
+      // this.representanteService.deleteRepresentante(this.selectedRow.id).subscribe({
+      //   next: () => {
+      //     this.loadRepresentantes();
+      //     this.selectedRow = null;
+      //   },
+      //   error: (error) => {
+      //     console.error('Error deleting representante:', error);
+      //   }
+      // });
+    }
+  }
+
+  openComunaDialog(): void {
+    // Placeholder for Comuna dialog logic
+    this.snackBar.open('Comuna dialog opened', 'Cerrar', {
+      duration: 3000,
+      panelClass: 'success-snackbar',
+      horizontalPosition: 'right',
+      verticalPosition: 'top'
     });
   }
 
@@ -404,4 +492,50 @@ export class RepresentanteListComponent implements OnInit, AfterViewInit {
 
     this.exportService.exportToExcel(data, columns, 'representantes_export.csv');
   }
+  // Add these methods to your RepresentanteListComponent class
+
+toggleDetails(representanteId: number): void {
+  if (this.selectedRow?.id === representanteId) {
+    // If clicking on the same row, close it
+    this.selectedRow = null;
+  } else {
+    // Find the representante and set it as selected
+    const representante = this.dataSource.data.find(r => r.id === representanteId);
+    if (representante) {
+      this.selectedRow = representante;
+      // Populate the form with the selected representante data
+      this.selectedRowForm.patchValue({
+        nombre: representante.nombre || '',
+        apellido: representante.apellido || '',
+        cargo: representante.cargo || '',
+        telefono: representante.telefono || '',
+        email: representante.email || '',
+        estado: representante.estado || ''
+      });
+    }
+  }
+}
+
+deleteRepresentante(representanteId: number): void {
+  if (confirm('¿Está seguro que desea eliminar este representante?')) {
+    this.representanteService.deleteRepresentante(representanteId).subscribe({
+      next: () => {
+        this.showMessage('Representante eliminado exitosamente', 'success');
+        this.loadRepresentantes();
+        // Close details if the deleted item was selected
+        if (this.selectedRow?.id === representanteId) {
+          this.selectedRow = null;
+        }
+      },
+      error: (error) => {
+        console.error('Error deleting representante:', error);
+        this.showMessage('Error al eliminar el representante', 'error');
+      }
+    });
+  }
+}
+
+trackByFn(index: number, item: any): any {
+  return item.id || index;
+}
 }

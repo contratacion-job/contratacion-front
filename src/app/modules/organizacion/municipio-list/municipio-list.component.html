@@ -71,37 +71,116 @@
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef class="w-24 text-center">Acciones</th>
                 <td mat-cell *matCellDef="let element" class="w-24 text-center">
-                <!-- Cambiar esta línea en el HTML -->
+                  <button class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                          mat-stroked-button
+                          (click)="toggleDetails(element)"
+                          matTooltip="Ver detalles">
+                    <mat-icon class="icon-size-5"
+                              [svgIcon]="isRowSelected(element) ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
+                    </mat-icon>
+                  </button>
+                </td>
+              </ng-container>
 
-<!-- Cambiar esta línea en el HTML -->
+              <!-- Detail Column Definition -->
+              <ng-container matColumnDef="detail">
+                <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="p-0">
+                  <div *ngIf="isRowSelected(element)" 
+                       class="detail-container bg-gray-50 dark:bg-gray-800 border-t">
+                    <div class="p-6">
+                      <form [formGroup]="selectedRowForm" class="space-y-4">
+                        
+                        <!-- Form Header -->
+                        <div class="flex items-center justify-between mb-6">
+                          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                            Detalles del Departamento
+                          </h3>
+                          <button mat-icon-button (click)="closeDetails()" matTooltip="Cerrar">
+                            <mat-icon [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
+                          </button>
+                        </div>
 
+                        <!-- Form Fields Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          
+                          <mat-form-field class="w-full">
+                            <mat-label>Nombre del Departamento</mat-label>
+                            <input matInput formControlName="nombre_departamento" />
+                            <mat-icon matSuffix [svgIcon]="'heroicons_outline:building-office'"></mat-icon>
+                          </mat-form-field>
 
-<!-- A: -->
-<button class="min-w-10 min-h-7 h-7 px-2 leading-6"
-        mat-stroked-button
-        (click)="toggleDetails(element)"
-        matTooltip="Ver detalles">
-  <mat-icon class="icon-size-5"
-            [svgIcon]="isRowSelected(element) ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
-  </mat-icon>
-</button>
+                          <mat-form-field class="w-full">
+                            <mat-label>Código</mat-label>
+                            <input matInput formControlName="codigo" />
+                            <mat-icon matSuffix [svgIcon]="'heroicons_outline:hashtag'"></mat-icon>
+                          </mat-form-field>
 
+                          <mat-form-field class="w-full">
+                            <mat-label>Director</mat-label>
+                            <input matInput formControlName="director" />
+                            <mat-icon matSuffix [svgIcon]="'heroicons_outline:user'"></mat-icon>
+                          </mat-form-field>
 
+                          <mat-form-field class="w-full">
+                            <mat-label>Teléfono</mat-label>
+                            <input matInput formControlName="telefono" />
+                            <mat-icon matSuffix [svgIcon]="'heroicons_outline:phone'"></mat-icon>
+                          </mat-form-field>
 
+                          <mat-form-field class="w-full">
+                            <mat-label>Estado</mat-label>
+                            <mat-select formControlName="estado">
+                              <mat-option value="activo">Activo</mat-option>
+                              <mat-option value="inactivo">Inactivo</mat-option>
+                            </mat-select>
+                          </mat-form-field>
+
+                          <mat-form-field class="w-full">
+                            <mat-label>Ministerio</mat-label>
+                            <input matInput formControlName="ministerio" />
+                            <mat-icon matSuffix [svgIcon]="'heroicons_outline:building-office-2'"></mat-icon>
+                          </mat-form-field>
+
+                        </div>
+
+                        <!-- Description Field (Full Width) -->
+                        <mat-form-field class="w-full">
+                          <mat-label>Descripción</mat-label>
+                          <textarea matInput formControlName="descripcion" rows="3"></textarea>
+                          <mat-icon matSuffix [svgIcon]="'heroicons_outline:document-text'"></mat-icon>
+                        </mat-form-field>
+
+                        <!-- Action Buttons -->
+                        <div class="flex items-center justify-between pt-4 border-t">
+                          <button mat-button color="warn" (click)="deleteSelectedRecord()" class="flex items-center">
+                            <mat-icon [svgIcon]="'heroicons_outline:trash'" class="mr-2"></mat-icon>
+                            Eliminar
+                          </button>
+                          
+                          <div class="flex space-x-2">
+                            <button mat-button (click)="closeDetails()">
+                              Cancelar
+                            </button>
+                            <button mat-flat-button color="primary" (click)="updateSelectedRecord()" class="flex items-center">
+                              <mat-icon [svgIcon]="'heroicons_outline:check'" class="mr-2"></mat-icon>
+                              Actualizar
+                            </button>
+                          </div>
+                        </div>
+
+                      </form>
+                    </div>
+                  </div>
                 </td>
               </ng-container>
 
               <!-- Header and Row Definitions -->
               <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+              <tr mat-row *matRowDef="let row; columns: displayedColumns; when: isRegularRow" 
                   class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['detail']; when: isDetailRow" 
+                  class="detail-row"></tr>
 
-              <!-- Detail Row -->
-              <tr mat-row *matRowDef="let row; columns: ['detail']" class="expanded-row" [class.expanded]="selectedRow?.id === row.id">
-                <td [attr.colspan]="displayedColumns.length" class="p-0">
-                  <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: { $implicit: row }"></ng-container>
-                </td>
-              </tr>
             </table>
           </div>
 
@@ -122,10 +201,7 @@
             <mat-icon class="text-6xl text-gray-400 mb-4" [svgIcon]="'heroicons_outline:building-office'"></mat-icon>
             <div class="text-2xl font-semibold text-gray-600 mb-2">¡No hay departamentos!</div>
             <p class="text-gray-500 mb-6 text-center">Comienza agregando tu primer departamento al sistema</p>
-            <button mat-flat-button color="primary" (click)="openNewDepartamentoDialog()">
-              <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-              <span class="ml-2">Agregar Departamento</span>
-            </button>
+          
           </div>
         </ng-template>
 
@@ -168,92 +244,3 @@
     <span>Imprimir</span>
   </button>
 </mat-menu>
-
-<!-- Row Details Template -->
-<ng-template #rowDetailsTemplate let-departamento>
-  <div class="bg-gray-50 dark:bg-gray-800 border-t">
-    <div class="p-6">
-      <form [formGroup]="selectedRowForm" class="space-y-4">
-        
-        <!-- Form Header -->
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Detalles del Departamento
-          </h3>
-          <button mat-icon-button (click)="closeDetails()" matTooltip="Cerrar">
-            <mat-icon [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
-          </button>
-        </div>
-
-        <!-- Form Fields Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          
-          <mat-form-field class="w-full">
-            <mat-label>Nombre del Departamento</mat-label>
-            <input matInput formControlName="nombre" />
-            <mat-icon matSuffix [svgIcon]="'heroicons_outline:building-office'"></mat-icon>
-          </mat-form-field>
-
-          <mat-form-field class="w-full">
-            <mat-label>Código</mat-label>
-            <input matInput formControlName="codigo" />
-            <mat-icon matSuffix [svgIcon]="'heroicons_outline:hashtag'"></mat-icon>
-          </mat-form-field>
-
-          <mat-form-field class="w-full">
-            <mat-label>Director</mat-label>
-            <input matInput formControlName="director" />
-            <mat-icon matSuffix [svgIcon]="'heroicons_outline:user'"></mat-icon>
-          </mat-form-field>
-
-          <mat-form-field class="w-full">
-            <mat-label>Email</mat-label>
-            <input matInput formControlName="email" type="email" />
-            <mat-icon matSuffix [svgIcon]="'heroicons_outline:envelope'"></mat-icon>
-          </mat-form-field>
-
-          <mat-form-field class="w-full">
-            <mat-label>Teléfono</mat-label>
-            <input matInput formControlName="telefono" />
-            <mat-icon matSuffix [svgIcon]="'heroicons_outline:phone'"></mat-icon>
-          </mat-form-field>
-
-          <mat-form-field class="w-full">
-            <mat-label>Estado</mat-label>
-            <mat-select formControlName="estado">
-              <mat-option value="activo">Activo</mat-option>
-              <mat-option value="inactivo">Inactivo</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-        </div>
-
-        <!-- Description Field (Full Width) -->
-        <mat-form-field class="w-full">
-          <mat-label>Descripción</mat-label>
-          <textarea matInput formControlName="descripcion" rows="3"></textarea>
-          <mat-icon matSuffix [svgIcon]="'heroicons_outline:document-text'"></mat-icon>
-        </mat-form-field>
-
-        <!-- Action Buttons -->
-        <div class="flex items-center justify-between pt-4 border-t">
-          <button mat-button color="warn" (click)="deleteSelectedRecord()" class="flex items-center">
-            <mat-icon [svgIcon]="'heroicons_outline:trash'" class="mr-2"></mat-icon>
-            Eliminar
-          </button>
-          
-          <div class="flex space-x-2">
-            <button mat-button (click)="closeDetails()">
-              Cancelar
-            </button>
-            <button mat-flat-button color="primary" (click)="updateSelectedRecord()" class="flex items-center">
-              <mat-icon [svgIcon]="'heroicons_outline:check'" class="mr-2"></mat-icon>
-              Actualizar
-            </button>
-          </div>
-        </div>
-
-      </form>
-    </div>
-  </div>
-</ng-template>

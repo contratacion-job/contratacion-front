@@ -698,7 +698,7 @@ print(): void {
       return resultado || 'Menos de un día';
     } else if (contrato.fecha_firmado && contrato.vigencia && contrato.vigencia.vigencia) {
       const fechaVencimiento = new Date(contrato.fecha_firmado);
-      fechaVencimiento.setDate(fechaVencimiento.getDate() + contrato.vigencia.vigencia);
+      
       const diffMs = fechaVencimiento.getTime() - hoy.getTime();
       if (diffMs < 0) {
         return 'Vencido';

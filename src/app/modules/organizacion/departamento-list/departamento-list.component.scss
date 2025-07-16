@@ -1,0 +1,98 @@
+/* departamento-form.component.scss */
+.dialog-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 90vh;
+  }
+  
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px 8px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 16px;
+    
+    h2 {
+      margin: 0;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    .close-button {
+      position: relative;
+      top: -8px;
+      right: -8px;
+      color: #666;
+      
+      &:hover {
+        background-color: #f5f5f5;
+        color: #333;
+      }
+    }
+  }
+  
+  .dialog-content {
+    flex: 1;
+    padding: 0 24px !important;
+    margin: 0 !important;
+    overflow-y: auto;
+    
+    .departamento-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      
+      mat-form-field {
+        width: 100%;
+      }
+    }
+  }
+  
+  .dialog-actions {
+    padding: 16px 24px !important;
+    margin: 0 !important;
+    border-top: 1px solid #e0e0e0;
+    gap: 8px;
+    justify-content: flex-end;
+    
+    button {
+      min-width: 80px;
+    }
+  }
+  
+  /* Estilos globales para el diálogo */
+  ::ng-deep .custom-dialog-container {
+    .mat-mdc-dialog-container {
+      padding: 0 !important;
+    }
+    
+    .mat-mdc-dialog-title {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+  }
+  .close-button{
+    float: right;
+    top:-24px;
+    right:-24px;
+  }
+  
+  .close-icon {
+    transition: 1s ease-in-out;
+  }
+  
+  .close-icon:hover {
+    transform: rotate(180deg);
+  }
+  
+  ::ng-deep .icon-outside .close-button{
+    float: right;
+    top:-52px;
+    right:-52px;
+  }
+  
+  ::ng-deep .icon-outside .mat-dialog-container {
+   overflow: unset
+  }

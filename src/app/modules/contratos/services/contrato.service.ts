@@ -13,8 +13,7 @@ export class ContratoService {
   private expired: Contrato[] = [];
 
   constructor(private http: HttpClient) {
-    this.contratos = mockContrato as Contrato[] || [];
-    this.expired = expiredContracts as Contrato[] || [];
+
   }
 
   /**

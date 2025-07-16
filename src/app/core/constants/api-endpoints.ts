@@ -61,7 +61,7 @@ export const API_ENDPOINTS = {
   NOTIFICACIONES: `${environment.apiUrl}/notificaciones`,
 
   // Proveedores
-  PROVEEDORES: `${environment.apiUrl}/proveedores`,
+  PROVEEDORES: `${environment.apiUrl}/protectores`,
   PROVEEDORES_EXPORT_EXCEL: `${environment.apiUrl}/proveedores/exportar/excel`,
   PROVEEDORES_EXPORT_PDF: `${environment.apiUrl}/proveedores/exportar/pdf`,
 
@@ -70,11 +70,19 @@ export const API_ENDPOINTS = {
   REPRESENTANTES_EXPORT_EXCEL: `${environment.apiUrl}/representantes/exportar/excel`,
   REPRESENTANTES_EXPORT_PDF: `${environment.apiUrl}/representantes/exportar/pdf`,
 
-//Trabajadores
-TRABAJADORES: `${environment.apiUrl}/trabajadores`,
-TRABAJADORES_EXPORT_EXCEL: `${environment.apiUrl}/trabajadores/exportar/excel`,
-TRABAJADORES_EXPORT_PDF: `${environment.apiUrl}/trabajadores/exportar/pdf`,
+  // Trabajadores
+  TRABAJADORES: `${environment.apiUrl}/trabajadores`,
+  TRABAJADORES_EXPORT_EXCEL: `${environment.apiUrl}/trabajadores/exportar/excel`,
+  TRABAJADORES_EXPORT_PDF: `${environment.apiUrl}/trabajadores/exportar/pdf`,
 
   // Suplementos
-  SUPLEMENTOS: `${environment.apiUrl}/suplementos`
+  SUPLEMENTOS: `${environment.apiUrl}/suplementos`,
+
+  // Configuración
+  CONFIGURACION: {
+    BASE: `${environment.apiUrl}/config`,
+    EMAIL: `${environment.apiUrl}/config/email`,
+    EMAIL_TEST: `${environment.apiUrl}/config/email/test`,
+    BACKUP: `${environment.apiUrl}/config/backup`
+  }
 } as const;

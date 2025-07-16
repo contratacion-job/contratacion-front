@@ -14,10 +14,7 @@ export interface TipoContrato {
 // Table: vigencia
 export interface Vigencia {
   id: number;
-  vigencia: number;
-  alerta_vigencia: number;
-  tipo_vigencia: string;
-  tipo_alerta_vigencia: string;
+  vigencia: string;
 }
 
 export interface VigenciaContrato {
@@ -71,7 +68,13 @@ export interface Entidad {
   provincia?: Provincia;
   municipio: Municipio;
 }
-
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message: string;
+  timestamp: string;
+  statusCode: number;
+}
 // Table: departamento
 export interface Departamento {
   id: number;
@@ -418,4 +421,33 @@ export interface UpdateTrabajadorRequest {
 export interface TrabajadorDialogData {
   trabajador?: Trabajador;
   isEdit: boolean;
+}
+export interface SystemConfig {
+  nombre_sistema: string;
+  version: string;
+  logo_url: string;
+  configuracion_email: EmailConfig;
+}
+
+export interface EmailConfig {
+  servidor_smtp: string;
+  puerto: number;
+  usuario: string;
+  contrasena: string;
+  remitente: string;
+  nombre_remitente: string;
+  usar_ssl?: boolean;
+}
+
+export interface BackupConfig {
+  directorio_backup: string;
+  retencion_dias: number;
+  backup_automatico: boolean;
+  hora_backup: string;
+  incluir_datos: boolean;
+  incluir_esquema: boolean;
+}
+
+export interface EmailTest {
+  email_destino: string;
 }

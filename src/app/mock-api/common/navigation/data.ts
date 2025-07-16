@@ -230,24 +230,8 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 link: '/organizacion/licencia',
             },
         ],
-    },
-    // En tu navegación, agregar:
-    {
-        id: 'gestion-usuarios-group',
-        title: 'Administración',
-        subtitle: 'Gestión del sistema',
-        type: 'group',
-        icon: 'heroicons_outline:cog-6-tooth',
-        children: [
-            {
-                id: 'gestion-usuarios',
-                title: 'Gestión de Usuarios',
-                type: 'basic',
-                icon: 'heroicons_outline:users',
-                link: '/admin/usuarios',
-            },
-        ],
-    },
+    }
+   
 ];
 
 export const compactNavigation: FuseNavigationItem[] = [
