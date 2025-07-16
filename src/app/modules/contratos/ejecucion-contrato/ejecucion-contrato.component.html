@@ -1,61 +1,35 @@
 <div class="flex flex-col min-h-screen p-6 w-full">
   <!-- Card -->
   <div class="relative flex flex-col flex-auto p-6 pr-3 pb-3 bg-card rounded-2xl shadow overflow-hidden mb-6 w-full">
-   
-
     <div class="flex flex-row flex-wrap mt-4 -mx-6">
       <div class="flex flex-col mx-6 my-3">
         <div class="text-sm font-medium leading-none text-secondary">Total Ejecuciones</div>
-        <div class="mt-2 font-medium text-3xl leading-none">{{data.length}}</div>
+        <div class="mt-2 font-medium text-3xl leading-none">{{ data.length }}</div>
       </div>
       <div class="flex flex-col mx-6 my-3">
-        <div class="text-sm font-medium leading-none text-secondary">
-            Monto Inicial CUP
-        </div>
-        <div class="mt-2 font-medium text-3xl leading-none">
-            {{ montoInicialCup | currency : "CUP" }}
-        </div>
-    </div>
-    <div class="flex flex-col mx-6 my-3">
-        <div class="text-sm font-medium leading-none text-secondary">
-            Total Ejecutado CUP
-        </div>
-        <div class="mt-2 font-medium text-3xl leading-none">
-            {{ totalEjecutadoCup | currency : "CUP" }}
-        </div>
-    </div>
-    <div class="flex flex-col mx-6 my-3">
-        <div class="text-sm font-medium leading-none text-secondary">
-            Monto Restante CUP
-        </div>
-        <div class="mt-2 font-medium text-3xl leading-none">
-            {{ montoRestanteCup | currency : "CUP" }}
-        </div>
-    </div>
-    <div class="flex flex-col mx-6 my-3">
-        <div class="text-sm font-medium leading-none text-secondary">
-            Monto Inicial USD
-        </div>
-        <div class="mt-2 font-medium text-3xl leading-none">
-            {{ montoInicialUsd }}
-        </div>
-    </div>
-    <div class="flex flex-col mx-6 my-3">
-        <div class="text-sm font-medium leading-none text-secondary">
-            Total Ejecutado USD
-        </div>
-        <div class="mt-2 font-medium text-3xl leading-none">
-            {{ totalEjecutadoUsd }}
-        </div>
-    </div>
-    <div class="flex flex-col mx-6 my-3">
-        <div class="text-sm font-medium leading-none text-secondary">
-            Monto Restante USD
-        </div>
-        <div class="mt-2 font-medium text-3xl leading-none">
-            {{ montoRestanteUsd }}
-        </div>
-    </div>
+        <div class="text-sm font-medium leading-none text-secondary">Monto Inicial CUP</div>
+        <div class="mt-2 font-medium text-3xl leading-none">{{ montoInicialCup | currency:'CUP':'symbol' }}</div>
+      </div>
+      <div class="flex flex-col mx-6 my-3">
+        <div class="text-sm font-medium leading-none text-secondary">Total Ejecutado CUP</div>
+        <div class="mt-2 font-medium text-3xl leading-none">{{ totalEjecutadoCup | currency:'CUP':'symbol' }}</div>
+      </div>
+      <div class="flex flex-col mx-6 my-3">
+        <div class="text-sm font-medium leading-none text-secondary">Monto Restante CUP</div>
+        <div class="mt-2 font-medium text-3xl leading-none">{{ montoRestanteCup | currency:'CUP':'symbol' }}</div>
+      </div>
+      <div class="flex flex-col mx-6 my-3">
+        <div class="text-sm font-medium leading-none text-secondary">Monto Inicial USD</div>
+        <div class="mt-2 font-medium text-3xl leading-none">{{ montoInicialUsd | currency:'USD':'symbol' }}</div>
+      </div>
+      <div class="flex flex-col mx-6 my-3">
+        <div class="text-sm font-medium leading-none text-secondary">Total Ejecutado USD</div>
+        <div class="mt-2 font-medium text-3xl leading-none">{{ totalEjecutadoUsd | currency:'USD':'symbol' }}</div>
+      </div>
+      <div class="flex flex-col mx-6 my-3">
+        <div class="text-sm font-medium leading-none text-secondary">Monto Restante USD</div>
+        <div class="mt-2 font-medium text-3xl leading-none">{{ montoRestanteUsd | currency:'USD':'symbol' }}</div>
+      </div>
     </div>
   </div>
 
@@ -64,9 +38,7 @@
     <!-- Header -->
     <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
       <!-- Loader -->
-      <div
-        class="absolute inset-x-0 bottom-0"
-        *ngIf="isLoading">
+      <div class="absolute inset-x-0 bottom-0" *ngIf="isLoading">
         <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
       </div>
       <!-- Title -->
@@ -74,37 +46,34 @@
       <!-- Actions -->
       <div class="flex flex-col sm:flex-row shrink-0 items-center mt-6 sm:mt-0 sm:ml-4 search-add-wrapper">
         <!-- Search -->
-        <mat-form-field
-          class="fuse-mat-dense fuse-mat-rounded min-w-64"
-          [subscriptSizing]="'dynamic'">
-          <mat-icon
-            class="icon-size-5"
-            matPrefix
-            [svgIcon]="'heroicons_solid:magnifying-glass'"></mat-icon>
-          <input
-            matInput
-            [formControl]="searchInputControl"
-            [autocomplete]="'off'"
-            [placeholder]="'Buscar ejecuciones'">
+        <mat-form-field class="fuse-mat-dense fuse-mat-rounded min-w-64" [subscriptSizing]="'dynamic'">
+          <mat-icon class="icon-size-5" matPrefix [svgIcon]="'heroicons_solid:magnifying-glass'"></mat-icon>
+          <input matInput [formControl]="searchInputControl" [autocomplete]="'off'" [placeholder]="'Buscar ejecuciones'">
         </mat-form-field>
-      <!-- Add ejecucion button -->
-        <button
-          class="ml-4 mt-4 sm:mt-0 w-40 text-lg"
-          mat-flat-button
-          [color]="'primary'"
-          (click)="createRecord()">
+        <!-- Add ejecucion button -->
+        <button class="ml-4 mt-4 sm:mt-0 w-40 text-lg" mat-flat-button [color]="'primary'" (click)="createRecord()">
           <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
           <span class="ml-2 mr-1">Agregar</span>
         </button>
-        <button
-          class="ml-4 mt-4 sm:mt-0"
-          mat-icon-button
-          [color]="'primary'"
-          (click)="exportToCSV()"
-          matTooltip="Exportar tabla a CSV"
-          aria-label="Exportar tabla a CSV">
+        <!-- Export CSV button -->
+        <button class="ml-4 mt-4 sm:mt-0" mat-icon-button [color]="'primary'" (click)="exportToCSV()" matTooltip="Exportar tabla a CSV" aria-label="Exportar tabla a CSV">
           <mat-icon [svgIcon]="'heroicons_outline:arrow-up-tray'"></mat-icon>
         </button>
+        <!-- Print button -->
+        <button class="ml-4 mt-4 sm:mt-0" mat-icon-button [color]="'primary'" (click)="printTable()" matTooltip="Imprimir tabla" aria-label="Imprimir tabla">
+          <mat-icon [svgIcon]="'heroicons_outline:printer'"></mat-icon>
+        </button>
+        <!-- Column selection menu -->
+        <button class="ml-4 mt-4 sm:mt-0" mat-icon-button [color]="'primary'" [matMenuTriggerFor]="columnMenu" matTooltip="Seleccionar columnas" aria-label="Seleccionar columnas">
+          <mat-icon [svgIcon]="'heroicons_outline:view-columns'"></mat-icon>
+        </button>
+        <mat-menu #columnMenu="matMenu">
+          <button mat-menu-item *ngFor="let column of columns" (click)="toggleColumn(column.key)">
+            <mat-checkbox [checked]="selectedColumns.includes(column.key)" (click)="$event.stopPropagation()" (change)="toggleColumn(column.key)">
+              {{ column.label }}
+            </mat-checkbox>
+          </button>
+        </mat-menu>
       </div>
     </div>
 
@@ -115,50 +84,30 @@
         <ng-container *ngIf="dataSource.data.length > 0; else noEjecucionesTemplate">
           <div class="flex flex-col h-full overflow-y-auto">
             <!-- Header -->
-            <div
-              class="inventory-grid sticky top-0 z-30 grid gap-4 py-4 px-6 md:px-8 shadow-md text-md font-semibold text-secondary bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
-              matSort
-              matSortDisableClear
-              style="grid-template-columns: 200px 200px 150px 150px 300px 250px 120px;">
-              <div [mat-sort-header]="'proveedor'">Proveedor</div>
-              <div [mat-sort-header]="'contrato'">Contrato</div>
-              <div [mat-sort-header]="'costo_cup'">Costo (CUP)</div>
-              <div [mat-sort-header]="'costo_cl'">Costo (CL)</div>
-              <div [mat-sort-header]="'trabajo_ejecutado'">Trabajo Ejecutado</div>
-              <div [mat-sort-header]="'fecha_ejecucion'">Fecha Ejecución</div>
+            <div class="inventory-grid sticky top-0 z-30 grid gap-4 py-4 px-6 md:px-8 shadow-md text-md font-semibold text-secondary bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+                 matSort matSortDisableClear
+                 style="grid-template-columns: 200px 200px 150px 150px 300px 250px 120px;">
+              <div *ngIf="selectedColumns.includes('proveedor')" [mat-sort-header]="'proveedor'">Proveedor</div>
+              <div *ngIf="selectedColumns.includes('contrato')" [mat-sort-header]="'contrato'">Contrato</div>
+              <div *ngIf="selectedColumns.includes('costo_cup')" [mat-sort-header]="'costo_cup'">Costo (CUP)</div>
+              <div *ngIf="selectedColumns.includes('costo_usd')" [mat-sort-header]="'costo_usd'">Costo (USD)</div>
+              <div *ngIf="selectedColumns.includes('trabajo_ejecutado')" [mat-sort-header]="'trabajo_ejecutado'">Trabajo Ejecutado</div>
+              <div *ngIf="selectedColumns.includes('fecha_ejecucion')" [mat-sort-header]="'fecha_ejecucion'">Fecha Ejecución</div>
               <div class="sticky-end">Detalles</div>
             </div>
             <!-- Rows -->
             <ng-container *ngFor="let ejecucion of dataSource.filteredData; trackBy: trackByFn">
-              <div
-                class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b items-center text-m"
-                style="grid-template-columns: 200px 200px 150px 150px 300px 250px 200px;">
-                <div class="truncate">
-                  {{ejecucion.proveedor?.nombre || 'Sin proveedor'}}
-                </div>
-                <div class="truncate">
-                  {{ejecucion.contrato?.no_contrato || 'Sin contrato'}}
-                </div>
-                <div>
-                  {{ejecucion.costo_cup | currency:'CUP':'symbol':'1.2-2'}}
-                </div>
-                <div>
-                  {{ejecucion.costo_cl | currency:'CLP':'symbol':'1.2-2'}}
-                </div>
-                <div class="truncate">
-                  {{ejecucion.trabajo_ejecutado}}
-                </div>
-                <div>
-                  {{ejecucion.fecha_ejecucion | date:'shortDate'}}
-                </div>
+              <div class="inventory-grid grid gap-4 py-3 px-6 md:px-8 border-b items-center text-m"
+                   style="grid-template-columns: 200px 200px 150px 150px 300px 250px 120px;">
+                <div *ngIf="selectedColumns.includes('proveedor')" class="truncate">{{ ejecucion.Proveedor?.nombre || 'Sin proveedor' }}</div>
+                <div *ngIf="selectedColumns.includes('contrato')" class="truncate">{{ ejecucion.Contrato?.no_contrato || 'Sin contrato' }}</div>
+                <div *ngIf="selectedColumns.includes('costo_cup')">{{ ejecucion.costo_cup | currency:'CUP':'symbol':'1.2-2' }}</div>
+                <div *ngIf="selectedColumns.includes('costo_usd')">{{ ejecucion.costo_usd | currency:'USD':'symbol':'1.2-2' }}</div>
+                <div *ngIf="selectedColumns.includes('trabajo_ejecutado')" class="truncate">{{ ejecucion.trabajo_ejecutado || 'N/A' }}</div>
+                <div *ngIf="selectedColumns.includes('fecha_ejecucion')">{{ ejecucion.fecha_ejecucion | date:'shortDate' }}</div>
                 <div class="flex items-center justify-center sticky-end">
-                  <button
-                    class="min-w-10 min-h-7 h-7 px-2 leading-6 whitespace-nowrap"
-                    mat-stroked-button
-                    (click)="toggleDetails(ejecucion.id)">
-                    <mat-icon
-                      class="icon-size-5"
-                      [svgIcon]="selectedRow?.id === ejecucion.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                  <button class="min-w-10 min-h-7 h-7 px-2 leading-6 whitespace-nowrap" mat-stroked-button (click)="toggleDetails(ejecucion.id)">
+                    <mat-icon class="icon-size-5" [svgIcon]="selectedRow?.id === ejecucion.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
                   </button>
                 </div>
               </div>
@@ -169,102 +118,65 @@
               </div>
             </ng-container>
           </div>
-        
-          <mat-paginator
-            class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
-            [ngClass]="{'pointer-events-none': isLoading}"
-            [length]="pagination.length"
-            [pageIndex]="pagination.page"
-            [pageSize]="pagination.size"
-            [pageSizeOptions]="[5, 10, 25, 100]"
-            [showFirstLastButtons]="true"></mat-paginator>
+          <mat-paginator class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                         [ngClass]="{'pointer-events-none': isLoading}"
+                         [length]="pagination.length"
+                         [pageIndex]="pagination.page"
+                         [pageSize]="pagination.size"
+                         [pageSizeOptions]="[5, 10, 25, 100]"
+                         [showFirstLastButtons]="true"></mat-paginator>
         </ng-container>
 
         <ng-template #rowDetailsTemplate let-ejecucion>
           <div class="shadow-lg overflow-hidden">
             <div class="flex border-b">
               <!-- Selected ejecucion form -->
-
               <form class="responsive-form flex flex-col w-full max-w-full mx-auto box-border"
-                [formGroup]="selectedRowForm"
-                style="width: 100%; max-width: 500px; padding: 0 16px; box-sizing: border-box;">
+                    [formGroup]="selectedRowForm"
+                    style="width: 100%; max-width: 500px; padding: 0 16px; box-sizing: border-box;">
                 <div class="flex flex-col sm:flex-row p-8">
                   <!-- Ejecucion details -->
                   <div class="flex flex-auto flex-wrap">
                     <div class="flex flex-col w-full lg:w-2/4 sm:pl-8">
                       <mat-form-field class="w-full">
                         <mat-label>Proveedor</mat-label>
-                        <mat-select formControlName="proveedor">
-                          <mat-option *ngFor="let proveedor of mockProveedor" [value]="proveedor">
-                            {{proveedor.nombre}}
-                          </mat-option>
-                        </mat-select>
+                        <input matInput formControlName="proveedor" [disabled]="true">
                       </mat-form-field>
                       <mat-form-field class="w-full">
                         <mat-label>Contrato</mat-label>
-                        <mat-select formControlName="contrato">
-                          <mat-option *ngFor="let contrato of mockContrato" [value]="contrato">
-                            {{contrato.no_contrato}}
-                          </mat-option>
-                        </mat-select>
+                        <input matInput formControlName="contrato" [disabled]="true">
                       </mat-form-field>
                       <mat-form-field class="w-full">
                         <mat-label>Costo (CUP)</mat-label>
                         <span matPrefix>CUP</span>
-                        <input
-                          matInput
-                          type="number"
-                          formControlName="costo_cup">
+                        <input matInput type="number" formControlName="costo_cup">
                       </mat-form-field>
                     </div>
                     <div class="flex flex-col w-full lg:w-1/4 sm:pl-8">
                       <mat-form-field class="w-full">
-                        <mat-label>Costo (CL)</mat-label>
-                        <span matPrefix>CLP</span>
-                        <input
-                          matInput
-                          type="number"
-                          formControlName="costo_cl">
+                        <mat-label>Costo (USD)</mat-label>
+                        <span matPrefix>USD</span>
+                        <input matInput type="number" formControlName="costo_usd">
                       </mat-form-field>
                       <mat-form-field class="w-full">
                         <mat-label>Trabajo Ejecutado</mat-label>
-                        <input
-                          matInput
-                          formControlName="trabajo_ejecutado">
+                        <input matInput formControlName="trabajo_ejecutado">
                       </mat-form-field>
                       <mat-form-field class="w-full">
                         <mat-label>Fecha Ejecución</mat-label>
-                        <input
-                          matInput
-                          type="date"
-                          formControlName="fecha_ejecucion">
+                        <input matInput type="date" formControlName="fecha_ejecucion">
                       </mat-form-field>
                     </div>
                   </div>
                 </div>
                 <div class="flex flex-col sm:flex-row items-center justify-between w-full border-t px-4 sm:px-8 py-4">
-                  <button
-                  class="-ml-4"
-                  mat-button
-                  [color]="'warn'"
-                  (click)="deleteSelectedRecord()"
-              ></button>
-              <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto lg:w-auto">
-
-                    <button
-                    class="w-full sm:w-auto lg:w-auto px-6"
-                    mat-stroked-button
-                      color="primary"
-                      (click)="updateSelectedRecord()">
+                  <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto lg:w-auto">
+                    <button class="w-full sm:w-auto lg:w-auto px-6" mat-stroked-button color="primary" (click)="updateSelectedRecord()">
                       Actualizar
                     </button>
-                    <button
-                    class="w-full sm:w-auto lg:w-auto px-6"
-                    mat-stroked-button
-                    color="warn"
-                    (click)="deleteSelectedRecord()">
-                    Eliminar
-                  </button>
+                    <button class="w-full sm:w-auto lg:w-auto px-6" mat-stroked-button color="warn" (click)="deleteSelectedRecord()">
+                      Eliminar
+                    </button>
                   </div>
                 </div>
               </form>

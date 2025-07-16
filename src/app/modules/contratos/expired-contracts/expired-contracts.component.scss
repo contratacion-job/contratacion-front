@@ -1,17 +1,44 @@
-/* Estilos básicos para el componente de contratos vencidos */
-
 .inventory-grid {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: center;
   gap: 1rem;
-  padding: 0.5rem 0;
+  padding: 0.5rem 1.5rem;
   border-bottom: 1px solid #e0e0e0;
+
+  // Define specific widths for each column
+  &.header {
+    font-weight: 600;
+    background-color: #f5f5f5;
+    padding: 0.75rem 1.5rem;
+  }
+
+  // Adjust column widths dynamically based on selected columns
+  &[style*="grid-template-columns"] {
+    // Fallback to avoid breaking if no columns are selected
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) 120px;
+  }
+
+  & > div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0.25rem;
+  }
+
+  // Specific widths for each column type
+  & > div:nth-child(1) { min-width: 200px; max-width: 200px; } // Proveedor
+  & > div:nth-child(2) { min-width: 200px; max-width: 200px; } // Contrato
+  & > div:nth-child(3) { min-width: 150px; max-width: 150px; } // Costo (CUP)
+  & > div:nth-child(4) { min-width: 150px; max-width: 150px; } // Costo (USD)
+  & > div:nth-child(5) { min-width: 300px; max-width: 300px; } // Trabajo Ejecutado
+  & > div:nth-child(6) { min-width: 150px; max-width: 150px; } // Fecha Ejecución
+  & > div.sticky-end { min-width: 120px; max-width: 120px; text-align: center; } // Details
 }
 
-.inventory-grid > div {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.sticky-end {
+  position: sticky;
+  right: 0;
+  background-color: inherit;
 }
 
 .bg-card {
@@ -26,4 +53,53 @@
 
 .shadow {
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+}
+
+@media print {
+  .search-add-wrapper,
+  .mat-paginator,
+  .mat-icon-button,
+  .mat-stroked-button,
+  .mat-progress-bar,
+  .mat-form-field,
+  .row-details-template {
+    display: none !important;
+  }
+
+  .inventory-grid {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12pt;
+  }
+
+  .inventory-grid.header {
+    display: table-header-group;
+    background-color: #f0f0f0 !important;
+  }
+
+  .inventory-grid:not(.header) {
+    display: table-row-group;
+  }
+
+  .inventory-grid > div {
+    display: table-cell;
+    border: 1px solid #000;
+    padding: 8px;
+    vertical-align: middle;
+  }
+
+  .sticky-end {
+    display: none !important;
+  }
+
+  .text-red-500,
+  .text-4xl {
+    display: none !important;
+  }
+
+  .border-b,
+  .border-t {
+    border: none !important;
+  }
 }

@@ -1,44 +1,50 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { EjecucionContrato } from '../../../models/Type';
-import { mockEjecucionContrato } from '../../../mock-api/contrato-fake/fake';
 import { API_ENDPOINTS } from 'app/core/constants/api-endpoints';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EjecucionService {
-
-  constructor() { }
+  constructor(private http: HttpClient) {}
 
   getEjecuciones(): Observable<EjecucionContrato[]> {
-    return of(mockEjecucionContrato as EjecucionContrato[]);
+    return this.http.get<{ success: boolean, message: string, data: EjecucionContrato[], pagination: any, timestamp: string }>(API_ENDPOINTS.EJECUCIONES_CONTRATO).pipe(
+      map(response => response.data || []),
+      catchError((error) => {
+        console.error('Error fetching ejecuciones:', error);
+        return of([]);
+      })
+    );
   }
 
-  getEjecucionById(id: number): Observable<EjecucionContrato | undefined> {
-    const ejecucion = mockEjecucionContrato.find(e => e.id === id);
-    return of(ejecucion as EjecucionContrato | undefined);
+  addEjecucion(ejecucion: EjecucionContrato): Observable<any> {
+    return this.http.post(API_ENDPOINTS.EJECUCIONES_CONTRATO, ejecucion).pipe(
+      catchError((error) => {
+        console.error('Error adding ejecucion:', error);
+        throw error;
+      })
+    );
   }
 
-  addEjecucion(ejecucion: EjecucionContrato): Observable<EjecucionContrato> {
-    (mockEjecucionContrato as any[]).push(ejecucion as any);
-    return of(ejecucion);
+  updateEjecucion(ejecucion: EjecucionContrato): Observable<any> {
+    return this.http.put(`${API_ENDPOINTS.EJECUCIONES_CONTRATO}/${ejecucion.id}`, ejecucion).pipe(
+      catchError((error) => {
+        console.error('Error updating ejecucion:', error);
+        throw error;
+      })
+    );
   }
 
-  updateEjecucion(ejecucion: EjecucionContrato): Observable<EjecucionContrato> {
-    const index = mockEjecucionContrato.findIndex(e => e.id === ejecucion.id);
-    if (index !== -1) {
-      (mockEjecucionContrato as any[])[index] = ejecucion as any;
-    }
-    return of(ejecucion);
-  }
-
-  deleteEjecucion(id: number): Observable<boolean> {
-    const index = mockEjecucionContrato.findIndex(e => e.id === id);
-    if (index !== -1) {
-      mockEjecucionContrato.splice(index, 1);
-      return of(true);
-    }
-    return of(false);
+  deleteEjecucion(id: number): Observable<any> {
+    return this.http.delete(`${API_ENDPOINTS.EJECUCIONES_CONTRATO}/${id}`).pipe(
+      catchError((error) => {
+        console.error('Error deleting ejecucion:', error);
+        throw error;
+      })
+    );
   }
 }

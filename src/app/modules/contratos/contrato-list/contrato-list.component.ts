@@ -1,3 +1,5 @@
+
+
 import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectionStrategy, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
@@ -58,12 +60,12 @@ declare module 'jspdf' {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatCheckboxModule,
     CurrencyPipe,
     DatePipe,
     MatMenuModule,
     MatTooltipModule,
     MatDividerModule,
-    MatCheckboxModule
   ],
   templateUrl: './contrato-list.component.html',
   styleUrls: ['./contrato-list.component.scss']
@@ -74,18 +76,6 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
   tiposContrato: TipoContrato[] = [];
   vigencias: VigenciaContrato[] = [];
   departamentos: any[] = [];
-
-  showFilters: boolean = false;
-
-  toggleFilters(): void {
-    this.showFilters = !this.showFilters;
-    this.cdr.detectChanges();
-  }
-
-  isColumnVisible(columnKey: string): boolean {
-    const column = this.columnSettings.find(col => col.key === columnKey);
-    return column ? column.visible : false;
-  }
 
   // Add a flag to check if departamentos is loaded as array
   isDepartamentosArray(): boolean {
@@ -104,7 +94,7 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
   montoInicialUsd: string = '-';
   totalEjecutadoUsd: string = '-';
   montoRestanteUsd: string = '-';
-  @ViewChild('columnMenuTrigger', { read: MatMenuTrigger }) columnMenuTrigger!: MatMenuTrigger;
+
   private _unsubscribeAll: Subject<any> = new Subject<any>();
 
   columnSettings = [
@@ -133,24 +123,50 @@ export class ContratoListComponent implements OnInit, AfterViewInit {
   //   { key: 'fecha_firmado', label: 'Fecha Firmado', sortable: true },
   //   { key: 'vigencia', label: 'Vigencia', sortable: true }
   // ];
+  showFilters: boolean = false;
+@ViewChild('columnMenuTrigger', { read: MatMenuTrigger }) columnMenuTrigger!: MatMenuTrigger;
+  
+toggleFilters(): void {
+  this.showFilters = !this.showFilters;
+  this.cdr.detectChanges();
+}
 
-  getVisibleColumns() {
-    return this.columnSettings.filter(column => column.visible);
+private updateDisplayedColumns(): void {
+  this.displayedColumns = [
+    ...this.columnSettings.filter(col => col.visible).map(col => col.key),
+    'details' // Mantener la columna de detalles al final
+  ];
+}
+
+toggleColumn(columnKey: string): void {
+  const column = this.columnSettings.find(col => col.key === columnKey);
+  if (column) {
+    column.visible = !column.visible;
+    this.updateDisplayedColumns();
+    this.cdr.detectChanges();
   }
+}
 
-  private updateDisplayedColumns(): void {
-    this.displayedColumns = [
-      ...this.columnSettings.filter(col => col.visible).map(col => col.key),
-      'details' // Mantener la columna de detalles al final
-    ];
+closeColumnMenu(): void {
+  if (this.columnMenuTrigger) {
+    this.columnMenuTrigger.closeMenu();
   }
+}
+  
 
-  getGridColumns(): string {
-    const visibleColumns = this.getVisibleColumns();
-    const columnSizes = visibleColumns.map(() => 'minmax(120px, 1fr)');
-    return `${columnSizes.join(' ')} 100px`; // 100px for details button column
-  }
+isColumnVisible(columnKey: string): boolean {
+  const column = this.columnSettings.find(col => col.key === columnKey);
+  return column ? column.visible : false;
+}
+getVisibleColumns() {
+  return this.columnSettings.filter(column => column.visible);
+}
 
+getGridColumns(): string {
+  const visibleColumns = this.getVisibleColumns();
+  const columnSizes = visibleColumns.map(() => 'minmax(120px, 1fr)');
+  return `${columnSizes.join(' ')} 100px`; // 100px for details button column
+}
 
   getColumnValue(row: Contrato, columnKey: string): string | number {
     switch (columnKey) {
@@ -552,15 +568,7 @@ print(): void {
     this.filterForm.reset();
     this.dataSource.filteredData = this.dataSource.data;
   }
-  toggleColumn(columnKey: string): void {
-    const column = this.columnSettings.find(col => col.key === columnKey);
-    if (column) {
-      column.visible = !column.visible;
-      this.updateDisplayedColumns();
-      this.cdr.detectChanges();
-    }
-  }
-  
+
   initSelectedContratoForm(): void {
     this.selectedContratoForm = this.fb.group({
       no_contrato: ['', Validators.required],

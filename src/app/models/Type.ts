@@ -169,14 +169,23 @@ export interface Contrato {
 // Table: ejecucion_contrato
 export interface EjecucionContrato {
   id: number;
+  contrato_id: number;
   proveedor_id: number;
-  no_contrato_id: number;
-  costo_cup: number;
-  costo_cl: number;
+  codigo_proveedor: string;
+  contrato_fecha_inicio: string;
+  fecha_ejecucion: string;
+  costo_cup: string;
+  costo_usd: string;
+  monto: string;
   trabajo_ejecutado: string;
-  fecha_ejecucion: Date;
-  proveedor: Proveedor;
-  contrato: Contrato;
+  estado: string;
+  descripcion: string | null;
+  observaciones: string | null;
+  numero_factura: string | null;
+  createdAt: string;
+  updatedAt: string;
+  Contrato?: { no_contrato: string }; // Populated after fetching
+  Proveedor?: { nombre: string }; // Populated after fetching
 }
 
 // Table: ejecucion_suplemento
