@@ -16,3 +16,11 @@ git clone https://github.com/contratacion-job/contratacion-front.git
 cd contratacion-front
 npm install
 ng serve
+
+## 📦 Módulos disponibles
+
+- `auth/` – Login, registro y recuperación de contraseña
+- `dashboard/` – Panel principal con métricas
+- `usuarios/` – Gestión de usuarios y roles
+- `contratos/` – Visualización y edición de contratos
+
