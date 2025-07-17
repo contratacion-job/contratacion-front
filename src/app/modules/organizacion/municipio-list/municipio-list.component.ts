@@ -102,7 +102,7 @@ export class DepartamentoComponent implements OnInit, AfterViewInit {
       if (!filter) return true;
       const searchTerms = filter.toLowerCase().split(' ').filter(term => term.length > 0);
       const dataStr = [
-        data.nombre_departamento,
+        data.nombre,
         data.codigo,
         data.descripcion,
       ].join(' ').toLowerCase();
@@ -169,7 +169,7 @@ export class DepartamentoComponent implements OnInit, AfterViewInit {
   isRowSelected(element: any): boolean {
     if (!this.selectedRow) return false;
     
-    const selectedId = this.selectedRow.id || this.selectedRow.nombre_departamento;
+    const selectedId = this.selectedRow.id || this.selectedRow.nombre;
     const elementId = element.id || element.nombre_departamento;
     
     return selectedId === elementId;
@@ -179,7 +179,7 @@ export class DepartamentoComponent implements OnInit, AfterViewInit {
   toggleDetails(departamento: any): void {
     // Usar nombre_departamento como identificador único si no hay id
     const identifier = departamento.id || departamento.nombre_departamento;
-    const currentIdentifier = this.selectedRow?.id || this.selectedRow?.nombre_departamento;
+    const currentIdentifier = this.selectedRow?.id || this.selectedRow?.nombre;
     
     if (currentIdentifier === identifier) {
       this.selectedRow = null;

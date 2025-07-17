@@ -196,7 +196,7 @@ export class SuplementoListComponent implements OnInit, AfterViewInit {
       switch(property) {
         case 'proveedor': return item.proveedor?.nombre;
         case 'tipo_contrato': return item.tipo_contrato?.nombre_tipo_contrato;
-        case 'departamento': return item.departamento?.nombre_departamento;
+        case 'departamento': return item.departamento?.nombre;
         case 'vigencia': return item.vigencia?.vigencia;
         case 'valor_cup': return item.valor_cup || 0;
         case 'valor_usd': return item.valor_usd || 0;
@@ -214,7 +214,7 @@ export class SuplementoListComponent implements OnInit, AfterViewInit {
         data.no_contrato_contratacion?.toString() || '',
         data.proveedor?.nombre?.toLowerCase() || '',
         data.tipo_contrato?.nombre_tipo_contrato?.toLowerCase() || '',
-        data.departamento?.nombre_departamento?.toLowerCase() || '',
+        data.departamento?.nombre?.toLowerCase() || '',
         data.valor_cup?.toString() || '',
         data.valor_usd?.toString() || '',
         data.fecha_entrada || '',
@@ -536,7 +536,7 @@ clearFilters(): void {
       no_contrato_contratacion: item.no_contrato_contratacion,
       proveedor: item.proveedor?.nombre || '',
       tipo_contrato: item.tipo_contrato?.nombre_tipo_contrato || '',
-      departamento: item.departamento?.nombre_departamento || '',
+      departamento: item.departamento?.nombre || '',
       valor_cup: item.valor_cup,
       valor_usd: item.valor_usd,
       fecha_entrada: item.fecha_entrada,
@@ -574,7 +574,7 @@ clearFilters(): void {
       no_contrato_contratacion: item.no_contrato_contratacion,
       proveedor: this.truncateText(item.proveedor?.nombre || '', 20),
       tipo_contrato: this.truncateText(item.tipo_contrato?.nombre_tipo_contrato || '', 15),
-      departamento: this.truncateText(item.departamento?.nombre_departamento || '', 15),
+      departamento: this.truncateText(item.departamento?.nombre || '', 15),
       valor_cup: this.formatNumber(item.valor_cup),
       valor_usd: this.formatNumber(item.valor_usd),
       fecha_entrada: this.formatDateForPDF(item.fecha_entrada),

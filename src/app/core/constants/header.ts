@@ -26,7 +26,7 @@ import { MatDialogModule } from '@angular/material/dialog';
       </button>
     </div>
   `,
-  styleUrls: ['./dialog-header.component.scss']
+  
 })
 export class DialogHeaderComponent {
   @Input() title: string = 'Diálogo';

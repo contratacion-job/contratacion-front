@@ -808,7 +808,7 @@ export class ContratoDashboardComponent implements OnInit {
 
   private createDepartamentosChart(): void {
     const departamentos = this.contratos.reduce((acc, contrato) => {
-      const departamento = contrato.departamento?.nombre_departamento || 'Desconocido';
+      const departamento = contrato.departamento?.nombre|| 'Desconocido';
       if (!acc[departamento]) acc[departamento] = 0;
       acc[departamento]++;
       return acc;

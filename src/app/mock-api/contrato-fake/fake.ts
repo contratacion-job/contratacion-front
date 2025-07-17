@@ -87,27 +87,9 @@ export const mockMinisterio = [
 export const mockDepartamento = [
   {
     id: 1,
-    nombre_departamento: "Departamento de Compras",
+    nombre: "Departamento de Compras",
     codigo: "COMP",
     descripcion: "Encargado de las compras institucionales"
-  },
-  {
-    id: 2,
-    nombre_departamento: "Departamento de Educación",
-    codigo: "EDU",
-    descripcion: "Gestión de servicios educativos"
-  },
-  {
-    id: 3,
-    nombre_departamento: "Departamento de Construcción",
-    codigo: "CONST",
-    descripcion: "Supervisión de proyectos de construcción"
-  },
-  {
-    id: 4,
-    nombre_departamento: "Departamento de Tecnología",
-    codigo: "TEC",
-    descripcion: "Gestión de servicios tecnológicos"
   }
 ];
 export const mockVigencia = [

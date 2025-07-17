@@ -78,7 +78,7 @@ interface ApiResponse<T> {
 // Table: departamento
 export interface Departamento {
   id: number;
-  nombre_departamento: string;
+  nombre: string;
   codigo: string;
   descripcion: string;
 }
@@ -138,35 +138,35 @@ export interface Suplemento {
 
 // Table: contrato
 export interface Contrato {
-  id: number;
+  id?: number;
   vigencia_id: number;
-  proveedor_id: number;
-  tipo_contrato_id: number;
-  no_contrato: number;
-  fecha_entrada: Date;
-  fecha_firmado: Date;
-  valor_cup: number;
+  proveedor_id: number; // Maps to API's proveedor_id
+  tipo_contrato_id: number; // Maps to API's tipo_contrato_id
+  no_contrato: number; // Maps to API's numero
+  fecha_entrada: string | Date; // Maps to API's fecha_inicio
+  fecha_firmado: string | Date;
+  valor_cup: number; // Maps to API's valor
   monto_vencimiento_cup: number;
   monto_vencimiento_cl: number;
   valor_usd: number;
   monto_vencimiento_usd: number;
-  observaciones: string;
+  observaciones: string; // Maps to API's objeto
   no_contrato_contratacion: number;
-  fecha_comite_contratacion: Date;
+  fecha_comite_contratacion: string | Date;
   no_comite_contratacion: number;
   no_acuerdo_comite_contratacion: number;
-  fecha_comite_administracion: Date;
-  no_comite_administracion: number;
-  no_acuerdo_comite_administracion: number;
-  departamento_id: number;
-  fecha_vencido: Date;
+  fecha_comite_administracion?: string | Date;
+  no_comite_administracion?: number;
+  no_acuerdo_comite_administracion?: number;
+  departamento_id: number; // Maps to API's departamento_id
+  fecha_vencido: string | Date; // Maps to API's fecha_fin
   valor_monto_restante: number;
   entidad: string[];
   vigencia: Vigencia;
   proveedor: Proveedor;
   tipo_contrato: TipoContrato;
   departamento: Departamento;
-  estado?: string;
+  estado: string; // Maps to API's estado
 }
 
 // Table: ejecucion_contrato

@@ -61,7 +61,7 @@ export const API_ENDPOINTS = {
   NOTIFICACIONES: `${environment.apiUrl}/notificaciones`,
 
   // Proveedores
-  PROVEEDORES: `${environment.apiUrl}/protectores`,
+  PROVEEDORES: `${environment.apiUrl}/proveedores`,
   PROVEEDORES_EXPORT_EXCEL: `${environment.apiUrl}/proveedores/exportar/excel`,
   PROVEEDORES_EXPORT_PDF: `${environment.apiUrl}/proveedores/exportar/pdf`,
 

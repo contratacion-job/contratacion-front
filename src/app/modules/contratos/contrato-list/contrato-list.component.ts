@@ -179,7 +179,7 @@ getGridColumns(): string {
       case 'tipo_contrato':
         return row.tipo_contrato?.nombre_tipo_contrato || '';
       case 'departamento':
-        return row.departamento?.nombre_departamento || '';
+        return row.departamento?.nombre || '';
       case 'valor_cup':
         return row.valor_cup !== undefined && row.valor_cup !== null ? `${row.valor_cup}` : '';
       case 'valor_usd':
@@ -346,7 +346,7 @@ private convertToArray(data: any): any[] {
       switch(property) {
         case 'proveedor': return item.proveedor?.nombre;
         case 'tipo_contrato': return item.tipo_contrato?.nombre_tipo_contrato;
-        case 'departamento': return item.departamento?.nombre_departamento;
+        case 'departamento': return item.departamento?.nombre;
         case 'vigencia': return item.vigencia?.vigencia;
         case 'valor_cup': return item.valor_cup || 0;
         case 'valor_usd': return item.valor_usd || 0;
@@ -364,7 +364,7 @@ private convertToArray(data: any): any[] {
         data.no_contrato?.toString() || '',
         data.proveedor?.nombre?.toLowerCase() || '',
         data.tipo_contrato?.nombre_tipo_contrato?.toLowerCase() || '',
-        data.departamento?.nombre_departamento?.toLowerCase() || '',
+        data.departamento?.nombre?.toLowerCase() || '',
         data.estado?.toLowerCase() || '',
         data.valor_cup?.toString() || '',
         data.valor_usd?.toString() || '',
@@ -888,7 +888,7 @@ print(): void {
       no_contrato: contract.no_contrato || '',
       proveedor: this.truncateText(contract.proveedor?.nombre || '', 20),
       tipo_contrato: this.truncateText(contract.tipo_contrato?.nombre_tipo_contrato || '', 15),
-      departamento: this.truncateText(contract.departamento?.nombre_departamento || '', 15),
+      departamento: this.truncateText(contract.departamento?.nombre || '', 15),
       valor_cup: this.formatNumber(contract.valor_cup || 0),
       valor_usd: this.formatNumber(contract.valor_usd || 0),
       fecha_entrada: this.formatDateForPDF(contract.fecha_entrada),
@@ -1011,7 +1011,7 @@ print(): void {
       no_contrato: contract.no_contrato,
       proveedor: contract.proveedor?.nombre || '',
       tipo_contrato: contract.tipo_contrato?.nombre_tipo_contrato || '',
-      departamento: contract.departamento?.nombre_departamento || '',
+      departamento: contract.departamento?.nombre || '',
       valor_cup: contract.valor_cup,
       valor_usd: contract.valor_usd,
       fecha_entrada: contract.fecha_entrada,

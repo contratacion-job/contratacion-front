@@ -1,311 +1,259 @@
-<div class="flex flex-col p-6 md:p-8 gap-4 max-w-3xl mx-auto">
-    <h2 class="text-3xl font-bold mb-4">Crear Nuevo Contrato</h2>
-  
-    <form [formGroup]="contratoForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
-      <!-- Información básica del contrato -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <mat-form-field appearance="outline">
-          <mat-label>Número de Contrato</mat-label>
-          <input matInput type="number" formControlName="no_contrato" required>
-          <mat-error *ngIf="contratoForm.get('no_contrato')?.hasError('required')">
-            El número de contrato es requerido
-          </mat-error>
-          <mat-error *ngIf="contratoForm.get('no_contrato')?.hasError('min')">
-            El número debe ser mayor a 0
-          </mat-error>
-        </mat-form-field>
-  
-        <mat-form-field appearance="outline">
-          <mat-label>Vigencia</mat-label>
-          <mat-select formControlName="vigencia_id" required>
-            <mat-option *ngFor="let vigencia of vigenciasContrato" [value]="vigencia.id">
-              {{ vigencia.vigencia }}
-            </mat-option>
-          </mat-select>
-          <mat-error *ngIf="contratoForm.get('vigencia_id')?.hasError('required')">
-            La vigencia es requerida
-          </mat-error>
-        </mat-form-field>
-      </div>
-  
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="flex items-center gap-2">
-          <mat-form-field appearance="outline" class="flex-grow">
-            <mat-label>Proveedor</mat-label>
-            <mat-select formControlName="proveedor_id" required>
-              <mat-option *ngFor="let prov of proveedores" [value]="prov.id">
-                {{ prov.nombre }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="contratoForm.get('proveedor_id')?.hasError('required')">
-              El proveedor es requerido
-            </mat-error>
-          </mat-form-field>
-          <button type="button" 
-                  mat-icon-button 
-                  color="primary"
-                  class="!w-10 !h-10 !min-w-10 -mt-3"
-                  (click)="openNewProveedorDialog()">
-            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:plus'"></mat-icon>
-          </button>
-        </div>
-  
-        <div class="flex items-center gap-2">
-          <mat-form-field appearance="outline" class="flex-grow">
-            <mat-label>Tipo de Contrato</mat-label>
-            <mat-select formControlName="tipo_contrato_id" required>
-              <mat-option *ngFor="let tipo of tiposContrato" [value]="tipo.id">
-                {{ tipo.nombre_tipo_contrato || tipo.nombre }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="contratoForm.get('tipo_contrato_id')?.hasError('required')">
-              El tipo de contrato es requerido
-            </mat-error>
-          </mat-form-field>
-          <button type="button" 
-                  mat-icon-button 
-                  color="primary"
-                  class="!w-10 !h-10 !min-w-10 -mt-3"
-                  (click)="openNewTipoContratoDialog()">
-            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:plus'"></mat-icon>
-          </button>
-        </div>
-      </div>
-  
-      <!-- Fechas del contrato -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <mat-form-field appearance="outline">
-          <mat-label>Fecha de Entrada</mat-label>
-          <input matInput [matDatepicker]="entradaPicker" formControlName="fecha_entrada" required>
-          <mat-datepicker-toggle matSuffix [for]="entradaPicker"></mat-datepicker-toggle>
-          <mat-datepicker #entradaPicker></mat-datepicker>
-          <mat-error *ngIf="contratoForm.get('fecha_entrada')?.hasError('required')">
-            La fecha de entrada es requerida
-          </mat-error>
-        </mat-form-field>
-  
-        <mat-form-field appearance="outline">
-          <mat-label>Fecha de Firma</mat-label>
-          <input matInput [matDatepicker]="firmaPicker" formControlName="fecha_firmado" required>
-          <mat-datepicker-toggle matSuffix [for]="firmaPicker"></mat-datepicker-toggle>
-          <mat-datepicker #firmaPicker></mat-datepicker>
-          <mat-error *ngIf="contratoForm.get('fecha_firmado')?.hasError('required')">
-            La fecha de firma es requerida
-          </mat-error>
-        </mat-form-field>
-  
-        <mat-form-field appearance="outline">
-          <mat-label>Fecha de Vencimiento</mat-label>
-          <input matInput [matDatepicker]="vencidoPicker" formControlName="fecha_vencido" required>
-          <mat-datepicker-toggle matSuffix [for]="vencidoPicker"></mat-datepicker-toggle>
-          <mat-datepicker #vencidoPicker></mat-datepicker>
-          <mat-error *ngIf="contratoForm.get('fecha_vencido')?.hasError('required')">
-            La fecha de vencimiento es requerida
-          </mat-error>
-        </mat-form-field>
-      </div>
-  
-      <!-- Valores monetarios -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <mat-form-field appearance="outline">
-          <mat-label>Valor CUP</mat-label>
-          <input matInput type="number" formControlName="valor_cup" required>
-          <mat-error *ngIf="contratoForm.get('valor_cup')?.hasError('required')">
-            El valor CUP es requerido
-          </mat-error>
-          <mat-error *ngIf="contratoForm.get('valor_cup')?.hasError('min')">
-            El valor debe ser mayor o igual a 0
-          </mat-error>
-        </mat-form-field>
-  
-        <mat-form-field appearance="outline">
-          <mat-label>Monto Vencimiento CUP</mat-label>
-          <input matInput type="number" formControlName="monto_vencimiento_cup" required>
-          <mat-error *ngIf="contratoForm.get('monto_vencimiento_cup')?.hasError('required')">
-            El monto vencimiento CUP es requerido
-          </mat-error>
-          <mat-error *ngIf="contratoForm.get('monto_vencimiento_cup')?.hasError('min')">
-            El monto debe ser mayor o igual a 0
-          </mat-error>
-        </mat-form-field>
-  
-        <mat-form-field appearance="outline">
-          <mat-label>Monto Vencimiento CL</mat-label>
-          <input matInput type="number" formControlName="monto_vencimiento_cl" required>
-          <mat-error *ngIf="contratoForm.get('monto_vencimiento_cl')?.hasError('required')">
-            El monto vencimiento CL es requerido
-          </mat-error>
-          <mat-error *ngIf="contratoForm.get('monto_vencimiento_cl')?.hasError('min')">
-            El monto debe ser mayor o igual a 0
-          </mat-error>
-        </mat-form-field>
-      </div>
-  
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <mat-form-field appearance="outline">
-          <mat-label>Valor USD</mat-label>
-          <input matInput type="number" formControlName="valor_usd" required>
-          <mat-error *ngIf="contratoForm.get('valor_usd')?.hasError('required')">
-            El valor USD es requerido
-          </mat-error>
-          <mat-error *ngIf="contratoForm.get('valor_usd')?.hasError('min')">
-            El valor debe ser mayor o igual a 0
-          </mat-error>
-        </mat-form-field>
-  
-        <mat-form-field appearance="outline">
-          <mat-label>Monto Vencimiento USD</mat-label>
-          <input matInput type="number" formControlName="monto_vencimiento_usd" required>
-          <mat-error *ngIf="contratoForm.get('monto_vencimiento_usd')?.hasError('required')">
-            El monto vencimiento USD es requerido
-          </mat-error>
-          <mat-error *ngIf="contratoForm.get('monto_vencimiento_usd')?.hasError('min')">
-            El monto debe ser mayor o igual a 0
-          </mat-error>
-        </mat-form-field>
-      </div>
-  
-      <!-- Valor Monto Restante -->
-      <mat-form-field appearance="outline">
-        <mat-label>Valor Monto Restante</mat-label>
-        <input matInput type="number" formControlName="valor_monto_restante" required>
-        <mat-error *ngIf="contratoForm.get('valor_monto_restante')?.hasError('required')">
-          El valor monto restante es requerido
-        </mat-error>
-        <mat-error *ngIf="contratoForm.get('valor_monto_restante')?.hasError('min')">
-          El valor debe ser mayor o igual a 0
-        </mat-error>
-      </mat-form-field>
-  
-      <!-- Departamento y Objeto -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="flex items-center gap-2">
-          <mat-form-field appearance="outline" class="flex-grow">
-            <mat-label>Departamento</mat-label>
-            <mat-select formControlName="departamento_id" required>
-              <mat-option *ngFor="let depto of departamentos" [value]="depto.id">
-                {{ depto.nombre }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="contratoForm.get('departamento_id')?.hasError('required')">
-              El departamento es requerido
-            </mat-error>
-          </mat-form-field>
-          <button type="button" 
-                  mat-icon-button 
-                  color="primary"
-                  class="!w-10 !h-10 !min-w-10 -mt-3"
-                  (click)="openNewDepartamentoDialog()">
-            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:plus'"></mat-icon>
-          </button>
-        </div>
-  
-        <mat-form-field appearance="outline">
-          <mat-label>Objeto (Descripción)</mat-label>
-          <textarea matInput formControlName="objeto" rows="3"></textarea>
-        </mat-form-field>
-      </div>
-  
-      <!-- Observaciones -->
-      <mat-form-field appearance="outline">
-        <mat-label>Observaciones</mat-label>
-        <textarea matInput formControlName="observaciones" rows="3"></textarea>
-      </mat-form-field>
-  
-      <!-- Entidad -->
-      <mat-form-field appearance="outline">
-        <mat-label>Entidades (separadas por comas)</mat-label>
-        <input matInput formControlName="entidad" placeholder="Entidad1, Entidad2">
-        <mat-hint>Ingrese entidades separadas por comas</mat-hint>
-      </mat-form-field>
-  
-      <!-- Comité de Contratación -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <mat-form-field appearance="outline">
-          <mat-label>No. Contrato Contratación</mat-label>
-          <input matInput type="number" formControlName="no_contrato_contratacion" required>
-          <mat-error *ngIf="contratoForm.get('no_contrato_contratacion')?.hasError('required')">
-            El número de contrato contratación es requerido
-          </mat-error>
-          <mat-error *ngIf="contratoForm.get('no_contrato_contratacion')?.hasError('min')">
-            El número debe ser mayor a 0
-          </mat-error>
-        </mat-form-field>
-  
-        <mat-form-field appearance="outline">
-          <mat-label>No. Comité Contratación</mat-label>
-          <input matInput type="number" formControlName="no_comite_contratacion" required>
-          <mat-error *ngIf="contratoForm.get('no_comite_contratacion')?.hasError('required')">
-            El número de comité es requerido
-          </mat-error>
-          <mat-error *ngIf="contratoForm.get('no_comite_contratacion')?.hasError('min')">
-            El número debe ser mayor a 0
-          </mat-error>
-        </mat-form-field>
-      </div>
-  
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <mat-form-field appearance="outline">
-          <mat-label>Fecha Comité Contratación</mat-label>
-          <input matInput [matDatepicker]="comiteContratacionPicker" formControlName="fecha_comite_contratacion" required>
-          <mat-datepicker-toggle matSuffix [for]="comiteContratacionPicker"></mat-datepicker-toggle>
-          <mat-datepicker #comiteContratacionPicker></mat-datepicker>
-          <mat-error *ngIf="contratoForm.get('fecha_comite_contratacion')?.hasError('required')">
-            La fecha del comité es requerida
-          </mat-error>
-        </mat-form-field>
-  
-        <mat-form-field appearance="outline">
-          <mat-label>No. Acuerdo Comité Contratación</mat-label>
-          <input matInput type="number" formControlName="no_acuerdo_comite_contratacion" required>
-          <mat-error *ngIf="contratoForm.get('no_acuerdo_comite_contratacion')?.hasError('required')">
-            El número de acuerdo es requerido
-          </mat-error>
-          <mat-error *ngIf="contratoForm.get('no_acuerdo_comite_contratacion')?.hasError('min')">
-            El número debe ser mayor a 0
-          </mat-error>
-        </mat-form-field>
-      </div>
-  
-      <mat-form-field appearance="outline">
-        <mat-label>Fecha Acuerdo Comité Contratación</mat-label>
-        <input matInput [matDatepicker]="acuerdoContratacionPicker" formControlName="fecha_acuerdo_comite_contratacion" required>
-        <mat-datepicker-toggle matSuffix [for]="acuerdoContratacionPicker"></mat-datepicker-toggle>
-        <mat-datepicker #acuerdoContratacionPicker></mat-datepicker>
-        <mat-error *ngIf="contratoForm.get('fecha_acuerdo_comite_contratacion')?.hasError('required')">
-          La fecha del acuerdo es requerida
-        </mat-error>
-      </mat-form-field>
-  
-      <!-- Comité de Administración -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <mat-form-field appearance="outline">
-          <mat-label>No. Comité Administración</mat-label>
-          <input matInput type="number" formControlName="no_comite_administracion">
-          <mat-error *ngIf="contratoForm.get('no_comite_administracion')?.hasError('min')">
-            El número debe ser mayor a 0
-          </mat-error>
-        </mat-form-field>
-  
-        <mat-form-field appearance="outline">
-          <mat-label>Fecha Comité Administración</mat-label>
-          <input matInput [matDatepicker]="comiteAdminPicker" formControlName="fecha_comite_administracion">
-          <mat-datepicker-toggle matSuffix [for]="comiteAdminPicker"></mat-datepicker-toggle>
-          <mat-datepicker #comiteAdminPicker></mat-datepicker>
-        </mat-form-field>
-      </div>
-  
-      <mat-form-field appearance="outline">
-        <mat-label>No. Acuerdo Comité Administración</mat-label>
-        <input matInput type="number" formControlName="no_acuerdo_comite_administracion">
-        <mat-error *ngIf="contratoForm.get('no_acuerdo_comite_administracion')?.hasError('min')">
-          El número debe ser mayor a 0
-        </mat-error>
-      </mat-form-field>
-  
-      <div class="flex justify-end gap-4 mt-4">
-        <button mat-button type="button" (click)="onCancel()">Cancelar</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="!contratoForm.valid">Crear Contrato</button>
-      </div>
-    </form>
+<div class="contrato-form-container">
+  <h2>{{ isEditMode ? 'Editar Contrato' : 'Crear Contrato' }}</h2>
+
+  <!-- Loading Spinner -->
+  <mat-spinner *ngIf="isLoading" diameter="50" style="margin: 20px auto;"></mat-spinner>
+
+  <!-- Debug Information -->
+  <div *ngIf="!isLoading" class="debug-info">
+    <p>Proveedores cargados: {{ proveedores.length }}</p>
+    <p>Departamentos cargados: {{ departamentos.length }}</p>
+    <p>Tipos de contrato cargados: {{ tiposContrato.length }}</p>
   </div>
+
+  <form [formGroup]="contratoForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+    <mat-form-field appearance="outline">
+      <mat-label>Número de Contrato</mat-label>
+      <input matInput type="number" formControlName="no_contrato" required>
+      <mat-error *ngIf="contratoForm.get('no_contrato')?.hasError('required')">
+        El número de contrato es obligatorio.
+      </mat-error>
+      <mat-error *ngIf="contratoForm.get('no_contrato')?.hasError('min')">
+        El número debe ser mayor a 0.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Observaciones</mat-label>
+      <textarea matInput formControlName="observaciones" required></textarea>
+      <mat-error *ngIf="contratoForm.get('observaciones')?.hasError('required')">
+        Las observaciones son obligatorias.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Valor CUP</mat-label>
+      <input matInput type="number" formControlName="valor_cup" required>
+      <mat-error *ngIf="contratoForm.get('valor_cup')?.hasError('required')">
+        El valor CUP es obligatorio.
+      </mat-error>
+      <mat-error *ngIf="contratoForm.get('valor_cup')?.hasError('min')">
+        El valor debe ser mayor o igual a 0.
+      </mat-error>
+    </mat-form-field>
+
+   <!-- Replace the date input fields with these improved versions -->
+<mat-form-field appearance="outline">
+  <mat-label>Fecha de Entrada</mat-label>
+  <input matInput [matDatepicker]="pickerEntrada" formControlName="fecha_entrada" required>
+  <mat-datepicker-toggle matSuffix [for]="pickerEntrada"></mat-datepicker-toggle>
+  <mat-datepicker #pickerEntrada></mat-datepicker>
+  <mat-error *ngIf="contratoForm.get('fecha_entrada')?.hasError('required')">
+    La fecha de entrada es obligatoria.
+  </mat-error>
+</mat-form-field>
+
+<mat-form-field appearance="outline">
+  <mat-label>Fecha Vencido</mat-label>
+  <input matInput [matDatepicker]="pickerVencido" formControlName="fecha_vencido" required>
+  <mat-datepicker-toggle matSuffix [for]="pickerVencido"></mat-datepicker-toggle>
+  <mat-datepicker #pickerVencido></mat-datepicker>
+  <mat-error *ngIf="contratoForm.get('fecha_vencido')?.hasError('required')">
+    La fecha vencido es obligatoria.
+  </mat-error>
+</mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Proveedor</mat-label>
+      <mat-select formControlName="proveedor_id" required>
+        <mat-option *ngFor="let proveedor of proveedores" [value]="proveedor.id">
+          {{ proveedor.nombre || 'Sin nombre' }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="contratoForm.get('proveedor_id')?.hasError('required')">
+        El proveedor es obligatorio.
+      </mat-error>
+      <mat-error *ngIf="contratoForm.get('proveedor_id')?.hasError('min')">
+        Seleccione un proveedor válido.
+      </mat-error>
+      <button mat-icon-button matSuffix (click)="openNewProveedorDialog()" type="button">
+        <mat-icon>add</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo de Contrato</mat-label>
+      <mat-select formControlName="tipo_contrato_id" required>
+        <mat-option *ngFor="let tipo of tiposContrato" [value]="tipo.id">
+          {{ tipo.nombre_tipo_contrato || 'Sin nombre' }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="contratoForm.get('tipo_contrato_id')?.hasError('required')">
+        El tipo de contrato es obligatorio.
+      </mat-error>
+      <mat-error *ngIf="contratoForm.get('tipo_contrato_id')?.hasError('min')">
+        Seleccione un tipo de contrato válido.
+      </mat-error>
+      <button mat-icon-button matSuffix (click)="openNewTipoContratoDialog()" type="button">
+        <mat-icon>add</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Departamento</mat-label>
+      <mat-select formControlName="departamento_id" required>
+        <mat-option *ngFor="let departamento of departamentos" [value]="departamento.id">
+          {{ departamento.nombre|| 'Sin nombre' }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="contratoForm.get('departamento_id')?.hasError('required')">
+        El departamento es obligatorio.
+      </mat-error>
+      <mat-error *ngIf="contratoForm.get('departamento_id')?.hasError('min')">
+        Seleccione un departamento válido.
+      </mat-error>
+      <button mat-icon-button matSuffix (click)="openNewDepartamentoDialog()" type="button">
+        <mat-icon>add</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select formControlName="estado" required>
+        <mat-option value="activo">Activo</mat-option>
+        <mat-option value="inactivo">Inactivo</mat-option>
+      </mat-select>
+      <mat-error *ngIf="contratoForm.get('estado')?.hasError('required')">
+        El estado es obligatorio.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Optional Fields -->
+    <mat-form-field appearance="outline">
+      <mat-label>Vigencia</mat-label>
+      <mat-select formControlName="vigencia_id">
+        <mat-option *ngFor="let vigencia of vigenciasContrato" [value]="vigencia.id">
+          {{ vigencia.vigencia }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="contratoForm.get('vigencia_id')?.hasError('min')">
+        Seleccione una vigencia válida.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha Firmado</mat-label>
+      <input matInput [matDatepicker]="pickerFirmado" formControlName="fecha_firmado" >
+      <mat-datepicker-toggle matSuffix [for]="pickerFirmado"></mat-datepicker-toggle>
+      <mat-datepicker #pickerFirmado></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Monto Vencimiento CUP</mat-label>
+      <input matInput type="number" formControlName="monto_vencimiento_cup">
+      <mat-error *ngIf="contratoForm.get('monto_vencimiento_cup')?.hasError('min')">
+        El monto debe ser mayor o igual a 0.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Monto Vencimiento CL</mat-label>
+      <input matInput type="number" formControlName="monto_vencimiento_cl">
+      <mat-error *ngIf="contratoForm.get('monto_vencimiento_cl')?.hasError('min')">
+        El monto debe ser mayor o igual a 0.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Valor USD</mat-label>
+      <input matInput type="number" formControlName="valor_usd">
+      <mat-error *ngIf="contratoForm.get('valor_usd')?.hasError('min')">
+        El valor debe ser mayor o igual a 0.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Monto Vencimiento USD</mat-label>
+      <input matInput type="number" formControlName="monto_vencimiento_usd">
+      <mat-error *ngIf="contratoForm.get('monto_vencimiento_usd')?.hasError('min')">
+        El monto debe ser mayor o igual a 0.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Valor Monto Restante</mat-label>
+      <input matInput type="number" formControlName="valor_monto_restante">
+      <mat-error *ngIf="contratoForm.get('valor_monto_restante')?.hasError('min')">
+        El valor debe ser mayor o igual a 0.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>No. Contrato Contratación</mat-label>
+      <input matInput type="number" formControlName="no_contrato_contratacion">
+      <mat-error *ngIf="contratoForm.get('no_contrato_contratacion')?.hasError('min')">
+        El número debe ser mayor a 0.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>No. Comité Contratación</mat-label>
+      <input matInput type="number" formControlName="no_comite_contratacion">
+      <mat-error *ngIf="contratoForm.get('no_comite_contratacion')?.hasError('min')">
+        El número debe ser mayor a 0.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha Comité Contratación</mat-label>
+      <input matInput [matDatepicker]="pickerComiteContratacion" formControlName="fecha_comite_contratacion" (dateChange)="console.log('Fecha comité contratación selected:', $event.value)">
+      <mat-datepicker-toggle matSuffix [for]="pickerComiteContratacion"></mat-datepicker-toggle>
+      <mat-datepicker #pickerComiteContratacion></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>No. Acuerdo Comité Contratación</mat-label>
+      <input matInput type="number" formControlName="no_acuerdo_comite_contratacion">
+      <mat-error *ngIf="contratoForm.get('no_acuerdo_comite_contratacion')?.hasError('min')">
+        El número debe ser mayor a 0.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha Comité Administración</mat-label>
+      <input matInput [matDatepicker]="pickerComiteAdmin" formControlName="fecha_comite_administracion" (dateChange)="console.log('Fecha comité administración selected:', $event.value)">
+      <mat-datepicker-toggle matSuffix [for]="pickerComiteAdmin"></mat-datepicker-toggle>
+      <mat-datepicker #pickerComiteAdmin></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>No. Comité Administración</mat-label>
+      <input matInput type="number" formControlName="no_comite_administracion">
+      <mat-error *ngIf="contratoForm.get('no_comite_administracion')?.hasError('min')">
+        El número debe ser mayor a 0.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>No. Acuerdo Comité Administración</mat-label>
+      <input matInput type="number" formControlName="no_acuerdo_comite_administracion">
+      <mat-error *ngIf="contratoForm.get('no_acuerdo_comite_administracion')?.hasError('min')">
+        El número debe ser mayor a 0.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Entidad</mat-label>
+      <input matInput formControlName="entidad">
+    </mat-form-field>
+
+    <div class="form-actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="isLoading || proveedores.length === 0 || departamentos.length === 0 || tiposContrato.length === 0">
+        {{ isLoading ? 'Guardando...' : (isEditMode ? 'Actualizar' : 'Crear') }}
+      </button>
+      <button mat-raised-button color="warn" type="button" (click)="onCancel()" [disabled]="isLoading">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>
