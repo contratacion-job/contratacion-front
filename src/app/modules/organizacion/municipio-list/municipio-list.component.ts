@@ -44,7 +44,7 @@ export class DepartamentoComponent implements OnInit, AfterViewInit {
   
   // Configuración de columnas
   columnSettings = [
-    { key: 'nombre_departamento', label: 'Nombre', visible: true, tooltip: 'Nombre del departamento' },
+    { key: 'nombre', label: 'Nombre', visible: true, tooltip: 'Nombre del departamento' },
     { key: 'codigo', label: 'Código', visible: true, tooltip: 'Código del departamento' },
     { key: 'descripcion', label: 'Descripción', visible: true, tooltip: 'Descripción del departamento' },
     { key: 'director', label: 'Director', visible: false, tooltip: 'Director del departamento' },
@@ -75,8 +75,7 @@ export class DepartamentoComponent implements OnInit, AfterViewInit {
     private dialog: MatDialog
   ) {
     this.selectedRowForm = new FormGroup({
-      id: new FormControl(''),
-      nombre_departamento: new FormControl(''),
+      nombre: new FormControl(''),
       codigo: new FormControl(''),
       descripcion: new FormControl(''),
       director: new FormControl(''),
@@ -170,7 +169,7 @@ export class DepartamentoComponent implements OnInit, AfterViewInit {
     if (!this.selectedRow) return false;
     
     const selectedId = this.selectedRow.id || this.selectedRow.nombre;
-    const elementId = element.id || element.nombre_departamento;
+    const elementId = element.id || element.nombre;
     
     return selectedId === elementId;
   }
@@ -178,7 +177,7 @@ export class DepartamentoComponent implements OnInit, AfterViewInit {
   // Actualizar el método toggleDetails para manejar mejor los identificadores
   toggleDetails(departamento: any): void {
     // Usar nombre_departamento como identificador único si no hay id
-    const identifier = departamento.id || departamento.nombre_departamento;
+    const identifier = departamento.id || departamento.nombre;
     const currentIdentifier = this.selectedRow?.id || this.selectedRow?.nombre;
     
     if (currentIdentifier === identifier) {

@@ -1,4 +1,7 @@
-<div class="flex flex-col p-6 md:p-8 gap-4">
+<div class="flex flex-col p-6 md:p-8 gap-4 relative">
+    <button mat-icon-button class="absolute top-2 right-2" aria-label="Cerrar" (click)="onCancel()">
+        <mat-icon>close</mat-icon>
+    </button>
     <h2 class="text-3xl font-bold mb-4">Nuevo Proveedor</h2>
 
     <form [formGroup]="proveedorForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
@@ -20,90 +23,75 @@
             </mat-form-field>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
             <mat-form-field appearance="outline">
-                <mat-label>Teléfonos</mat-label>
-                <input matInput formControlName="telefonos" required>
-                <mat-error *ngIf="proveedorForm.get('telefonos')?.hasError('required')">
-                    Los teléfonos son requeridos
-                </mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-                <mat-label>Domicilio</mat-label>
-                <input matInput formControlName="domicilio" required>
-                <mat-error *ngIf="proveedorForm.get('domicilio')?.hasError('required')">
-                    El domicilio es requerido
-                </mat-error>
+                <mat-label>NIT</mat-label>
+                <input matInput formControlName="nit">
             </mat-form-field>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <mat-form-field appearance="outline">
-                <mat-label>Municipio</mat-label>
-                <mat-select formControlName="municipio" required>
-                    <mat-option *ngFor="let mun of municipios" [value]="mun">
-                        {{mun.nombre_municipio}}
-                    </mat-option>
-                </mat-select>
-                <mat-error *ngIf="proveedorForm.get('municipio')?.hasError('required')">
-                    El municipio es requerido
+                <mat-label>Teléfono</mat-label>
+                <input matInput formControlName="telefono" required>
+                <mat-error *ngIf="proveedorForm.get('telefono')?.hasError('required')">
+                    El teléfono es requerido
+                </mat-error>
+                <mat-error *ngIf="proveedorForm.get('telefono')?.hasError('telefonoInvalid')">
+                    El teléfono debe comenzar con +53
                 </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-                <mat-label>Ministerio</mat-label>
-                <mat-select formControlName="ministerio" required>
-                    <mat-option *ngFor="let min of ministerios" [value]="min">
-                        {{min.nombre_ministerio}}
-                    </mat-option>
-                </mat-select>
-                <mat-error *ngIf="proveedorForm.get('ministerio')?.hasError('required')">
-                    El ministerio es requerido
+                <mat-label>Dirección</mat-label>
+                <input matInput formControlName="direccion" required>
+                <mat-error *ngIf="proveedorForm.get('direccion')?.hasError('required')">
+                    La dirección es requerida
                 </mat-error>
             </mat-form-field>
         </div>
 
-        <!-- Representatives Section -->
-        <div class="col-span-full mt-4">
-            <div class="flex items-center justify-between mb-2">
-                <h3 class="text-lg font-medium">Representantes</h3>
-                <button mat-icon-button color="primary" type="button" (click)="addRepresentante()" matTooltip="Agregar representante">
-                    <mat-icon>add_circle</mat-icon>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Tipo Empresa</mat-label>
+                <mat-select formControlName="tipo_empresa" required>
+                    <mat-option *ngFor="let tipo of tiposEmpresa" [value]="tipo.nombre">
+                        {{ tipo.nombre }}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="proveedorForm.get('tipo_empresa')?.hasError('required')">
+                    El tipo de empresa es requerido
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" required>
+                <mat-error *ngIf="proveedorForm.get('email')?.hasError('required')">
+                    El email es requerido
+                </mat-error>
+                <mat-error *ngIf="proveedorForm.get('email')?.hasError('email')">
+                    Ingrese un email válido
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Representante Legal</mat-label>
+                <mat-select formControlName="representante_legal" required>
+                    <mat-option *ngFor="let rep of representantes" [value]="rep.id">
+                        {{ rep.nombre }} - {{ rep.cargo }}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="proveedorForm.get('representante_legal')?.hasError('required')">
+                    El representante legal es requerido
+                </mat-error>
+            </mat-form-field>
+            <div class="flex items-center gap-2 mt-6">
+                <button mat-stroked-button color="primary" type="button" (click)="openAddRepresentanteDialog()">
+                    Agregar Nuevo Representante
                 </button>
-            </div>
-
-            <div formArrayName="representantes" class="space-y-4">
-                <div *ngFor="let rep of representantesArray.controls; let i = index" [formGroupName]="i" class="p-4 border rounded-lg">
-                    <div class="flex justify-between items-center mb-2">
-                        <h4 class="text-md font-medium">Representante {{ i + 1 }}</h4>
-                        <button mat-icon-button color="warn" type="button" (click)="removeRepresentante(i)" matTooltip="Eliminar">
-                            <mat-icon>delete</mat-icon>
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <mat-form-field appearance="outline">
-                            <mat-label>Nombre</mat-label>
-                            <input matInput formControlName="nombre" required>
-                            <mat-error>El nombre es requerido</mat-error>
-                        </mat-form-field>
-                        <mat-form-field appearance="outline">
-                            <mat-label>Cargo</mat-label>
-                            <input matInput formControlName="cargo" required>
-                            <mat-error>El cargo es requerido</mat-error>
-                        </mat-form-field>
-                        <mat-form-field appearance="outline">
-                            <mat-label>Teléfono</mat-label>
-                            <input matInput formControlName="telefono" required>
-                            <mat-error>El teléfono es requerido</mat-error>
-                        </mat-form-field>
-                        <mat-form-field appearance="outline">
-                            <mat-label>Email</mat-label>
-                            <input matInput type="email" formControlName="email" required>
-                            <mat-error>Ingrese un email válido</mat-error>
-                        </mat-form-field>
-                    </div>
-                </div>
             </div>
         </div>
 

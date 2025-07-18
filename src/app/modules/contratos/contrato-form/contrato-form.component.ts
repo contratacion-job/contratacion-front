@@ -85,17 +85,20 @@ export class ContratoFormComponent implements OnInit {
     public dialogRef: MatDialogRef<ContratoFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { contrato?: Contrato }
   ) {
+    const today = new Date();
     this.contratoForm = this.fb.group({
       no_contrato: [null, [Validators.required, Validators.min(1)]],
-      observaciones: ['', Validators.required],
-      valor_cup: [0, [Validators.required, Validators.min(0)]],
-      fecha_entrada: [null, Validators.required],
-      fecha_vencido: [null, Validators.required],
+      observaciones: [''], // made optional
+      valor: [0, [Validators.required, Validators.min(0)]], // renamed from valor_cup
+      remanente: [0, [Validators.required, Validators.min(0)]], // new required field
+      monto: [0, [Validators.required, Validators.min(0)]], // new required field
+      fecha_inicio: [today, Validators.required],
+      fecha_fin: [null, Validators.required],
       proveedor_id: [null, [Validators.required, Validators.min(1)]],
       tipo_contrato_id: [null, [Validators.required, Validators.min(1)]],
       departamento_id: [null, [Validators.required, Validators.min(1)]],
-      estado: ['activo', Validators.required],
-      vigencia_id: [null, [Validators.min(1)]],
+      estado: ['vigente', Validators.required],
+      vigencia_id: [null, [Validators.required, Validators.min(1)]],
       fecha_firmado: [null],
       monto_vencimiento_cup: [0, [Validators.min(0)]],
       monto_vencimiento_cl: [0, [Validators.min(0)]],
@@ -110,12 +113,21 @@ export class ContratoFormComponent implements OnInit {
       no_comite_administracion: [null, [Validators.min(1)]],
       no_acuerdo_comite_administracion: [null, [Validators.min(1)]],
       entidad: ['']
-    });
+    }, { validators: this.validateFechaFinAfterFechaInicioValidator.bind(this) });
+  }
 
-    if (data?.contrato) {
-      this.isEditMode = true;
-      this.populateForm(data.contrato);
+  validateFechaVencidoAfterFechaEntrada(group: FormGroup) {
+    const fechaEntrada = group.get('fecha_entrada')?.value;
+    const fechaVencido = group.get('fecha_vencido')?.value;
+    if (fechaEntrada && fechaVencido) {
+      const fechaEntradaDate = new Date(fechaEntrada);
+      const fechaVencidoDate = new Date(fechaVencido);
+      if (fechaVencidoDate <= fechaEntradaDate) {
+        return { fechaVencidoBeforeFechaEntrada: true };
+      }
     }
+    return null;
+  
   }
 
   ngOnInit(): void {
@@ -125,11 +137,13 @@ export class ContratoFormComponent implements OnInit {
     // Debug form control changes
     this.contratoForm.get('fecha_entrada')?.valueChanges.subscribe(value => {
       console.log('Fecha entrada changed:', value);
+      // Update min date for fecha_vencido picker if needed
+      this.contratoForm.get('fecha_vencido')?.updateValueAndValidity();
     });
     this.contratoForm.get('fecha_vencido')?.valueChanges.subscribe(value => {
       console.log('Fecha vencido changed:', value);
     });
-    
+
   }
 
 
@@ -209,143 +223,153 @@ export class ContratoFormComponent implements OnInit {
       }
     });
   }
+private formatDateForAPI(date: Date | string | null | undefined): string | null {
+  if (!date) {
+    console.warn('Date is null or undefined');
+    return null;
+  }
 
-  private formatDateForAPI(date: Date | string | null | undefined): string | null {
-    if (!date) {
-      console.warn('Date is null or undefined');
+  let parsedDate: Date;
+
+  if (typeof date === 'string') {
+    parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      console.warn(`Invalid date string: ${date}`);
       return null;
     }
-    if (typeof date === 'string') {
-      const parsed = new Date(date);
-      if (isNaN(parsed.getTime())) {
-        console.warn(`Invalid date string: ${date}`);
-        return null;
-      }
-      return parsed.toISOString().split('T')[0];
-    }
-    if (date instanceof Date && !isNaN(date.getTime())) {
-      return date.toISOString().split('T')[0];
-    }
+  } else if (date instanceof Date && !isNaN(date.getTime())) {
+    parsedDate = date;
+  } else {
     console.warn(`Invalid date object: ${date}`);
     return null;
   }
 
+  return parsedDate.toISOString().split('T')[0];
+}
+
+private populateForm(contrato: Contrato): void {
+  const parseDate = (date: any): string | null => {
+    if (!date) return null;
+    const d = new Date(date);
+    if (isNaN(d.getTime())) {
+      console.warn(`Invalid date in populateForm: ${date}`);
+      return null;
+    }
+    return d.toISOString().split('T')[0];
+  };
+
+  this.contratoForm.patchValue({
+    no_contrato: contrato.no_contrato,
+    observaciones: contrato.observaciones,
+    valor_cup: contrato.valor_cup,
+    fecha_entrada: parseDate(contrato.fecha_entrada),
+    fecha_vencido: parseDate(contrato.fecha_vencido),
+    proveedor_id: contrato.proveedor_id,
+    tipo_contrato_id: contrato.tipo_contrato_id,
+    departamento_id: contrato.departamento_id,
+    estado: contrato.estado,
+    vigencia_id: contrato.vigencia_id,
+    fecha_firmado: parseDate(contrato.fecha_firmado),
+    monto_vencimiento_cup: contrato.monto_vencimiento_cup,
+    monto_vencimiento_cl: contrato.monto_vencimiento_cl,
+    valor_usd: contrato.valor_usd,
+    monto_vencimiento_usd: contrato.monto_vencimiento_usd,
+    valor_monto_restante: contrato.valor_monto_restante,
+    no_contrato_contratacion: contrato.no_contrato_contratacion,
+    no_comite_contratacion: contrato.no_comite_contratacion,
+    fecha_comite_contratacion: parseDate(contrato.fecha_comite_contratacion),
+    no_acuerdo_comite_contratacion: contrato.no_acuerdo_comite_contratacion,
+    fecha_comite_administracion: parseDate(contrato.fecha_comite_administracion),
+    no_comite_administracion: contrato.no_comite_administracion,
+    no_acuerdo_comite_administracion: contrato.no_acuerdo_comite_administracion,
+    entidad: contrato.entidad?.join(', ') || '',
+  });
+}
+
   onSubmit(): void {
+    console.log('Raw form values:', this.contratoForm.getRawValue());
     if (this.contratoForm.invalid) {
-      this.contratoForm.markAllAsTouched();
       console.log('Form errors:', this.contratoForm.errors);
-      console.log('Fecha entrada value:', this.contratoForm.get('fecha_entrada')?.value);
-      console.log('Fecha vencido value:', this.contratoForm.get('fecha_vencido')?.value);
+      Object.keys(this.contratoForm.controls).forEach(key => {
+        const control = this.contratoForm.get(key);
+        if (control?.invalid) {
+          console.log(`Field ${key} errors:`, control.errors);
+        }
+      });
       this.snackBar.open('Por favor, complete todos los campos requeridos.', 'Cerrar', { duration: 3000 });
       return;
     }
 
-    const formValue = this.contratoForm.value;
-    const entidadArray = formValue.entidad
-      ? formValue.entidad.split(',').map((e: string) => e.trim()).filter((e: string) => e)
-      : [];
+    this.isLoading = true;
 
-    const contrato: Contrato = {
-      id: this.isEditMode ? this.data.contrato?.id : undefined,
-      no_contrato: parseInt(formValue.no_contrato, 10),
+    const formValue = this.contratoForm.value;
+
+    // Prepare contract data object
+    const contratoData = {
+      no_contrato: formValue.no_contrato,
       observaciones: formValue.observaciones,
-      valor_cup: parseFloat(formValue.valor_cup),
+      valor_cup: formValue.valor_cup,
       fecha_entrada: this.formatDateForAPI(formValue.fecha_entrada),
       fecha_vencido: this.formatDateForAPI(formValue.fecha_vencido),
-      proveedor_id: parseInt(formValue.proveedor_id, 10),
-      tipo_contrato_id: parseInt(formValue.tipo_contrato_id, 10),
-      departamento_id: parseInt(formValue.departamento_id, 10),
+      proveedor_id: formValue.proveedor_id,
+      tipo_contrato_id: formValue.tipo_contrato_id,
+      departamento_id: formValue.departamento_id,
       estado: formValue.estado,
-      vigencia_id: formValue.vigencia_id ? parseInt(formValue.vigencia_id, 10) : 0,
+      vigencia_id: formValue.vigencia_id,
       fecha_firmado: this.formatDateForAPI(formValue.fecha_firmado),
-      monto_vencimiento_cup: parseFloat(formValue.monto_vencimiento_cup || 0),
-      monto_vencimiento_cl: parseFloat(formValue.monto_vencimiento_cl || 0),
-      valor_usd: parseFloat(formValue.valor_usd || 0),
-      monto_vencimiento_usd: parseFloat(formValue.monto_vencimiento_usd || 0),
-      valor_monto_restante: parseFloat(formValue.valor_monto_restante || 0),
-      no_contrato_contratacion: formValue.no_contrato_contratacion ? parseInt(formValue.no_contrato_contratacion, 10) : 0,
-      no_comite_contratacion: formValue.no_comite_contratacion ? parseInt(formValue.no_comite_contratacion, 10) : 0,
+      monto_vencimiento_cup: formValue.monto_vencimiento_cup,
+      monto_vencimiento_cl: formValue.monto_vencimiento_cl,
+      valor_usd: formValue.valor_usd,
+      monto_vencimiento_usd: formValue.monto_vencimiento_usd,
+      valor_monto_restante: formValue.valor_monto_restante,
+      no_contrato_contratacion: formValue.no_contrato_contratacion,
+      no_comite_contratacion: formValue.no_comite_contratacion,
       fecha_comite_contratacion: this.formatDateForAPI(formValue.fecha_comite_contratacion),
-      no_acuerdo_comite_contratacion: formValue.no_acuerdo_comite_contratacion ? parseInt(formValue.no_acuerdo_comite_contratacion, 10) : 0,
+      no_acuerdo_comite_contratacion: formValue.no_acuerdo_comite_contratacion,
       fecha_comite_administracion: this.formatDateForAPI(formValue.fecha_comite_administracion),
-      no_comite_administracion: formValue.no_comite_administracion ? parseInt(formValue.no_comite_administracion, 10) : undefined,
-      no_acuerdo_comite_administracion: formValue.no_acuerdo_comite_administracion ? parseInt(formValue.no_acuerdo_comite_administracion, 10) : undefined,
-      entidad: entidadArray,
-      vigencia: this.vigenciasContrato.find(v => v.id === parseInt(formValue.vigencia_id, 10)) || { id: 0, vigencia: '' },
-      proveedor: this.proveedores.find(p => p.id === parseInt(formValue.proveedor_id, 10)) || {
-        id: 0,
-        municipio_id: 0,
-        ministerio_id: 0,
-        nombre: '',
-        codigo: '',
-        telefonos: '',
-        domicilio: '',
-        municipio: '',
-        ministerio: '',
-        fechaCreacion: '',
-        estado: ''
-      },
-      tipo_contrato: this.tiposContrato.find(t => t.id === parseInt(formValue.tipo_contrato_id, 10)) || {
-        id: 0,
-        nombre_tipo_contrato: '',
-        descripcion: ''
-      },
-      departamento: this.departamentos.find(d => d.id === parseInt(formValue.departamento_id, 10)) || {
-        id: 0,
-        nombre: '',
-        codigo: '',
-        descripcion: ''
-      }
+      no_comite_administracion: formValue.no_comite_administracion,
+      no_acuerdo_comite_administracion: formValue.no_acuerdo_comite_administracion,
+      entidad: formValue.entidad ? formValue.entidad.split(',').map((e: string) => e.trim()) : [],
+      // Add full related objects
+      proveedor: this.proveedores.find(p => p.id === formValue.proveedor_id) || null,
+      tipo_contrato: this.tiposContrato.find(t => t.id === formValue.tipo_contrato_id) || null,
+      departamento: this.departamentos.find(d => d.id === formValue.departamento_id) || null,
+      vigencia: this.vigenciasContrato.find(v => v.id === formValue.vigencia_id) || null
     };
 
-    if (
-      isNaN(contrato.no_contrato) ||
-      isNaN(contrato.valor_cup) ||
-      isNaN(contrato.proveedor_id) ||
-      isNaN(contrato.tipo_contrato_id) ||
-      isNaN(contrato.departamento_id) ||
-      (formValue.vigencia_id && isNaN(contrato.vigencia_id)) ||
-      (formValue.no_contrato_contratacion && isNaN(contrato.no_contrato_contratacion)) ||
-      (formValue.no_comite_contratacion && isNaN(contrato.no_comite_contratacion)) ||
-      (formValue.no_acuerdo_comite_contratacion && isNaN(contrato.no_acuerdo_comite_contratacion)) ||
-      (formValue.no_comite_administracion && isNaN(contrato.no_comite_administracion)) ||
-      (formValue.no_acuerdo_comite_administracion && isNaN(contrato.no_acuerdo_comite_administracion))
-    ) {
-      this.snackBar.open('Datos numéricos inválidos.', 'Cerrar', { duration: 3000 });
-      return;
+    if (this.isEditMode && this.data?.contrato?.id) {
+      // Update existing contract
+      this.contratoService.updateContrato(this.data.contrato.id, contratoData).subscribe({
+        next: (response) => {
+          this.snackBar.open('Contrato actualizado exitosamente.', 'Cerrar', { duration: 3000 });
+          this.isLoading = false;
+          this.dialogRef.close(response);
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al actualizar el contrato:', error);
+          this.snackBar.open('Error al actualizar el contrato.', 'Cerrar', { duration: 3000 });
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
+    } else {
+      // Create new contract
+      this.contratoService.createContrato(contratoData).subscribe({
+        next: (response) => {
+          this.snackBar.open('Contrato creado exitosamente.', 'Cerrar', { duration: 3000 });
+          this.isLoading = false;
+          this.dialogRef.close(response);
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al crear el contrato:', error);
+          this.snackBar.open('Error al crear el contrato.', 'Cerrar', { duration: 3000 });
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
     }
-
-    if (!contrato.fecha_entrada || !contrato.fecha_vencido) {
-      this.snackBar.open('Fechas de entrada y vencimiento deben ser válidas.', 'Cerrar', { duration: 3000 });
-      return;
-    }
-
-    this.isLoading = true;
-    const request = this.isEditMode
-      ? this.contratoService.updateContrato(contrato.id!, contrato)
-      : this.contratoService.createContrato(contrato);
-
-    request.subscribe({
-      next: (response) => {
-        const message = this.isEditMode ? 'Contrato actualizado exitosamente.' : 'Contrato creado exitosamente.';
-        this.snackBar.open(message, 'Cerrar', { duration: 3000 });
-        this.dialogRef.close(response);
-      },
-      error: (error) => {
-        const status = error.status;
-        let message = 'Error al procesar la solicitud.';
-        if (status === 400) message = 'Error de validación en los datos.';
-        else if (status === 401) message = 'No autorizado. Por favor, inicie sesión.';
-        else if (status === 404 && this.isEditMode) message = 'Contrato no encontrado.';
-        else if (status === 500) message = 'Error interno del servidor.';
-        this.snackBar.open(message, 'Cerrar', { duration: 5000 });
-        console.error('Error processing contract:', error);
-      },
-      complete: () => {
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      }
-    });
   }
 
   openNewProveedorDialog(): void {
@@ -424,24 +448,16 @@ export class ContratoFormComponent implements OnInit {
     this.dialogRef.close();
   }
 
-private populateForm(contrato: Contrato): void {
-  // Función para convertir cualquier fecha a formato local (YYYY-MM-DD)
-  const parseDate = (date: any): string | null => {
-    if (!date) return null;
-    
-    const d = new Date(date);
-    if (isNaN(d.getTime())) return null;
-    
-    return d.toISOString().split('T')[0];
-  };
-  this.contratoForm.patchValue({
-    // ... otros campos ...
-    fecha_entrada: parseDate(contrato.fecha_entrada),
-    fecha_vencido: parseDate(contrato.fecha_vencido),
-    fecha_firmado: parseDate(contrato.fecha_firmado),
-    fecha_comite_contratacion: parseDate(contrato.fecha_comite_contratacion),
-    fecha_comite_administracion: parseDate(contrato.fecha_comite_administracion),
-    // ... otros campos ...
-  });
-}
+  validateFechaFinAfterFechaInicioValidator(group: FormGroup) {
+    const fechaInicio = group.get('fecha_inicio')?.value;
+    const fechaFin = group.get('fecha_fin')?.value;
+    if (fechaInicio && fechaFin) {
+      const fechaInicioDate = new Date(fechaInicio);
+      const fechaFinDate = new Date(fechaFin);
+      if (fechaFinDate <= fechaInicioDate) {
+        return { fechaFinBeforeFechaInicio: true };
+      }
+    }
+    return null;
+  }
 }

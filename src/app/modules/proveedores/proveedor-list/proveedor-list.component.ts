@@ -300,6 +300,7 @@ export class ProveedorListComponent implements OnInit {
       if (result) {
         this.proveedorService.createProveedor(result).subscribe({
           next: (newProveedor) => {
+            console.log(newProveedor)
             this.loadProveedores();
           },
           error: (error) => {
